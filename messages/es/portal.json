@@ -1,0 +1,82 @@
+{
+  "portal": {
+    "dashboard": {
+      "title": "Bienvenido",
+      "subtitle": "Gestiona tu apartamento y reservaciones",
+      "reserveSpace": "Reservar un Espacio",
+      "upcomingReservations": "Próximas Reservaciones",
+      "noUpcoming": "No hay reservaciones próximas",
+      "recentAnnouncements": "Anuncios Recientes",
+      "noAnnouncements": "No hay anuncios",
+      "pendingPayments": "Pagos Pendientes",
+      "apartmentInfo": "Mi Apartamento"
+    },
+    "spaces": {
+      "title": "Espacios Disponibles",
+      "browse": "Explorar Espacios",
+      "capacity": "{count} personas",
+      "hourlyRate": "{amount}/hora",
+      "deposit": "Depósito: {amount}",
+      "free": "Gratis",
+      "reserve": "Reservar Este Espacio",
+      "viewDetails": "Ver Detalles",
+      "noSpaces": "No hay espacios disponibles",
+      "availability": "Disponibilidad",
+      "rules": "Reglas"
+    },
+    "reservations": {
+      "title": "Mis Reservaciones",
+      "new": "Nueva Reservación",
+      "selectDate": "Selecciona una Fecha",
+      "selectTime": "Selecciona una Hora",
+      "startTime": "Hora de Inicio",
+      "endTime": "Hora de Fin",
+      "duration": "Duración",
+      "hours": "{count} horas",
+      "summary": "Resumen de Reservación",
+      "totalCost": "Costo Total",
+      "bankTransferInfo": "Información de Transferencia Bancaria",
+      "bankName": "Banco",
+      "accountNumber": "Número de Cuenta",
+      "accountType": "Tipo de Cuenta",
+      "accountHolder": "Titular de la Cuenta",
+      "referenceCode": "Código de Referencia",
+      "paymentDeadline": "Fecha Límite de Pago",
+      "paymentDeadlineNote": "Sube tu comprobante de pago antes del {deadline}",
+      "uploadProof": "Subir Comprobante de Pago",
+      "uploadProofDescription": "Sube una captura o foto de tu transferencia bancaria",
+      "acceptTerms": "Acepto los términos de uso de este espacio",
+      "confirmBooking": "Confirmar Reservación",
+      "bookingSuccess": "¡Reservación creada exitosamente!",
+      "bookingError": "Error al crear la reservación",
+      "cancelReservation": "Cancelar Reservación",
+      "cancelConfirm": "¿Estás seguro de que deseas cancelar esta reservación?",
+      "cancelSuccess": "Reservación cancelada",
+      "viewDetails": "Ver Detalles",
+      "downloadCalendar": "Agregar al Calendario",
+      "noReservations": "Aún no hay reservaciones",
+      "upcoming": "Próximas",
+      "past": "Pasadas",
+      "all": "Todas"
+    },
+    "reservationStatus": {
+      "pending_payment": "Pago Pendiente",
+      "payment_submitted": "Pago Enviado",
+      "confirmed": "Confirmada",
+      "cancelled": "Cancelada",
+      "completed": "Completada",
+      "rejected": "Rechazada"
+    },
+    "profile": {
+      "title": "Mi Perfil",
+      "personalInfo": "Información Personal",
+      "changePassword": "Cambiar Contraseña",
+      "currentPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "updateSuccess": "Perfil actualizado exitosamente",
+      "passwordSuccess": "Contraseña cambiada exitosamente",
+      "preferredLocale": "Idioma Preferido"
+    }
+  }
+}

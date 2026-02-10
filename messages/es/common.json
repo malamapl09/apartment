@@ -1,0 +1,102 @@
+{
+  "app": {
+    "name": "ResidenceHub",
+    "tagline": "Gestión inteligente de apartamentos"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "apartments": "Apartamentos",
+    "owners": "Propietarios",
+    "spaces": "Espacios",
+    "reservations": "Reservaciones",
+    "announcements": "Anuncios",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "portal": "Portal de Propietarios",
+    "admin": "Panel Administrativo",
+    "pendingPayments": "Pagos Pendientes"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "update": "Actualizar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "confirm": "Confirmar",
+    "reject": "Rechazar",
+    "approve": "Aprobar",
+    "close": "Cerrar",
+    "upload": "Subir",
+    "download": "Descargar",
+    "view": "Ver",
+    "invite": "Invitar"
+  },
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "pending": "Pendiente",
+    "confirmed": "Confirmado",
+    "cancelled": "Cancelado",
+    "completed": "Completado",
+    "rejected": "Rechazado",
+    "occupied": "Ocupado",
+    "vacant": "Vacante"
+  },
+  "labels": {
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "description": "Descripción",
+    "date": "Fecha",
+    "time": "Hora",
+    "from": "Desde",
+    "to": "Hasta",
+    "status": "Estado",
+    "actions": "Acciones",
+    "notes": "Notas",
+    "amount": "Monto",
+    "total": "Total",
+    "noResults": "No se encontraron resultados",
+    "loading": "Cargando...",
+    "required": "Requerido"
+  },
+  "errors": {
+    "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+    "notFound": "Página no encontrada",
+    "unauthorized": "No tienes autorización para acceder a esta página.",
+    "forbidden": "Acceso denegado.",
+    "validation": "Por favor, revisa los errores del formulario."
+  },
+  "notFound": {
+    "title": "Página No Encontrada",
+    "description": "La página que buscas no existe o ha sido movida.",
+    "goToDashboard": "Ir al Panel"
+  },
+  "confirm": {
+    "delete": "¿Estás seguro de que deseas eliminar esto? Esta acción no se puede deshacer.",
+    "cancel": "¿Estás seguro de que deseas cancelar?"
+  },
+  "pagination": {
+    "showing": "Mostrando {from} a {to} de {total}",
+    "rowsPerPage": "Filas por página",
+    "page": "Página {current} de {total}"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "en": "Inglés",
+    "es": "Español"
+  }
+}

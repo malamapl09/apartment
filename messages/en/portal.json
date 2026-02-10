@@ -1,0 +1,82 @@
+{
+  "portal": {
+    "dashboard": {
+      "title": "Welcome",
+      "subtitle": "Manage your apartment and reservations",
+      "reserveSpace": "Reserve a Space",
+      "upcomingReservations": "Upcoming Reservations",
+      "noUpcoming": "No upcoming reservations",
+      "recentAnnouncements": "Recent Announcements",
+      "noAnnouncements": "No announcements",
+      "pendingPayments": "Pending Payments",
+      "apartmentInfo": "My Apartment"
+    },
+    "spaces": {
+      "title": "Available Spaces",
+      "browse": "Browse Spaces",
+      "capacity": "{count} people",
+      "hourlyRate": "{amount}/hour",
+      "deposit": "Deposit: {amount}",
+      "free": "Free",
+      "reserve": "Reserve This Space",
+      "viewDetails": "View Details",
+      "noSpaces": "No spaces available",
+      "availability": "Availability",
+      "rules": "Rules"
+    },
+    "reservations": {
+      "title": "My Reservations",
+      "new": "New Reservation",
+      "selectDate": "Select a Date",
+      "selectTime": "Select a Time",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "duration": "Duration",
+      "hours": "{count} hours",
+      "summary": "Booking Summary",
+      "totalCost": "Total Cost",
+      "bankTransferInfo": "Bank Transfer Information",
+      "bankName": "Bank",
+      "accountNumber": "Account Number",
+      "accountType": "Account Type",
+      "accountHolder": "Account Holder",
+      "referenceCode": "Reference Code",
+      "paymentDeadline": "Payment Deadline",
+      "paymentDeadlineNote": "Upload your payment proof before {deadline}",
+      "uploadProof": "Upload Payment Proof",
+      "uploadProofDescription": "Upload a screenshot or photo of your bank transfer",
+      "acceptTerms": "I accept the terms of use for this space",
+      "confirmBooking": "Confirm Booking",
+      "bookingSuccess": "Reservation created successfully!",
+      "bookingError": "Failed to create reservation",
+      "cancelReservation": "Cancel Reservation",
+      "cancelConfirm": "Are you sure you want to cancel this reservation?",
+      "cancelSuccess": "Reservation cancelled",
+      "viewDetails": "View Details",
+      "downloadCalendar": "Add to Calendar",
+      "noReservations": "No reservations yet",
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "all": "All"
+    },
+    "reservationStatus": {
+      "pending_payment": "Pending Payment",
+      "payment_submitted": "Payment Submitted",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "profile": {
+      "title": "My Profile",
+      "personalInfo": "Personal Information",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "updateSuccess": "Profile updated successfully",
+      "passwordSuccess": "Password changed successfully",
+      "preferredLocale": "Preferred Language"
+    }
+  }
+}
