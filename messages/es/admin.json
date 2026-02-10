@@ -2,19 +2,29 @@
   "admin": {
     "dashboard": {
       "title": "Panel Administrativo",
-      "totalApartments": "Total de Apartamentos",
-      "registeredOwners": "Propietarios Registrados",
-      "upcomingReservations": "Próximas Reservaciones",
-      "pendingPayments": "Pagos Pendientes",
-      "recentActivity": "Actividad Reciente",
-      "quickActions": "Acciones Rápidas"
+      "description": "Resumen general de tu edificio",
+      "stats": {
+        "apartments": "Apartamentos",
+        "owners": "Propietarios",
+        "upcomingReservations": "Próximas Reservaciones",
+        "pendingPayments": "Pagos Pendientes"
+      },
+      "viewAll": "Ver Todo",
+      "quickActions": {
+        "title": "Acciones Rápidas",
+        "newApartment": "Nuevo Apartamento",
+        "inviteOwner": "Invitar Propietario",
+        "manageReservations": "Gestionar Reservaciones"
+      }
     },
     "apartments": {
       "title": "Apartamentos",
-      "new": "Nuevo Apartamento",
+      "description": "Administra los apartamentos del edificio",
       "newApartment": "Nuevo Apartamento",
       "newApartmentDescription": "Crear un nuevo apartamento en el edificio",
-      "edit": "Editar Apartamento",
+      "edit": "Editar",
+      "editApartment": "Editar Apartamento",
+      "editApartmentDescription": "Modificar los detalles del apartamento",
       "unitNumber": "Número de Unidad",
       "floor": "Piso",
       "area": "Área (m²)",
@@ -23,12 +33,24 @@
       "status": "Estado",
       "owners": "Propietarios",
       "noOwners": "Sin propietarios asignados",
-      "deleteConfirm": "¿Estás seguro de que deseas eliminar este apartamento?"
+      "deleteConfirm": "¿Estás seguro de que deseas eliminar este apartamento?",
+      "searchPlaceholder": "Buscar apartamentos...",
+      "linkedOwners": "Propietarios Vinculados",
+      "noOwnersLinked": "No hay propietarios vinculados",
+      "inviteOwner": "Invitar Propietario"
     },
     "owners": {
       "title": "Propietarios",
-      "invite": "Invitar Propietario",
-      "edit": "Editar Propietario",
+      "description": "Administra los propietarios del edificio",
+      "invite": "Invitar",
+      "inviteOwner": "Invitar Propietario",
+      "inviteOwnerDescription": "Invitar un nuevo propietario al edificio",
+      "ownerDetailDescription": "Detalles del propietario y apartamentos vinculados",
+      "profileInformation": "Información del Perfil",
+      "linkedApartments": "Apartamentos Vinculados",
+      "noApartmentsLinked": "No hay apartamentos vinculados",
+      "noReservationsYet": "Aún no hay reservaciones",
+      "edit": "Editar",
       "fullName": "Nombre Completo",
       "email": "Correo Electrónico",
       "phone": "Teléfono",
@@ -47,15 +69,19 @@
       "activate": "Activar",
       "linkApartment": "Vincular Apartamento",
       "unlinkApartment": "Desvincular Apartamento",
-      "reservationHistory": "Historial de Reservaciones"
+      "reservationHistory": "Historial de Reservaciones",
+      "searchPlaceholder": "Buscar propietarios..."
     },
     "spaces": {
       "title": "Espacios Comunes",
+      "description": "Administra los espacios comunes del edificio",
       "new": "Nuevo Espacio",
+      "newSpace": "Nuevo Espacio",
       "createNewSpace": "Crear Nuevo Espacio",
+      "createFirstSpace": "Crear Primer Espacio",
+      "noSpaces": "No hay espacios registrados",
       "edit": "Editar Espacio",
       "name": "Nombre del Espacio",
-      "description": "Descripción",
       "capacity": "Capacidad",
       "hourlyRate": "Tarifa por Hora",
       "deposit": "Monto del Depósito",
@@ -73,10 +99,21 @@
       "blackoutDates": "Fechas Bloqueadas",
       "rules": "Reglas y Políticas",
       "active": "Activo",
-      "inactive": "Inactivo"
+      "inactive": "Inactivo",
+      "activeSpace": "Espacio Activo",
+      "inactiveSpace": "Espacio Inactivo",
+      "deactivate": "Desactivar",
+      "activate": "Activar",
+      "details": "Detalles",
+      "schedule": "Horario",
+      "blackouts": "Fechas Bloqueadas",
+      "spaceDetails": "Detalles del Espacio",
+      "description": "Descripción"
     },
     "reservations": {
       "title": "Todas las Reservaciones",
+      "description": "Gestiona todas las reservaciones del edificio",
+      "error": "Error",
       "pending": "Pagos Pendientes",
       "space": "Espacio",
       "owner": "Propietario",
@@ -94,10 +131,146 @@
       "rejectSuccess": "Pago rechazado",
       "cancelSuccess": "Reservación cancelada",
       "createForOwner": "Crear Reservación",
-      "noPaymentProof": "No se ha subido comprobante de pago"
+      "noPaymentProof": "No se ha subido comprobante de pago",
+      "filters": {
+        "title": "Filtros",
+        "description": "Filtra las reservaciones por estado, espacio o fecha",
+        "status": "Estado",
+        "statusPlaceholder": "Seleccionar estado",
+        "allStatuses": "Todos los estados",
+        "statusOptions": {
+          "pending_payment": "Pago Pendiente",
+          "payment_submitted": "Pago Enviado",
+          "confirmed": "Confirmada",
+          "cancelled": "Cancelada",
+          "completed": "Completada"
+        },
+        "dateFrom": "Desde",
+        "dateTo": "Hasta",
+        "clearFilters": "Limpiar Filtros"
+      },
+      "list": {
+        "title": "Lista de Reservaciones",
+        "description": "{count} reservaciones encontradas"
+      },
+      "table": {
+        "reference": "Referencia",
+        "space": "Espacio",
+        "resident": "Residente",
+        "dateTime": "Fecha y Hora",
+        "amount": "Monto",
+        "status": "Estado",
+        "actions": "Acciones",
+        "empty": "No se encontraron reservaciones",
+        "openMenu": "Abrir menú",
+        "menuLabel": "Acciones",
+        "viewDetails": "Ver Detalles",
+        "cancel": "Cancelar"
+      },
+      "pending": {
+        "title": "Pagos Pendientes de Verificación",
+        "description": "Reservaciones con comprobantes de pago pendientes de revisión",
+        "badge": "Pendiente",
+        "empty": {
+          "title": "No hay pagos pendientes",
+          "description": "No hay comprobantes de pago pendientes de verificación"
+        }
+      },
+      "details": {
+        "title": "Detalles de la Reservación",
+        "description": "Información completa de la reservación",
+        "reservation": {
+          "title": "Información de la Reservación",
+          "reference": "Código de Referencia",
+          "space": "Espacio",
+          "date": "Fecha",
+          "time": "Hora",
+          "amount": "Monto"
+        },
+        "resident": {
+          "title": "Información del Residente",
+          "name": "Nombre",
+          "email": "Correo Electrónico"
+        },
+        "payment": {
+          "title": "Información del Pago",
+          "viewProof": "Ver Comprobante"
+        },
+        "cancellation": {
+          "title": "Información de Cancelación"
+        },
+        "createdAt": "Creada el"
+      },
+      "cancel": {
+        "title": "Cancelar Reservación",
+        "description": "¿Estás seguro de que deseas cancelar esta reservación?",
+        "reasonRequired": "Debes proporcionar un motivo de cancelación",
+        "reasonLabel": "Motivo de Cancelación",
+        "reasonPlaceholder": "Ingresa el motivo de la cancelación...",
+        "cancelButton": "Cancelar",
+        "confirmButton": "Confirmar Cancelación",
+        "cancelling": "Cancelando...",
+        "error": "Error al cancelar la reservación",
+        "success": "Reservación Cancelada",
+        "successDescription": "La reservación ha sido cancelada exitosamente"
+      },
+      "verification": {
+        "title": "Verificación de Pago",
+        "submittedAt": "Enviado el",
+        "status": {
+          "pending": "Pendiente de Verificación"
+        },
+        "details": {
+          "title": "Detalles de la Reservación",
+          "space": "Espacio",
+          "amount": "Monto"
+        },
+        "resident": {
+          "title": "Información del Residente",
+          "name": "Nombre",
+          "email": "Correo",
+          "phone": "Teléfono"
+        },
+        "proof": {
+          "title": "Comprobante de Pago",
+          "notFound": "No se encontró comprobante",
+          "alt": "Comprobante de pago",
+          "viewFull": "Ver tamaño completo",
+          "pdfDocument": "Documento PDF",
+          "viewPdf": "Ver PDF",
+          "file": "Archivo",
+          "viewFile": "Ver Archivo"
+        },
+        "actions": {
+          "reject": "Rechazar",
+          "verify": "Verificar Pago",
+          "verifying": "Verificando..."
+        },
+        "verify": {
+          "error": "Error al verificar el pago",
+          "success": "Pago Verificado",
+          "successDescription": "El pago ha sido verificado exitosamente"
+        },
+        "reject": {
+          "reasonRequired": "Debes proporcionar un motivo de rechazo",
+          "error": "Error al rechazar el pago",
+          "success": "Pago Rechazado",
+          "successDescription": "El pago ha sido rechazado"
+        },
+        "rejectDialog": {
+          "title": "Rechazar Pago",
+          "description": "Por favor proporciona un motivo para rechazar este pago",
+          "reasonLabel": "Motivo del Rechazo",
+          "reasonPlaceholder": "Ingresa el motivo del rechazo...",
+          "cancel": "Cancelar",
+          "confirm": "Confirmar Rechazo",
+          "rejecting": "Rechazando..."
+        }
+      }
     },
     "announcements": {
       "title": "Anuncios",
+      "description": "Administra los anuncios del edificio",
       "new": "Nuevo Anuncio",
       "announcementTitle": "Título",
       "body": "Mensaje",

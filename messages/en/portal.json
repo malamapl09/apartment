@@ -1,5 +1,22 @@
 {
   "portal": {
+    "welcome": "Welcome",
+    "apartment": "Apt.",
+    "quick_actions": "Quick Actions",
+    "quick_actions_description": "What would you like to do today?",
+    "reserve_space": "Reserve a Space",
+    "reserve_space_description": "Browse available spaces and make a reservation",
+    "my_reservations": "My Reservations",
+    "my_reservations_description": "View and manage your upcoming reservations",
+    "upcoming_reservations": "Upcoming Reservations",
+    "upcoming_reservations_description": "Your next scheduled reservations",
+    "view_all": "View All",
+    "reference": "Ref",
+    "no_upcoming_reservations": "No upcoming reservations",
+    "browse_spaces": "Browse Spaces",
+    "announcements": "Announcements",
+    "announcements_description": "Latest news from your building",
+    "priority_high": "Important",
     "dashboard": {
       "title": "Welcome",
       "subtitle": "Manage your apartment and reservations",
@@ -13,20 +30,61 @@
     },
     "spaces": {
       "title": "Available Spaces",
+      "description": "Browse and reserve common spaces in your building",
       "browse": "Browse Spaces",
-      "capacity": "{count} people",
+      "capacity": "Capacity",
+      "people": "people",
       "hourlyRate": "{amount}/hour",
       "deposit": "Deposit: {amount}",
       "free": "Free",
+      "free_of_charge": "Free of charge",
+      "per_hour": "/hour",
+      "max_duration": "Max duration",
       "reserve": "Reserve This Space",
       "viewDetails": "View Details",
+      "view_details": "View Details",
       "noSpaces": "No spaces available",
+      "no_spaces_available": "No Spaces Available",
+      "no_spaces_description": "There are no spaces available for reservation at this time.",
       "availability": "Availability",
       "rules": "Rules"
     },
+    "space_detail": {
+      "free": "Free",
+      "about": "About This Space",
+      "details": "Details",
+      "capacity": "Capacity",
+      "people": "people",
+      "hourly_rate": "Hourly Rate",
+      "free_of_charge": "Free of charge",
+      "deposit": "Deposit",
+      "max_duration": "Max Duration",
+      "hours": "hours",
+      "gap_between": "Gap Between Bookings",
+      "minutes": "minutes",
+      "rules": "Rules & Policies",
+      "availability_schedule": "Availability Schedule",
+      "availability_description": "Available time slots for this space",
+      "day": "Day",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "no_schedule": "No availability schedule configured",
+      "blackout_dates": "Blackout Dates",
+      "blackout_description": "Dates when this space is not available",
+      "reserve_this_space": "Reserve This Space"
+    },
     "reservations": {
       "title": "My Reservations",
+      "description": "View and manage all your reservations",
       "new": "New Reservation",
+      "new_reservation": "New Reservation",
       "selectDate": "Select a Date",
       "selectTime": "Select a Time",
       "startTime": "Start Time",
@@ -44,20 +102,159 @@
       "paymentDeadline": "Payment Deadline",
       "paymentDeadlineNote": "Upload your payment proof before {deadline}",
       "uploadProof": "Upload Payment Proof",
+      "upload_proof": "Upload Proof",
       "uploadProofDescription": "Upload a screenshot or photo of your bank transfer",
       "acceptTerms": "I accept the terms of use for this space",
       "confirmBooking": "Confirm Booking",
       "bookingSuccess": "Reservation created successfully!",
       "bookingError": "Failed to create reservation",
       "cancelReservation": "Cancel Reservation",
+      "cancel": "Cancel",
       "cancelConfirm": "Are you sure you want to cancel this reservation?",
       "cancelSuccess": "Reservation cancelled",
       "viewDetails": "View Details",
+      "view_details": "View Details",
       "downloadCalendar": "Add to Calendar",
       "noReservations": "No reservations yet",
+      "no_reservations": "No Reservations",
+      "no_reservations_description": "You don't have any reservations yet.",
+      "make_first_reservation": "Make Your First Reservation",
       "upcoming": "Upcoming",
       "past": "Past",
-      "all": "All"
+      "all": "All",
+      "tabs": {
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "all": "All"
+      },
+      "no_upcoming": "No Upcoming Reservations",
+      "no_upcoming_description": "You don't have any upcoming reservations. Browse available spaces to make a new one.",
+      "no_past": "No Past Reservations",
+      "no_past_description": "You don't have any past reservations yet.",
+      "browse_spaces": "Browse Spaces"
+    },
+    "reservation_detail": {
+      "reference_code": "Reference Code",
+      "reservation": "Reservation",
+      "reference": "Reference",
+      "date_time": "Date & Time",
+      "date": "Date",
+      "time": "Time",
+      "payment_info": "Payment Information",
+      "hourly_rate": "Cost",
+      "deposit": "Deposit",
+      "total": "Total",
+      "payment_instructions": {
+        "title": "Payment Instructions",
+        "description": "Please transfer the total amount to the following bank account and upload your proof of payment.",
+        "bank": "Bank",
+        "account_name": "Account Name",
+        "account_number": "Account Number",
+        "routing": "Routing Number"
+      },
+      "amount_to_transfer": "Amount to Transfer",
+      "payment_proof": "Payment Proof",
+      "rules": "Space Rules",
+      "status_history": "Status History",
+      "status_history_description": "Timeline of status changes for this reservation",
+      "changed_by": "Changed by",
+      "download_ics": "Download Calendar",
+      "cancel_reservation": "Cancel Reservation",
+      "back_to_list": "Back to Reservations"
+    },
+    "payment_upload": {
+      "title": "Upload Payment Proof",
+      "description": "Upload a screenshot or photo of your bank transfer as proof of payment",
+      "select_file": "Payment Proof File",
+      "choose_file": "Choose File",
+      "file_requirements": "Accepted formats: JPG, PNG, WebP, PDF. Max size: 5MB.",
+      "errors": {
+        "invalid_type": "Invalid file type. Please upload a JPG, PNG, WebP, or PDF file.",
+        "file_too_large": "File is too large. Maximum size is 5MB.",
+        "no_file": "Please select a file to upload.",
+        "upload_failed": "Failed to upload payment proof. Please try again."
+      },
+      "uploading": "Uploading...",
+      "upload": "Upload Payment Proof",
+      "success": "Payment proof uploaded successfully!",
+      "info": {
+        "title": "Important",
+        "description": "After uploading, the admin will review your payment. You'll be notified once it's verified."
+      }
+    },
+    "booking": {
+      "title": "New Reservation",
+      "booking_for": "Booking for",
+      "select_date": "Select a Date",
+      "select_date_description": "Choose your preferred date for the reservation",
+      "legend": {
+        "selected": "Selected",
+        "today": "Today",
+        "unavailable": "Unavailable"
+      },
+      "existing_reservations": "Existing Reservations",
+      "occupied": "Occupied",
+      "no_reservations_this_day": "No reservations on this day",
+      "validation": {
+        "complete_all_fields": "Please complete all required fields",
+        "select_times": "Please select start and end times",
+        "end_after_start": "End time must be after start time",
+        "outside_schedule": "Selected time is outside available hours",
+        "exceeds_max_duration": "Duration exceeds the maximum allowed",
+        "time_conflict": "This time slot conflicts with an existing reservation"
+      },
+      "success": {
+        "title": "Reservation Created!",
+        "description": "Your reservation has been created successfully.",
+        "reservation_created": "Reservation created successfully!"
+      },
+      "error": {
+        "unknown": "An unexpected error occurred. Please try again."
+      },
+      "reference_code": "Reference Code",
+      "space": "Space",
+      "date": "Date",
+      "time": "Time",
+      "payment_instructions": {
+        "title": "Payment Instructions",
+        "description": "Transfer the total amount to the bank account below and upload proof of payment.",
+        "bank": "Bank",
+        "account_name": "Account Name",
+        "account_number": "Account Number",
+        "routing": "Routing Number"
+      },
+      "amount_to_transfer": "Amount to Transfer",
+      "view_my_reservations": "View My Reservations",
+      "make_another_reservation": "Make Another Reservation",
+      "steps": {
+        "date": "Date",
+        "time": "Time",
+        "review": "Review"
+      },
+      "next": "Next",
+      "back": "Back",
+      "review": {
+        "title": "Review Your Reservation",
+        "description": "Please review the details before confirming"
+      },
+      "cost_breakdown": "Cost Breakdown",
+      "hourly_rate": "Hourly Rate",
+      "deposit": "Deposit",
+      "total": "Total",
+      "terms": {
+        "accept": "I accept the terms of use for this space"
+      },
+      "creating": "Creating...",
+      "confirm_reservation": "Confirm Reservation",
+      "select_time": "Select a Time",
+      "available_hours": "Available Hours",
+      "start_time": "Start Time",
+      "end_time": "End Time",
+      "duration": "Duration",
+      "hours": "hours",
+      "max_duration": "Max duration",
+      "confirm_time": "Confirm Time",
+      "occupied_times": "Occupied Times"
     },
     "reservationStatus": {
       "pending_payment": "Pending Payment",
@@ -69,14 +266,46 @@
     },
     "profile": {
       "title": "My Profile",
+      "description": "Manage your personal information and preferences",
+      "my_apartments": "My Apartments",
+      "apartments_description": "Apartments linked to your account",
+      "apartment": "Apt.",
       "personalInfo": "Personal Information",
+      "personal_info": "Personal Information",
+      "personal_info_description": "Update your personal details",
       "changePassword": "Change Password",
+      "change_password": "Change Password",
+      "change_password_description": "Update your account password",
+      "save_changes": "Save Changes",
       "currentPassword": "Current Password",
       "newPassword": "New Password",
       "confirmPassword": "Confirm Password",
       "updateSuccess": "Profile updated successfully",
       "passwordSuccess": "Password changed successfully",
-      "preferredLocale": "Preferred Language"
+      "preferredLocale": "Preferred Language",
+      "fields": {
+        "full_name": "Full Name",
+        "email": "Email",
+        "email_description": "Email cannot be changed. Contact an admin if needed.",
+        "phone": "Phone",
+        "national_id": "National ID",
+        "emergency_contact_name": "Emergency Contact Name",
+        "emergency_contact_phone": "Emergency Contact Phone",
+        "preferred_locale": "Preferred Language",
+        "locale_description": "Choose your preferred language for the interface",
+        "current_password": "Current Password",
+        "new_password": "New Password",
+        "confirm_password": "Confirm Password"
+      },
+      "success": {
+        "profile_updated": "Profile updated successfully",
+        "password_changed": "Password changed successfully"
+      },
+      "error": {
+        "incorrect_password": "Current password is incorrect",
+        "password_change_failed": "Failed to change password",
+        "update_failed": "Failed to update profile"
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "ResidenceHub",
-    "tagline": "Gestión inteligente de apartamentos"
+    "tagline": "Gesti\u00f3n inteligente de apartamentos"
   },
   "nav": {
     "dashboard": "Panel",
@@ -11,7 +11,7 @@
     "reservations": "Reservaciones",
     "announcements": "Anuncios",
     "profile": "Perfil",
-    "settings": "Configuración",
+    "settings": "Configuraci\u00f3n",
     "portal": "Portal de Propietarios",
     "admin": "Panel Administrativo",
     "pendingPayments": "Pagos Pendientes"
@@ -52,10 +52,10 @@
   },
   "labels": {
     "name": "Nombre",
-    "email": "Correo electrónico",
-    "phone": "Teléfono",
-    "address": "Dirección",
-    "description": "Descripción",
+    "email": "Correo electr\u00f3nico",
+    "phone": "Tel\u00e9fono",
+    "address": "Direcci\u00f3n",
+    "description": "Descripci\u00f3n",
     "date": "Fecha",
     "time": "Hora",
     "from": "Desde",
@@ -70,33 +70,53 @@
     "required": "Requerido"
   },
   "errors": {
-    "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
-    "notFound": "Página no encontrada",
-    "unauthorized": "No tienes autorización para acceder a esta página.",
+    "generic": "Algo sali\u00f3 mal. Por favor, int\u00e9ntalo de nuevo.",
+    "notFound": "P\u00e1gina no encontrada",
+    "unauthorized": "No tienes autorizaci\u00f3n para acceder a esta p\u00e1gina.",
     "forbidden": "Acceso denegado.",
     "validation": "Por favor, revisa los errores del formulario."
   },
+  "error": {
+    "title": "\u00a1Algo sali\u00f3 mal!",
+    "description": "Ocurri\u00f3 un error inesperado. Por favor, int\u00e9ntalo de nuevo o contacta soporte si el problema persiste.",
+    "details": "Detalles del Error",
+    "unknown": "Error desconocido",
+    "errorId": "ID del Error",
+    "retry": "Intentar de Nuevo",
+    "goHome": "Ir al Inicio"
+  },
   "notFound": {
-    "title": "Página No Encontrada",
-    "description": "La página que buscas no existe o ha sido movida.",
+    "title": "P\u00e1gina No Encontrada",
+    "description": "La p\u00e1gina que buscas no existe o ha sido movida.",
     "goToDashboard": "Ir al Panel"
   },
   "confirm": {
-    "delete": "¿Estás seguro de que deseas eliminar esto? Esta acción no se puede deshacer.",
-    "cancel": "¿Estás seguro de que deseas cancelar?"
+    "delete": "\u00bfEst\u00e1s seguro de que deseas eliminar esto? Esta acci\u00f3n no se puede deshacer.",
+    "cancel": "\u00bfEst\u00e1s seguro de que deseas cancelar?"
   },
   "pagination": {
     "showing": "Mostrando {from} a {to} de {total}",
-    "rowsPerPage": "Filas por página",
-    "page": "Página {current} de {total}"
+    "rowsPerPage": "Filas por p\u00e1gina",
+    "page": "P\u00e1gina {current} de {total}"
   },
   "theme": {
+    "toggle_theme": "Cambiar tema",
     "light": "Claro",
     "dark": "Oscuro",
     "system": "Sistema"
   },
   "language": {
-    "en": "Inglés",
-    "es": "Español"
+    "en": "Ingl\u00e9s",
+    "es": "Espa\u00f1ol"
+  },
+  "reservations": {
+    "status": {
+      "pending_payment": "Pago Pendiente",
+      "payment_submitted": "Pago Enviado",
+      "confirmed": "Confirmada",
+      "cancelled": "Cancelada",
+      "completed": "Completada",
+      "rejected": "Rechazada"
+    }
   }
 }

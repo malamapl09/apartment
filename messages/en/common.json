@@ -76,6 +76,15 @@
     "forbidden": "Access denied.",
     "validation": "Please check the form for errors."
   },
+  "error": {
+    "title": "Something went wrong!",
+    "description": "An unexpected error occurred. Please try again or contact support if the problem persists.",
+    "details": "Error Details",
+    "unknown": "Unknown error occurred",
+    "errorId": "Error ID",
+    "retry": "Try Again",
+    "goHome": "Go Home"
+  },
   "notFound": {
     "title": "Page Not Found",
     "description": "The page you are looking for doesn't exist or has been moved.",
@@ -91,6 +100,7 @@
     "page": "Page {current} of {total}"
   },
   "theme": {
+    "toggle_theme": "Toggle theme",
     "light": "Light",
     "dark": "Dark",
     "system": "System"
@@ -98,5 +108,15 @@
   "language": {
     "en": "English",
     "es": "Spanish"
+  },
+  "reservations": {
+    "status": {
+      "pending_payment": "Pending Payment",
+      "payment_submitted": "Payment Submitted",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    }
   }
 }

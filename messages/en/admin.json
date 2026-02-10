@@ -2,33 +2,55 @@
   "admin": {
     "dashboard": {
       "title": "Admin Dashboard",
-      "totalApartments": "Total Apartments",
-      "registeredOwners": "Registered Owners",
-      "upcomingReservations": "Upcoming Reservations",
-      "pendingPayments": "Pending Payments",
-      "recentActivity": "Recent Activity",
-      "quickActions": "Quick Actions"
+      "description": "Overview of your building management",
+      "stats": {
+        "apartments": "Total Apartments",
+        "owners": "Registered Owners",
+        "upcomingReservations": "Upcoming Reservations",
+        "pendingPayments": "Pending Payments"
+      },
+      "viewAll": "View All",
+      "quickActions": {
+        "title": "Quick Actions",
+        "newApartment": "New Apartment",
+        "inviteOwner": "Invite Owner",
+        "manageReservations": "Manage Reservations"
+      }
     },
     "apartments": {
       "title": "Apartments",
-      "new": "New Apartment",
+      "description": "Manage apartments in the building",
       "newApartment": "New Apartment",
       "newApartmentDescription": "Create a new apartment in the building",
-      "edit": "Edit Apartment",
+      "edit": "Edit",
+      "editApartment": "Edit Apartment",
+      "editApartmentDescription": "Update apartment details",
       "unitNumber": "Unit Number",
       "floor": "Floor",
-      "area": "Area (m²)",
+      "area": "Area (m\u00b2)",
       "bedrooms": "Bedrooms",
       "bathrooms": "Bathrooms",
       "status": "Status",
       "owners": "Owners",
       "noOwners": "No owners assigned",
-      "deleteConfirm": "Are you sure you want to delete this apartment?"
+      "deleteConfirm": "Are you sure you want to delete this apartment?",
+      "searchPlaceholder": "Search apartments...",
+      "linkedOwners": "Linked Owners",
+      "noOwnersLinked": "No owners linked to this apartment",
+      "inviteOwner": "Invite Owner"
     },
     "owners": {
       "title": "Owners",
+      "description": "Manage building owners and residents",
       "invite": "Invite Owner",
-      "edit": "Edit Owner",
+      "inviteOwner": "Invite Owner",
+      "inviteOwnerDescription": "Send an invitation to a new owner",
+      "ownerDetailDescription": "Owner profile and linked apartments",
+      "profileInformation": "Profile Information",
+      "linkedApartments": "Linked Apartments",
+      "noApartmentsLinked": "No apartments linked to this owner",
+      "noReservationsYet": "No reservations yet",
+      "edit": "Edit",
       "fullName": "Full Name",
       "email": "Email",
       "phone": "Phone",
@@ -47,15 +69,19 @@
       "activate": "Activate",
       "linkApartment": "Link Apartment",
       "unlinkApartment": "Unlink Apartment",
-      "reservationHistory": "Reservation History"
+      "reservationHistory": "Reservation History",
+      "searchPlaceholder": "Search owners..."
     },
     "spaces": {
       "title": "Public Spaces",
+      "description": "Manage common areas and amenities",
       "new": "New Space",
+      "newSpace": "New Space",
       "createNewSpace": "Create New Space",
+      "createFirstSpace": "Create your first space to get started",
+      "noSpaces": "No spaces have been created yet",
       "edit": "Edit Space",
       "name": "Space Name",
-      "description": "Description",
       "capacity": "Capacity",
       "hourlyRate": "Hourly Rate",
       "deposit": "Deposit Amount",
@@ -73,10 +99,20 @@
       "blackoutDates": "Blackout Dates",
       "rules": "Rules & Policies",
       "active": "Active",
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "activeSpace": "This space is active and available for reservations",
+      "inactiveSpace": "This space is inactive and not available for reservations",
+      "deactivate": "Deactivate",
+      "activate": "Activate",
+      "details": "Details",
+      "schedule": "Schedule",
+      "blackouts": "Blackouts",
+      "spaceDetails": "Space Details"
     },
     "reservations": {
       "title": "All Reservations",
+      "description": "Manage and review all reservations",
+      "error": "An error occurred while loading reservations",
       "pending": "Pending Payments",
       "space": "Space",
       "owner": "Owner",
@@ -94,10 +130,146 @@
       "rejectSuccess": "Payment rejected",
       "cancelSuccess": "Reservation cancelled",
       "createForOwner": "Create Reservation",
-      "noPaymentProof": "No payment proof uploaded"
+      "noPaymentProof": "No payment proof uploaded",
+      "filters": {
+        "title": "Filters",
+        "description": "Filter reservations by status and date",
+        "status": "Status",
+        "statusPlaceholder": "Select a status",
+        "allStatuses": "All Statuses",
+        "statusOptions": {
+          "pending_payment": "Pending Payment",
+          "payment_submitted": "Payment Submitted",
+          "confirmed": "Confirmed",
+          "cancelled": "Cancelled",
+          "completed": "Completed"
+        },
+        "dateFrom": "Date From",
+        "dateTo": "Date To",
+        "clearFilters": "Clear Filters"
+      },
+      "list": {
+        "title": "Reservations List",
+        "description": "View and manage all reservations"
+      },
+      "table": {
+        "reference": "Reference",
+        "space": "Space",
+        "resident": "Resident",
+        "dateTime": "Date & Time",
+        "amount": "Amount",
+        "status": "Status",
+        "actions": "Actions",
+        "empty": "No reservations found",
+        "openMenu": "Open menu",
+        "menuLabel": "Actions",
+        "viewDetails": "View Details",
+        "cancel": "Cancel"
+      },
+      "pending": {
+        "title": "Pending Payments",
+        "description": "Reservations awaiting payment verification",
+        "badge": "Pending",
+        "empty": {
+          "title": "No pending payments",
+          "description": "All payments have been processed"
+        }
+      },
+      "details": {
+        "title": "Reservation Details",
+        "description": "View full reservation information",
+        "reservation": {
+          "title": "Reservation Information",
+          "reference": "Reference Code",
+          "space": "Space",
+          "date": "Date",
+          "time": "Time",
+          "amount": "Amount"
+        },
+        "resident": {
+          "title": "Resident Information",
+          "name": "Name",
+          "email": "Email"
+        },
+        "payment": {
+          "title": "Payment Information",
+          "viewProof": "View Payment Proof"
+        },
+        "cancellation": {
+          "title": "Cancellation Details"
+        },
+        "createdAt": "Created At"
+      },
+      "cancel": {
+        "title": "Cancel Reservation",
+        "description": "Are you sure you want to cancel this reservation?",
+        "reasonRequired": "A reason is required to cancel a reservation",
+        "reasonLabel": "Cancellation Reason",
+        "reasonPlaceholder": "Enter the reason for cancellation...",
+        "cancelButton": "Go Back",
+        "confirmButton": "Confirm Cancellation",
+        "cancelling": "Cancelling...",
+        "error": "Failed to cancel reservation",
+        "success": "Reservation Cancelled",
+        "successDescription": "The reservation has been successfully cancelled"
+      },
+      "verification": {
+        "title": "Payment Verification",
+        "submittedAt": "Submitted At",
+        "status": {
+          "pending": "Pending Verification"
+        },
+        "details": {
+          "title": "Reservation Details",
+          "space": "Space",
+          "amount": "Amount"
+        },
+        "resident": {
+          "title": "Resident Information",
+          "name": "Name",
+          "email": "Email",
+          "phone": "Phone"
+        },
+        "proof": {
+          "title": "Payment Proof",
+          "notFound": "No payment proof found",
+          "alt": "Payment proof image",
+          "viewFull": "View Full Image",
+          "pdfDocument": "PDF Document",
+          "viewPdf": "View PDF",
+          "file": "Uploaded File",
+          "viewFile": "View File"
+        },
+        "actions": {
+          "reject": "Reject Payment",
+          "verify": "Verify Payment",
+          "verifying": "Verifying..."
+        },
+        "verify": {
+          "error": "Failed to verify payment",
+          "success": "Payment Verified",
+          "successDescription": "The payment has been verified and the reservation is confirmed"
+        },
+        "reject": {
+          "reasonRequired": "A reason is required to reject the payment",
+          "error": "Failed to reject payment",
+          "success": "Payment Rejected",
+          "successDescription": "The payment has been rejected and the owner has been notified"
+        },
+        "rejectDialog": {
+          "title": "Reject Payment",
+          "description": "Please provide a reason for rejecting this payment",
+          "reasonLabel": "Rejection Reason",
+          "reasonPlaceholder": "Enter the reason for rejection...",
+          "cancel": "Cancel",
+          "confirm": "Confirm Rejection",
+          "rejecting": "Rejecting..."
+        }
+      }
     },
     "announcements": {
       "title": "Announcements",
+      "description": "Manage building announcements and notices",
       "new": "New Announcement",
       "announcementTitle": "Title",
       "body": "Message",
