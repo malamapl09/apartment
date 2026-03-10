@@ -175,7 +175,7 @@ export async function getReservation(id: string) {
 
   const { data, error } = await supabase
     .from("reservations")
-    .select(`*, public_spaces (*), profiles (id, full_name, email)`)
+    .select(`*, public_spaces (*), profiles!user_id(id, full_name, email)`)
     .eq("id", id)
     .eq("building_id", profile.building_id)
     .single();

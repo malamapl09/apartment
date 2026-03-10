@@ -28,7 +28,7 @@ export async function getAllVisitors(filters?: {
   let query = supabase
     .from("visitors")
     .select(
-      `*, profiles (id, full_name), apartments (id, unit_number)`
+      `*, profiles!registered_by(id, full_name), apartments (id, unit_number)`
     )
     .eq("building_id", profile.building_id)
     .order("valid_from", { ascending: false });
@@ -163,7 +163,7 @@ export async function getTodaysVisitors() {
 
   const { data, error } = await supabase
     .from("visitors")
-    .select(`*, profiles (id, full_name), apartments (id, unit_number)`)
+    .select(`*, profiles!registered_by(id, full_name), apartments (id, unit_number)`)
     .eq("building_id", profile.building_id)
     .eq("status", "expected")
     .lte("valid_from", now)
@@ -193,7 +193,7 @@ export async function lookupByAccessCode(code: string) {
 
   const { data, error } = await supabase
     .from("visitors")
-    .select(`*, apartments (id, unit_number), profiles (id, full_name)`)
+    .select(`*, apartments (id, unit_number), profiles!registered_by(id, full_name)`)
     .eq("building_id", profile.building_id)
     .eq("access_code", code.toUpperCase())
     .single();

@@ -22,7 +22,7 @@ export async function getReservations(filters?: {
 
   let query = supabase
     .from("reservations")
-    .select(`*, public_spaces (id, name), profiles (id, full_name, email)`)
+    .select(`*, public_spaces (id, name), profiles!user_id(id, full_name, email)`)
     .eq("building_id", profile.building_id)
     .order("start_time", { ascending: false });
 
@@ -49,7 +49,7 @@ export async function getPendingPayments() {
 
   const { data, error } = await supabase
     .from("reservations")
-    .select(`*, public_spaces (id, name), profiles (id, full_name, email, phone)`)
+    .select(`*, public_spaces (id, name), profiles!user_id(id, full_name, email, phone)`)
     .eq("building_id", profile.building_id)
     .eq("status", "payment_submitted")
     .order("created_at", { ascending: true })
