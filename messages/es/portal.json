@@ -16,6 +16,13 @@
     "browse_spaces": "Explorar Espacios",
     "announcements": "Anuncios",
     "announcements_description": "\u00daltimas noticias de tu edificio",
+    "announcements_feed": {
+      "empty": "No hay anuncios disponibles",
+      "targetAll": "Todos",
+      "targetOwners": "Propietarios",
+      "targetResidents": "Residentes",
+      "validUntil": "Válido hasta:"
+    },
     "priority_high": "Importante",
     "summary": {
       "pendingCharges": "Cargos Pendientes",

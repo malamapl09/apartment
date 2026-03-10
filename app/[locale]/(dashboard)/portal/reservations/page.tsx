@@ -27,7 +27,7 @@ export default async function MyReservationsPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    redirect(`/${locale}/login`);
   }
 
   const today = new Date().toISOString().split("T")[0];

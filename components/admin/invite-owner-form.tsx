@@ -28,25 +28,27 @@ import { inviteOwner } from "@/lib/actions/admin-users";
 import { Apartment } from "@/types";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-
-const inviteOwnerSchema = z.object({
-  full_name: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-  apartment_id: z.string().min(1, "Please select an apartment"),
-});
-
-type InviteOwnerFormValues = z.infer<typeof inviteOwnerSchema>;
+import { useTranslations } from "next-intl";
 
 interface InviteOwnerFormProps {
   apartments: Apartment[];
 }
 
 export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
+  const t = useTranslations("admin.owners.inviteForm");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
   const [isLoading, setIsLoading] = useState(false);
+
+  const inviteOwnerSchema = z.object({
+    full_name: z.string().min(2, t("validation.fullNameMin")),
+    email: z.string().email(t("validation.emailInvalid")),
+    phone: z.string().optional(),
+    apartment_id: z.string().min(1, t("validation.apartmentRequired")),
+  });
+
+  type InviteOwnerFormValues = z.infer<typeof inviteOwnerSchema>;
 
   const form = useForm<InviteOwnerFormValues>({
     resolver: zodResolver(inviteOwnerSchema),
@@ -71,14 +73,14 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
       const result = await inviteOwner(formData);
 
       if (result.success) {
-        toast.success("Owner invited successfully. An email has been sent.");
+        toast.success(t("successToast"));
         router.push(`/${locale}/admin/owners`);
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to invite owner");
+        toast.error(result.error || t("errorToast"));
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
       console.error(error);
     } finally {
       setIsLoading(false);
@@ -88,7 +90,7 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Invite New Owner</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -98,12 +100,12 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t("fullNameLabel")}</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder={t("fullNamePlaceholder")} {...field} />
                   </FormControl>
                   <FormDescription>
-                    The owner's full legal name
+                    {t("fullNameDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -115,16 +117,16 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("emailLabel")}</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="john.doe@example.com"
+                      placeholder={t("emailPlaceholder")}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    An invitation email will be sent to this address
+                    {t("emailDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -136,7 +138,7 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone (Optional)</FormLabel>
+                  <FormLabel>{t("phoneLabel")}</FormLabel>
                   <FormControl>
                     <Input
                       type="tel"
@@ -145,7 +147,7 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Contact phone number
+                    {t("phoneDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -157,26 +159,26 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
               name="apartment_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Apartment</FormLabel>
+                  <FormLabel>{t("apartmentLabel")}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select an apartment" />
+                        <SelectValue placeholder={t("apartmentPlaceholder")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {apartments.map((apartment) => (
                         <SelectItem key={apartment.id} value={apartment.id}>
-                          Unit {apartment.unit_number} - Floor {apartment.floor}
+                          {t("unitFloor", { unit: apartment.unit_number, floor: apartment.floor ?? 0 })}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    The apartment this owner will be linked to
+                    {t("apartmentDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -190,11 +192,11 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
                 onClick={() => router.push(`/${locale}/admin/owners`)}
                 disabled={isLoading}
               >
-                Cancel
+                {t("cancelButton")}
               </Button>
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Send Invitation
+                {t("submitButton")}
               </Button>
             </div>
           </form>

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 const apartmentSchema = z.object({
   unit_number: z.string().min(1, "Unit number is required"),
@@ -51,7 +52,8 @@ export async function getApartments(searchQuery?: string) {
 }
 
 export async function getApartment(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
     .from("apartments")
@@ -63,6 +65,7 @@ export async function getApartment(id: string) {
       )
     `)
     .eq("id", id)
+    .eq("building_id", profile.building_id)
     .single();
 
   if (error) return { error: error.message };
@@ -112,7 +115,8 @@ export async function createApartment(formData: FormData) {
 }
 
 export async function updateApartment(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const result = apartmentSchema.safeParse({
     unit_number: formData.get("unit_number"),
@@ -130,7 +134,8 @@ export async function updateApartment(id: string, formData: FormData) {
   const { error } = await supabase
     .from("apartments")
     .update(result.data)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 
@@ -140,12 +145,14 @@ export async function updateApartment(id: string, formData: FormData) {
 }
 
 export async function deleteApartment(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("apartments")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 

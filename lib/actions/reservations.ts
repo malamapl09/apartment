@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { validateBooking } from "@/lib/reservations/validate-booking";
+import { getAuthProfile } from "@/lib/actions/helpers";
 
 export async function createReservation(data: {
   space_id: string;
@@ -157,15 +158,23 @@ export async function getMyReservations(filter?: "upcoming" | "past" | "all") {
 }
 
 export async function getReservation(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, user, profile } = await getAuthProfile();
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
     .from("reservations")
     .select(`*, public_spaces (*), profiles (id, full_name, email)`)
     .eq("id", id)
+    .eq("building_id", profile.building_id)
     .single();
 
   if (error) return { error: error.message };
+
+  // Non-admin users can only view their own reservations
+  if (!["admin", "super_admin"].includes(profile.role) && data.user_id !== user.id) {
+    return { error: "Unauthorized" };
+  }
+
   return { data };
 }
 

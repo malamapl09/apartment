@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { getAdminProfile, getAuthProfile } from "@/lib/actions/helpers";
 
 const spaceSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -41,11 +42,14 @@ export async function getSpaces() {
 }
 
 export async function getSpace(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAuthProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
   const { data, error } = await supabase
     .from("public_spaces")
     .select("*")
     .eq("id", id)
+    .eq("building_id", profile.building_id)
     .single();
 
   if (error) return { error: error.message };
@@ -97,7 +101,8 @@ export async function createSpace(formData: FormData) {
 }
 
 export async function updateSpace(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const result = spaceSchema.safeParse({
     name: formData.get("name"),
@@ -123,7 +128,8 @@ export async function updateSpace(id: string, formData: FormData) {
   const { error } = await supabase
     .from("public_spaces")
     .update(result.data)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 
@@ -133,11 +139,14 @@ export async function updateSpace(id: string, formData: FormData) {
 }
 
 export async function toggleSpaceActive(id: string, isActive: boolean) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
   const { error } = await supabase
     .from("public_spaces")
     .update({ is_active: isActive })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 
@@ -146,11 +155,14 @@ export async function toggleSpaceActive(id: string, isActive: boolean) {
 }
 
 export async function updateSpacePhotos(id: string, photos: string[]) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
   const { error } = await supabase
     .from("public_spaces")
     .update({ photos })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 

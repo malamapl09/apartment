@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SpaceFormProps {
   initialData?: PublicSpace;
@@ -23,6 +24,7 @@ export default function SpaceForm({
   onSubmit,
   locale,
 }: SpaceFormProps) {
+  const t = useTranslations("admin.spaces.form");
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [requiresApproval, setRequiresApproval] = useState(
@@ -40,14 +42,14 @@ export default function SpaceForm({
       const result = await onSubmit(formData);
       if (result.success) {
         toast.success(
-          initialData ? "Space updated successfully" : "Space created successfully"
+          initialData ? t("updateSuccess") : t("createSuccess")
         );
         router.refresh();
       } else {
-        toast.error(result.error || "An error occurred");
+        toast.error(result.error || t("error"));
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -58,33 +60,33 @@ export default function SpaceForm({
       {/* Basic Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
+          <CardTitle>{t("basicInfo")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Space Name *</Label>
+            <Label htmlFor="name">{t("nameLabel")}</Label>
             <Input
               id="name"
               name="name"
               defaultValue={initialData?.name}
               required
-              placeholder="e.g., Community Room, Rooftop Terrace"
+              placeholder={t("namePlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t("descriptionLabel")}</Label>
             <Textarea
               id="description"
               name="description"
               defaultValue={initialData?.description || ""}
               rows={4}
-              placeholder="Describe the space, amenities, and features..."
+              placeholder={t("descriptionPlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="capacity">Capacity (people) *</Label>
+            <Label htmlFor="capacity">{t("capacityLabel")}</Label>
             <Input
               id="capacity"
               name="capacity"
@@ -100,12 +102,12 @@ export default function SpaceForm({
       {/* Pricing */}
       <Card>
         <CardHeader>
-          <CardTitle>Pricing</CardTitle>
+          <CardTitle>{t("pricing")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="hourly_rate">Hourly Rate ($) *</Label>
+              <Label htmlFor="hourly_rate">{t("hourlyRateLabel")}</Label>
               <Input
                 id="hourly_rate"
                 name="hourly_rate"
@@ -118,7 +120,7 @@ export default function SpaceForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deposit_amount">Deposit Amount ($)</Label>
+              <Label htmlFor="deposit_amount">{t("depositLabel")}</Label>
               <Input
                 id="deposit_amount"
                 name="deposit_amount"
@@ -135,13 +137,13 @@ export default function SpaceForm({
       {/* Booking Rules */}
       <Card>
         <CardHeader>
-          <CardTitle>Booking Rules</CardTitle>
+          <CardTitle>{t("bookingRules")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="min_advance_hours">
-                Minimum Advance Hours *
+                {t("minAdvanceLabel")}
               </Label>
               <Input
                 id="min_advance_hours"
@@ -152,12 +154,12 @@ export default function SpaceForm({
                 required
               />
               <p className="text-sm text-muted-foreground">
-                How far in advance must bookings be made
+                {t("minAdvanceDescription")}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="max_advance_days">Maximum Advance Days *</Label>
+              <Label htmlFor="max_advance_days">{t("maxAdvanceLabel")}</Label>
               <Input
                 id="max_advance_days"
                 name="max_advance_days"
@@ -167,13 +169,13 @@ export default function SpaceForm({
                 required
               />
               <p className="text-sm text-muted-foreground">
-                How far in advance can bookings be made
+                {t("maxAdvanceDescription")}
               </p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="max_duration_hours">
-                Maximum Duration (hours) *
+                {t("maxDurationLabel")}
               </Label>
               <Input
                 id="max_duration_hours"
@@ -187,7 +189,7 @@ export default function SpaceForm({
 
             <div className="space-y-2">
               <Label htmlFor="max_monthly_per_owner">
-                Max Monthly Bookings per Owner *
+                {t("maxMonthlyLabel")}
               </Label>
               <Input
                 id="max_monthly_per_owner"
@@ -200,7 +202,7 @@ export default function SpaceForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="gap_minutes">Gap Between Bookings (min) *</Label>
+              <Label htmlFor="gap_minutes">{t("gapMinutesLabel")}</Label>
               <Input
                 id="gap_minutes"
                 name="gap_minutes"
@@ -211,13 +213,13 @@ export default function SpaceForm({
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Cleanup/setup time between bookings
+                {t("gapMinutesDescription")}
               </p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="cancellation_hours">
-                Cancellation Window (hours) *
+                {t("cancellationLabel")}
               </Label>
               <Input
                 id="cancellation_hours"
@@ -228,7 +230,7 @@ export default function SpaceForm({
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Must cancel this many hours before booking
+                {t("cancellationDescription")}
               </p>
             </div>
           </div>
@@ -238,12 +240,12 @@ export default function SpaceForm({
       {/* Quiet Hours */}
       <Card>
         <CardHeader>
-          <CardTitle>Quiet Hours</CardTitle>
+          <CardTitle>{t("quietHours")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="quiet_hours_start">Quiet Hours Start</Label>
+              <Label htmlFor="quiet_hours_start">{t("quietHoursStartLabel")}</Label>
               <Input
                 id="quiet_hours_start"
                 name="quiet_hours_start"
@@ -253,7 +255,7 @@ export default function SpaceForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quiet_hours_end">Quiet Hours End</Label>
+              <Label htmlFor="quiet_hours_end">{t("quietHoursEndLabel")}</Label>
               <Input
                 id="quiet_hours_end"
                 name="quiet_hours_end"
@@ -263,7 +265,7 @@ export default function SpaceForm({
             </div>
           </div>
           <p className="text-sm text-muted-foreground">
-            Time range when noise should be minimized
+            {t("quietHoursDescription")}
           </p>
         </CardContent>
       </Card>
@@ -271,14 +273,14 @@ export default function SpaceForm({
       {/* Approval Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Approval Settings</CardTitle>
+          <CardTitle>{t("approvalSettings")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="requires_approval">Requires Approval</Label>
+              <Label htmlFor="requires_approval">{t("requiresApprovalLabel")}</Label>
               <p className="text-sm text-muted-foreground">
-                Bookings must be approved by admin before confirmation
+                {t("requiresApprovalDescription")}
               </p>
             </div>
             <Switch
@@ -297,11 +299,11 @@ export default function SpaceForm({
           onClick={() => router.back()}
           disabled={isSubmitting}
         >
-          Cancel
+          {t("cancelButton")}
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          {initialData ? "Update Space" : "Create Space"}
+          {initialData ? t("updateButton") : t("createButton")}
         </Button>
       </div>
     </form>

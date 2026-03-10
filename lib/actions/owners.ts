@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 export async function getOwners(searchQuery?: string) {
   const supabase = await createClient();
@@ -42,7 +43,8 @@ export async function getOwners(searchQuery?: string) {
 }
 
 export async function getOwner(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
     .from("profiles")
@@ -54,6 +56,7 @@ export async function getOwner(id: string) {
       )
     `)
     .eq("id", id)
+    .eq("building_id", profile.building_id)
     .single();
 
   if (error) return { error: error.message };
@@ -61,7 +64,8 @@ export async function getOwner(id: string) {
 }
 
 export async function updateOwner(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const updateSchema = z.object({
     full_name: z.string().min(2),
@@ -96,7 +100,8 @@ export async function updateOwner(id: string, formData: FormData) {
   const { error } = await supabase
     .from("profiles")
     .update(result.data)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 
@@ -106,7 +111,26 @@ export async function updateOwner(id: string, formData: FormData) {
 }
 
 export async function linkApartment(profileId: string, apartmentId: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
+  // Verify the target profile belongs to the admin's building
+  const { data: targetProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", profileId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!targetProfile) return { error: "Owner not found in your building" };
+
+  // Verify the apartment belongs to the admin's building
+  const { data: apartment } = await supabase
+    .from("apartments")
+    .select("id")
+    .eq("id", apartmentId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!apartment) return { error: "Apartment not found in your building" };
 
   const { error } = await supabase
     .from("apartment_owners")
@@ -130,7 +154,26 @@ export async function linkApartment(profileId: string, apartmentId: string) {
 }
 
 export async function unlinkApartment(profileId: string, apartmentId: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
+  // Verify the target profile belongs to the admin's building
+  const { data: targetProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", profileId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!targetProfile) return { error: "Owner not found in your building" };
+
+  // Verify the apartment belongs to the admin's building
+  const { data: apartment } = await supabase
+    .from("apartments")
+    .select("id")
+    .eq("id", apartmentId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!apartment) return { error: "Apartment not found in your building" };
 
   const { error } = await supabase
     .from("apartment_owners")
@@ -159,12 +202,14 @@ export async function unlinkApartment(profileId: string, apartmentId: string) {
 }
 
 export async function toggleOwnerActive(id: string, isActive: boolean) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("profiles")
     .update({ is_active: isActive })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 

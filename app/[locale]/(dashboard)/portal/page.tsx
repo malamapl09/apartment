@@ -28,7 +28,7 @@ export default async function PortalDashboardPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    redirect(`/${locale}/login`);
   }
 
   // Fetch user profile with apartment info

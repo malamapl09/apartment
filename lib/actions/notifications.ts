@@ -39,10 +39,16 @@ export async function getUnreadCount() {
 
 export async function markAsRead(notificationId: string) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
   await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
-    .eq("id", notificationId);
+    .eq("id", notificationId)
+    .eq("user_id", user.id);
 
   revalidatePath("/");
   return { success: true };

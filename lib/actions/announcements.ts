@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 const announcementSchema = z.object({
   title: z.string().min(1),
@@ -110,11 +111,14 @@ export async function getAnnouncements() {
 }
 
 export async function deleteAnnouncement(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
   const { error } = await supabase
     .from("announcements")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
   if (error) return { error: error.message };
 
   revalidatePath("/admin/announcements");

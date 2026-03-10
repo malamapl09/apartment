@@ -65,7 +65,7 @@ export async function middleware(request: NextRequest) {
   // Redirect authenticated users away from auth routes to dashboard
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/admin";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 

@@ -146,6 +146,14 @@
     },
     "hint": "Buscar apartamentos, propietarios, solicitudes..."
   },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAll": "Marcar todas",
+    "loading": "Cargando...",
+    "empty": "No hay notificaciones",
+    "emptyDescription": "Te notificaremos cuando haya novedades",
+    "newNotification": "Nueva notificación"
+  },
   "reservations": {
     "status": {
       "pending_payment": "Pago Pendiente",

@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface AvailabilityEditorProps {
   spaceId: string;
@@ -17,22 +18,23 @@ interface AvailabilityEditorProps {
   locale: string;
 }
 
-const DAYS_OF_WEEK = [
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-];
-
 export default function AvailabilityEditor({
   spaceId,
   initialSchedule,
   locale,
 }: AvailabilityEditorProps) {
+  const t = useTranslations("admin.spaces.availability");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const DAYS_OF_WEEK = [
+    { value: 0, label: t("days.sunday") },
+    { value: 1, label: t("days.monday") },
+    { value: 2, label: t("days.tuesday") },
+    { value: 3, label: t("days.wednesday") },
+    { value: 4, label: t("days.thursday") },
+    { value: 5, label: t("days.friday") },
+    { value: 6, label: t("days.saturday") },
+  ];
 
   // Initialize schedule state
   const [schedule, setSchedule] = useState<
@@ -89,12 +91,12 @@ export default function AvailabilityEditor({
       const result = await updateSchedule(spaceId, scheduleData);
 
       if (result.success) {
-        toast.success("Availability schedule updated successfully");
+        toast.success(t("updateSuccess"));
       } else {
-        toast.error(result.error || "Failed to update schedule");
+        toast.error(result.error || t("updateError"));
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -130,7 +132,7 @@ export default function AvailabilityEditor({
                         htmlFor={`start-${value}`}
                         className="text-sm text-muted-foreground min-w-[40px]"
                       >
-                        From
+                        {t("from")}
                       </Label>
                       <Input
                         id={`start-${value}`}
@@ -147,7 +149,7 @@ export default function AvailabilityEditor({
                         htmlFor={`end-${value}`}
                         className="text-sm text-muted-foreground min-w-[40px]"
                       >
-                        To
+                        {t("to")}
                       </Label>
                       <Input
                         id={`end-${value}`}
@@ -164,7 +166,7 @@ export default function AvailabilityEditor({
 
                 {!schedule[value].enabled && (
                   <p className="text-sm text-muted-foreground flex-1">
-                    Not available on this day
+                    {t("notAvailable")}
                   </p>
                 )}
               </div>
@@ -176,7 +178,7 @@ export default function AvailabilityEditor({
       <div className="flex justify-end">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          Save Schedule
+          {t("saveSchedule")}
         </Button>
       </div>
     </form>

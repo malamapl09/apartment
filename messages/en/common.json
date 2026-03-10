@@ -146,6 +146,14 @@
     },
     "hint": "Search apartments, owners, requests..."
   },
+  "notifications": {
+    "title": "Notifications",
+    "markAll": "Mark all",
+    "loading": "Loading...",
+    "empty": "No notifications",
+    "emptyDescription": "We'll notify you when there are updates",
+    "newNotification": "New notification"
+  },
   "reservations": {
     "status": {
       "pending_payment": "Pending Payment",

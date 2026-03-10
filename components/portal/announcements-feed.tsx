@@ -3,20 +3,27 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { Announcement } from "@/types";
-import { format } from "date-fns";
+import { format, type Locale } from "date-fns";
 import { es } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { Megaphone } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+
+const dateLocales: Record<string, Locale> = { es, en: enUS };
 
 interface AnnouncementsFeedProps {
   announcements: Announcement[];
 }
 
 export function AnnouncementsFeed({ announcements }: AnnouncementsFeedProps) {
+  const t = useTranslations("portal.announcements_feed");
+  const currentLocale = useLocale();
+
   if (announcements.length === 0) {
     return (
       <div className="text-center py-12">
         <Megaphone className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-        <p className="text-muted-foreground">No hay anuncios disponibles</p>
+        <p className="text-muted-foreground">{t("empty")}</p>
       </div>
     );
   }
@@ -24,11 +31,11 @@ export function AnnouncementsFeed({ announcements }: AnnouncementsFeedProps) {
   const getTargetLabel = (target: string) => {
     switch (target) {
       case "all":
-        return "Todos";
+        return t("targetAll");
       case "owners":
-        return "Propietarios";
+        return t("targetOwners");
       case "residents":
-        return "Residentes";
+        return t("targetResidents");
       default:
         return target;
     }
@@ -64,7 +71,7 @@ export function AnnouncementsFeed({ announcements }: AnnouncementsFeedProps) {
               </div>
               <time className="text-xs text-muted-foreground whitespace-nowrap">
                 {format(new Date(announcement.published_at), "dd MMM yyyy", {
-                  locale: es,
+                  locale: dateLocales[currentLocale] || enUS,
                 })}
               </time>
             </div>
@@ -75,9 +82,9 @@ export function AnnouncementsFeed({ announcements }: AnnouncementsFeedProps) {
             </p>
             {announcement.expires_at && (
               <p className="text-xs text-muted-foreground mt-4 italic">
-                Válido hasta:{" "}
+                {t("validUntil")}{" "}
                 {format(new Date(announcement.expires_at), "dd MMM yyyy", {
-                  locale: es,
+                  locale: dateLocales[currentLocale] || enUS,
                 })}
               </p>
             )}

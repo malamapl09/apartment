@@ -12,9 +12,11 @@ import { getNotifications, getUnreadCount, markAsRead, markAllAsRead } from "@/l
 import { useRealtimeNotifications } from "@/lib/hooks/use-realtime-notifications";
 import { useUser } from "@/lib/hooks/use-user";
 import type { Notification } from "@/types";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, type Locale } from "date-fns";
 import { es } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useTranslations, useLocale } from "next-intl";
 
 // Map notification types to icons
 const getNotificationIcon = (type: string) => {
@@ -32,7 +34,11 @@ const getNotificationIcon = (type: string) => {
   }
 };
 
+const dateLocales: Record<string, Locale> = { es, en: enUS };
+
 export function NotificationList() {
+  const t = useTranslations("common.notifications");
+  const currentLocale = useLocale();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -42,8 +48,8 @@ export function NotificationList() {
   const handleNewNotification = useCallback(() => {
     loadNotifications();
     loadUnreadCount();
-    toast.info("New notification");
-  }, []);
+    toast.info(t("newNotification"));
+  }, [t]);
 
   useRealtimeNotifications({
     userId: profile?.id ?? null,
@@ -110,12 +116,12 @@ export function NotificationList() {
               {unreadCount > 9 ? "9+" : unreadCount}
             </Badge>
           )}
-          <span className="sr-only">Notificaciones</span>
+          <span className="sr-only">{t("title")}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold">Notificaciones</h3>
+          <h3 className="font-semibold">{t("title")}</h3>
           {unreadCount > 0 && (
             <Button
               variant="ghost"
@@ -124,7 +130,7 @@ export function NotificationList() {
               className="h-auto p-1 text-xs"
             >
               <CheckCheck className="h-3 w-3 mr-1" />
-              Marcar todas
+              {t("markAll")}
             </Button>
           )}
         </div>
@@ -132,14 +138,14 @@ export function NotificationList() {
         <ScrollArea className="h-[400px]">
           {loading ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Cargando...
+              {t("loading")}
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mb-3" />
-              <p className="text-sm font-medium">No hay notificaciones</p>
+              <p className="text-sm font-medium">{t("empty")}</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Te notificaremos cuando haya novedades
+                {t("emptyDescription")}
               </p>
             </div>
           ) : (
@@ -148,7 +154,7 @@ export function NotificationList() {
                 const Icon = getNotificationIcon(notification.type);
                 const timeAgo = formatDistanceToNow(new Date(notification.created_at), {
                   addSuffix: true,
-                  locale: es,
+                  locale: dateLocales[currentLocale] || enUS,
                 });
 
                 return (

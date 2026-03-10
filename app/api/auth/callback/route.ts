@@ -4,7 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const nextParam = searchParams.get("next") ?? "/";
+
+  // Validate the redirect path to prevent open redirects
+  const isValidNext =
+    nextParam.startsWith("/") &&
+    !nextParam.startsWith("//") &&
+    !nextParam.includes("://");
+  const next = isValidNext ? nextParam : "/";
 
   if (code) {
     const supabase = await createClient();

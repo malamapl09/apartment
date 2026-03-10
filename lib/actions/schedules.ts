@@ -1,10 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 export async function getSchedule(spaceId: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
+
+  // Verify the space belongs to the admin's building
+  const { data: space } = await supabase
+    .from("public_spaces")
+    .select("id")
+    .eq("id", spaceId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!space) return { error: "Space not found in your building", data: [] };
+
   const { data, error } = await supabase
     .from("availability_schedules")
     .select("*")
@@ -19,7 +30,17 @@ export async function updateSchedule(
   spaceId: string,
   schedules: Array<{ day_of_week: number; start_time: string; end_time: string }>
 ) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
+  // Verify the space belongs to the admin's building
+  const { data: space } = await supabase
+    .from("public_spaces")
+    .select("id")
+    .eq("id", spaceId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!space) return { error: "Space not found in your building" };
 
   // Delete existing schedules
   await supabase

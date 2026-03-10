@@ -28,17 +28,7 @@ import { createApartment, updateApartment } from "@/lib/actions/apartments";
 import { Apartment } from "@/types";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-
-const apartmentFormSchema = z.object({
-  unit_number: z.string().min(1, "Unit number is required"),
-  floor: z.number().int().min(0, "Floor must be a positive number"),
-  area_sqm: z.number().positive("Area must be positive"),
-  bedrooms: z.number().int().min(0, "Bedrooms must be 0 or more"),
-  bathrooms: z.number().int().min(0, "Bathrooms must be 0 or more"),
-  status: z.enum(["vacant", "occupied", "maintenance"]),
-});
-
-type ApartmentFormValues = z.infer<typeof apartmentFormSchema>;
+import { useTranslations } from "next-intl";
 
 interface ApartmentFormProps {
   initialData?: Apartment;
@@ -46,12 +36,24 @@ interface ApartmentFormProps {
 }
 
 export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) {
+  const t = useTranslations("admin.apartments.form");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
   const [isLoading, setIsLoading] = useState(false);
 
   const isEditMode = !!initialData;
+
+  const apartmentFormSchema = z.object({
+    unit_number: z.string().min(1, t("validation.unitRequired")),
+    floor: z.number().int().min(0, t("validation.floorMin")),
+    area_sqm: z.number().positive(t("validation.areaPositive")),
+    bedrooms: z.number().int().min(0, t("validation.bedroomsMin")),
+    bathrooms: z.number().int().min(0, t("validation.bathroomsMin")),
+    status: z.enum(["vacant", "occupied", "maintenance"]),
+  });
+
+  type ApartmentFormValues = z.infer<typeof apartmentFormSchema>;
 
   const form = useForm<ApartmentFormValues>({
     resolver: zodResolver(apartmentFormSchema),
@@ -88,18 +90,18 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
 
       if (isEditMode && apartmentId) {
         await updateApartment(apartmentId, formData);
-        toast.success("Apartment updated successfully");
+        toast.success(t("updateSuccess"));
       } else {
         await createApartment(formData);
-        toast.success("Apartment created successfully");
+        toast.success(t("createSuccess"));
         router.push(`/${locale}/admin/apartments`);
       }
       router.refresh();
     } catch (error) {
       toast.error(
         isEditMode
-          ? "Failed to update apartment"
-          : "Failed to create apartment"
+          ? t("updateError")
+          : t("createError")
       );
       console.error(error);
     } finally {
@@ -111,7 +113,7 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
     <Card>
       <CardHeader>
         <CardTitle>
-          {isEditMode ? "Edit Apartment" : "New Apartment"}
+          {isEditMode ? t("editTitle") : t("newTitle")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -123,12 +125,12 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 name="unit_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Unit Number</FormLabel>
+                    <FormLabel>{t("unitNumberLabel")}</FormLabel>
                     <FormControl>
                       <Input placeholder="101" {...field} />
                     </FormControl>
                     <FormDescription>
-                      The apartment unit number (e.g., 101, 2A)
+                      {t("unitNumberDescription")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -140,12 +142,12 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 name="floor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Floor</FormLabel>
+                    <FormLabel>{t("floorLabel")}</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="1" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Floor number (0 for ground floor)
+                      {t("floorDescription")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -157,12 +159,12 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 name="area_sqm"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Area (m²)</FormLabel>
+                    <FormLabel>{t("areaLabel")}</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" placeholder="85.5" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Total area in square meters
+                      {t("areaDescription")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -174,12 +176,12 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 name="bedrooms"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bedrooms</FormLabel>
+                    <FormLabel>{t("bedroomsLabel")}</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="2" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Number of bedrooms
+                      {t("bedroomsDescription")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -191,12 +193,12 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 name="bathrooms"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bathrooms</FormLabel>
+                    <FormLabel>{t("bathroomsLabel")}</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="2" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Number of bathrooms
+                      {t("bathroomsDescription")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -208,24 +210,24 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>{t("statusLabel")}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t("statusPlaceholder")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="vacant">Vacant</SelectItem>
-                        <SelectItem value="occupied">Occupied</SelectItem>
-                        <SelectItem value="maintenance">Maintenance</SelectItem>
+                        <SelectItem value="vacant">{t("statusVacant")}</SelectItem>
+                        <SelectItem value="occupied">{t("statusOccupied")}</SelectItem>
+                        <SelectItem value="maintenance">{t("statusMaintenance")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Current apartment status
+                      {t("statusDescription")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -240,11 +242,11 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                 onClick={() => router.push(`/${locale}/admin/apartments`)}
                 disabled={isLoading}
               >
-                Cancel
+                {t("cancelButton")}
               </Button>
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditMode ? "Update" : "Create"} Apartment
+                {isEditMode ? t("updateButton") : t("createButton")}
               </Button>
             </div>
           </form>

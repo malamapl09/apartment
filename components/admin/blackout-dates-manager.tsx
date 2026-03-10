@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface BlackoutDatesManagerProps {
   spaceId: string;
@@ -40,6 +41,7 @@ export default function BlackoutDatesManager({
   initialBlackouts,
   locale,
 }: BlackoutDatesManagerProps) {
+  const t = useTranslations("admin.spaces.blackouts_manager");
   const [blackouts, setBlackouts] = useState<BlackoutDate[]>(initialBlackouts);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [reason, setReason] = useState("");
@@ -48,7 +50,7 @@ export default function BlackoutDatesManager({
 
   const handleAddBlackout = async () => {
     if (!selectedDate) {
-      toast.error("Please select a date");
+      toast.error(t("selectDateError"));
       return;
     }
 
@@ -62,15 +64,15 @@ export default function BlackoutDatesManager({
       );
 
       if ('success' in result && result.success) {
-        toast.success("Blackout date added successfully");
+        toast.success(t("addSuccess"));
         setSelectedDate(undefined);
         setReason("");
         window.location.reload();
       } else if ('error' in result) {
-        toast.error(result.error || "Failed to add blackout date");
+        toast.error(result.error || t("addError"));
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     } finally {
       setIsAdding(false);
     }
@@ -84,12 +86,12 @@ export default function BlackoutDatesManager({
 
       if ('success' in result && result.success) {
         setBlackouts((prev) => prev.filter((b) => b.id !== id));
-        toast.success("Blackout date removed successfully");
+        toast.success(t("removeSuccess"));
       } else if ('error' in result) {
-        toast.error(result.error || "Failed to remove blackout date");
+        toast.error(result.error || t("removeError"));
       }
     } catch (error) {
-      toast.error("An unexpected error occurred");
+      toast.error(t("unexpectedError"));
     } finally {
       setDeletingId(null);
     }
@@ -105,7 +107,7 @@ export default function BlackoutDatesManager({
         <CardContent className="pt-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Select Date</Label>
+              <Label>{t("selectDateLabel")}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -119,7 +121,7 @@ export default function BlackoutDatesManager({
                     {selectedDate ? (
                       format(selectedDate, "PPP")
                     ) : (
-                      <span>Pick a date</span>
+                      <span>{t("pickDate")}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -141,12 +143,12 @@ export default function BlackoutDatesManager({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reason">Reason (Optional)</Label>
+              <Label htmlFor="reason">{t("reasonLabel")}</Label>
               <Input
                 id="reason"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="e.g., Maintenance, Private Event"
+                placeholder={t("reasonPlaceholder")}
               />
             </div>
 
@@ -156,7 +158,7 @@ export default function BlackoutDatesManager({
               className="w-full"
             >
               {isAdding && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Add Blackout Date
+              {t("addButton")}
             </Button>
           </div>
         </CardContent>
@@ -164,12 +166,12 @@ export default function BlackoutDatesManager({
 
       {/* Existing Blackouts List */}
       <div className="space-y-3">
-        <h3 className="font-semibold">Blackout Dates</h3>
+        <h3 className="font-semibold">{t("listTitle")}</h3>
 
         {blackouts.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center text-muted-foreground">
-              No blackout dates configured
+              {t("empty")}
             </CardContent>
           </Card>
         ) : (
@@ -212,21 +214,19 @@ export default function BlackoutDatesManager({
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
-                              Remove Blackout Date?
+                              {t("removeDialogTitle")}
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will allow bookings on{" "}
-                              {format(new Date(blackout.date), "PPP")}.
-                              This action cannot be undone.
+                              {t("removeDialogDescription", { date: format(new Date(blackout.date), "PPP") })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{t("removeDialogCancel")}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleRemoveBlackout(blackout.id)}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                              Remove
+                              {t("removeDialogConfirm")}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

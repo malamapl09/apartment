@@ -42,7 +42,7 @@ export default async function ReservationDetailPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}/auth/login`);
+    redirect(`/${locale}/login`);
   }
 
   // Fetch reservation with related data

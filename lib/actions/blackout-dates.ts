@@ -1,10 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 export async function getBlackouts(spaceId: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
+
+  // Verify the space belongs to the admin's building
+  const { data: space } = await supabase
+    .from("public_spaces")
+    .select("id")
+    .eq("id", spaceId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!space) return { error: "Space not found in your building", data: [] };
+
   const { data, error } = await supabase
     .from("blackout_dates")
     .select("*")
@@ -16,7 +27,18 @@ export async function getBlackouts(spaceId: string) {
 }
 
 export async function addBlackout(spaceId: string, date: string, reason?: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
+  // Verify the space belongs to the admin's building
+  const { data: space } = await supabase
+    .from("public_spaces")
+    .select("id")
+    .eq("id", spaceId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!space) return { error: "Space not found in your building" };
+
   const { error } = await supabase
     .from("blackout_dates")
     .insert({ space_id: spaceId, date, reason: reason || null });
@@ -28,11 +50,23 @@ export async function addBlackout(spaceId: string, date: string, reason?: string
 }
 
 export async function removeBlackout(id: string, spaceId: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
+  // Verify the space belongs to the admin's building
+  const { data: space } = await supabase
+    .from("public_spaces")
+    .select("id")
+    .eq("id", spaceId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!space) return { error: "Space not found in your building" };
+
   const { error } = await supabase
     .from("blackout_dates")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("space_id", spaceId);
 
   if (error) return { error: error.message };
 

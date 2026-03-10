@@ -16,6 +16,13 @@
     "browse_spaces": "Browse Spaces",
     "announcements": "Announcements",
     "announcements_description": "Latest news from your building",
+    "announcements_feed": {
+      "empty": "No announcements available",
+      "targetAll": "Everyone",
+      "targetOwners": "Owners",
+      "targetResidents": "Residents",
+      "validUntil": "Valid until:"
+    },
     "priority_high": "Important",
     "summary": {
       "pendingCharges": "Pending Charges",

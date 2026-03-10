@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/send";
 import { NewChargeEmail } from "@/lib/email/templates/new-charge";
 import { MaintenanceUpdateEmail } from "@/lib/email/templates/maintenance-update";
@@ -114,7 +114,7 @@ export async function sendNotificationEmail({
   templateProps,
 }: SendNotificationEmailOptions) {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get or create email preferences
     let { data: prefs } = await supabase

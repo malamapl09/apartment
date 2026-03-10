@@ -33,28 +33,34 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, type Locale } from "date-fns";
 import { es } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useTranslations, useLocale } from "next-intl";
 
-const formSchema = z.object({
-  title: z
-    .string()
-    .min(3, "El título debe tener al menos 3 caracteres")
-    .max(200, "El título no puede superar 200 caracteres"),
-  body: z
-    .string()
-    .min(10, "El contenido debe tener al menos 10 caracteres")
-    .max(2000, "El contenido no puede superar 2000 caracteres"),
-  target: z.enum(["all", "owners", "residents"]),
-  expires_at: z.date().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+const dateLocales: Record<string, Locale> = { es, en: enUS };
 
 export function AnnouncementForm() {
+  const t = useTranslations("admin.announcements.form");
   const router = useRouter();
+  const currentLocale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formSchema = z.object({
+    title: z
+      .string()
+      .min(3, t("validation.titleMin"))
+      .max(200, t("validation.titleMax")),
+    body: z
+      .string()
+      .min(10, t("validation.bodyMin"))
+      .max(2000, t("validation.bodyMax")),
+    target: z.enum(["all", "owners", "residents"]),
+    expires_at: z.date().optional(),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -79,12 +85,12 @@ export function AnnouncementForm() {
 
       await createAnnouncement(formData);
 
-      toast.success("Anuncio creado exitosamente");
+      toast.success(t("successToast"));
       router.push("/admin/announcements");
       router.refresh();
     } catch (error) {
       console.error("Error creating announcement:", error);
-      toast.error("Error al crear el anuncio. Por favor intenta de nuevo.");
+      toast.error(t("errorToast"));
     } finally {
       setIsSubmitting(false);
     }
@@ -98,15 +104,15 @@ export function AnnouncementForm() {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Título</FormLabel>
+              <FormLabel>{t("titleLabel")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Ej: Mantenimiento programado del ascensor"
+                  placeholder={t("titlePlaceholder")}
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                Un título claro y descriptivo del anuncio
+                {t("titleDescription")}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -118,16 +124,16 @@ export function AnnouncementForm() {
           name="body"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contenido</FormLabel>
+              <FormLabel>{t("bodyLabel")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Escribe el contenido del anuncio..."
+                  placeholder={t("bodyPlaceholder")}
                   className="min-h-[150px]"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                Describe los detalles importantes del anuncio
+                {t("bodyDescription")}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -139,21 +145,21 @@ export function AnnouncementForm() {
           name="target"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Audiencia</FormLabel>
+              <FormLabel>{t("targetLabel")}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona quién verá este anuncio" />
+                    <SelectValue placeholder={t("targetPlaceholder")} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="owners">Solo propietarios</SelectItem>
-                  <SelectItem value="residents">Solo residentes</SelectItem>
+                  <SelectItem value="all">{t("targetAll")}</SelectItem>
+                  <SelectItem value="owners">{t("targetOwners")}</SelectItem>
+                  <SelectItem value="residents">{t("targetResidents")}</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
-                Define quién podrá ver este anuncio
+                {t("targetDescription")}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -165,7 +171,7 @@ export function AnnouncementForm() {
           name="expires_at"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Fecha de expiración (opcional)</FormLabel>
+              <FormLabel>{t("expiresAtLabel")}</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -177,9 +183,9 @@ export function AnnouncementForm() {
                       )}
                     >
                       {field.value ? (
-                        format(field.value, "PPP", { locale: es })
+                        format(field.value, "PPP", { locale: dateLocales[currentLocale] || enUS })
                       ) : (
-                        <span>Seleccionar fecha</span>
+                        <span>{t("selectDate")}</span>
                       )}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
@@ -198,7 +204,7 @@ export function AnnouncementForm() {
                 </PopoverContent>
               </Popover>
               <FormDescription>
-                El anuncio se ocultará automáticamente después de esta fecha
+                {t("expiresAtDescription")}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -214,7 +220,7 @@ export function AnnouncementForm() {
             {isSubmitting && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {isSubmitting ? "Publicando..." : "Publicar anuncio"}
+            {isSubmitting ? t("submitting") : t("submit")}
           </Button>
           <Button
             type="button"
@@ -222,7 +228,7 @@ export function AnnouncementForm() {
             onClick={() => router.back()}
             disabled={isSubmitting}
           >
-            Cancelar
+            {t("cancel")}
           </Button>
         </div>
       </form>
