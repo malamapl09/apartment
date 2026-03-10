@@ -5,7 +5,7 @@ import { OwnerTable } from "@/components/admin/owner-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Upload, Search } from "lucide-react";
 
 export default async function OwnersPage({
   params,
@@ -29,12 +29,20 @@ export default async function OwnersPage({
             {t("description")}
           </p>
         </div>
-        <Link href={`/${locale}/admin/owners/invite`}>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            {t("inviteOwner")}
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href={`/${locale}/admin/owners/import`}>
+            <Button variant="outline">
+              <Upload className="mr-2 h-4 w-4" />
+              {t("importCsv")}
+            </Button>
+          </Link>
+          <Link href={`/${locale}/admin/owners/invite`}>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              {t("inviteOwner")}
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search bar */}
