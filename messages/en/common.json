@@ -14,7 +14,11 @@
     "settings": "Settings",
     "portal": "Owner Portal",
     "admin": "Admin Panel",
-    "pendingPayments": "Pending Payments"
+    "pendingPayments": "Pending Payments",
+    "maintenance": "Maintenance",
+    "visitors": "Visitors",
+    "documents": "Documents",
+    "fees": "Fees & Payments"
   },
   "actions": {
     "save": "Save",
@@ -37,7 +41,10 @@
     "upload": "Upload",
     "download": "Download",
     "view": "View",
-    "invite": "Invite"
+    "invite": "Invite",
+    "submitting": "Submitting...",
+    "uploading": "Uploading...",
+    "generating": "Generating..."
   },
   "status": {
     "active": "Active",
@@ -67,7 +74,11 @@
     "total": "Total",
     "noResults": "No results found",
     "loading": "Loading...",
-    "required": "Required"
+    "required": "Required",
+    "optional": "(optional)",
+    "category": "Category",
+    "details": "Details",
+    "reference": "Reference"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

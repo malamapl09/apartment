@@ -1,0 +1,164 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import type { MaintenanceStatus } from "@/types";
+
+export async function getMaintenanceRequests(filters?: {
+  status?: string;
+  priority?: string;
+  category?: string;
+}) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized", data: [] };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("building_id, role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized", data: [] };
+  }
+
+  let query = supabase
+    .from("maintenance_requests")
+    .select(
+      `*, profiles (id, full_name, email), apartments (id, unit_number)`
+    )
+    .eq("building_id", profile.building_id)
+    .order("created_at", { ascending: false });
+
+  if (filters?.status) query = query.eq("status", filters.status);
+  if (filters?.priority) query = query.eq("priority", filters.priority);
+  if (filters?.category) query = query.eq("category", filters.category);
+
+  const { data, error } = await query;
+  if (error) return { error: error.message, data: [] };
+  return { data: data || [] };
+}
+
+export async function updateMaintenanceStatus(
+  id: string,
+  status: MaintenanceStatus,
+  assignedTo?: string
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized" };
+  }
+
+  const updates: Record<string, unknown> = { status };
+
+  if (status === "resolved") {
+    updates.resolved_at = new Date().toISOString();
+  }
+  if (status === "closed") {
+    updates.closed_at = new Date().toISOString();
+  }
+  if (assignedTo !== undefined) {
+    updates.assigned_to = assignedTo || null;
+    if (assignedTo) {
+      updates.assigned_at = new Date().toISOString();
+    }
+  }
+
+  const { error } = await supabase
+    .from("maintenance_requests")
+    .update(updates)
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/maintenance");
+  revalidatePath(`/admin/maintenance/${id}`);
+  return { success: true };
+}
+
+export async function addInternalNote(requestId: string, body: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase.from("maintenance_comments").insert({
+    request_id: requestId,
+    user_id: user.id,
+    body,
+    is_internal: true,
+  });
+
+  if (error) return { error: error.message };
+
+  revalidatePath(`/admin/maintenance/${requestId}`);
+  return { success: true };
+}
+
+export async function getMaintenanceStats() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized", data: null };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("building_id, role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized", data: null };
+  }
+
+  const { data, error } = await supabase
+    .from("maintenance_requests")
+    .select("status")
+    .eq("building_id", profile.building_id);
+
+  if (error) return { error: error.message, data: null };
+
+  const counts = (data || []).reduce(
+    (acc, row) => {
+      acc[row.status] = (acc[row.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  return {
+    data: {
+      open: counts["open"] || 0,
+      in_progress: counts["in_progress"] || 0,
+      waiting_parts: counts["waiting_parts"] || 0,
+      resolved: counts["resolved"] || 0,
+      closed: counts["closed"] || 0,
+    },
+  };
+}

@@ -14,7 +14,11 @@
     "settings": "Configuraci\u00f3n",
     "portal": "Portal de Propietarios",
     "admin": "Panel Administrativo",
-    "pendingPayments": "Pagos Pendientes"
+    "pendingPayments": "Pagos Pendientes",
+    "maintenance": "Mantenimiento",
+    "visitors": "Visitantes",
+    "documents": "Documentos",
+    "fees": "Cuotas y Pagos"
   },
   "actions": {
     "save": "Guardar",
@@ -37,7 +41,10 @@
     "upload": "Subir",
     "download": "Descargar",
     "view": "Ver",
-    "invite": "Invitar"
+    "invite": "Invitar",
+    "submitting": "Enviando...",
+    "uploading": "Subiendo...",
+    "generating": "Generando..."
   },
   "status": {
     "active": "Activo",
@@ -67,7 +74,11 @@
     "total": "Total",
     "noResults": "No se encontraron resultados",
     "loading": "Cargando...",
-    "required": "Requerido"
+    "required": "Requerido",
+    "optional": "(opcional)",
+    "category": "Categor\u00eda",
+    "details": "Detalles",
+    "reference": "Referencia"
   },
   "errors": {
     "generic": "Algo sali\u00f3 mal. Por favor, int\u00e9ntalo de nuevo.",

@@ -1,0 +1,173 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+
+export async function getAllVisitors(filters?: {
+  status?: string;
+  date?: string;
+  apartment_id?: string;
+}) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized", data: [] };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("building_id, role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized", data: [] };
+  }
+
+  let query = supabase
+    .from("visitors")
+    .select(
+      `*, profiles (id, full_name), apartments (id, unit_number)`
+    )
+    .eq("building_id", profile.building_id)
+    .order("valid_from", { ascending: false });
+
+  if (filters?.status) query = query.eq("status", filters.status);
+  if (filters?.apartment_id)
+    query = query.eq("apartment_id", filters.apartment_id);
+  if (filters?.date) {
+    const dateStart = `${filters.date}T00:00:00`;
+    const dateEnd = `${filters.date}T23:59:59`;
+    query = query.gte("valid_from", dateStart).lte("valid_from", dateEnd);
+  }
+
+  const { data, error } = await query;
+  if (error) return { error: error.message, data: [] };
+  return { data: data || [] };
+}
+
+export async function checkInVisitor(id: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("visitors")
+    .update({
+      status: "checked_in",
+      checked_in_at: new Date().toISOString(),
+      checked_in_by: user.id,
+    })
+    .eq("id", id)
+    .eq("status", "expected");
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/visitors");
+  return { success: true };
+}
+
+export async function checkOutVisitor(id: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("visitors")
+    .update({
+      status: "checked_out",
+      checked_out_at: new Date().toISOString(),
+      checked_out_by: user.id,
+    })
+    .eq("id", id)
+    .eq("status", "checked_in");
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/visitors");
+  return { success: true };
+}
+
+export async function getTodaysVisitors() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized", data: [] };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("building_id, role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized", data: [] };
+  }
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("visitors")
+    .select(`*, profiles (id, full_name), apartments (id, unit_number)`)
+    .eq("building_id", profile.building_id)
+    .eq("status", "expected")
+    .lte("valid_from", now)
+    .gte("valid_until", now)
+    .order("valid_from", { ascending: true });
+
+  if (error) return { error: error.message, data: [] };
+  return { data: data || [] };
+}
+
+export async function lookupByAccessCode(code: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("building_id, role")
+    .eq("id", user.id)
+    .single();
+  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
+    return { error: "Unauthorized" };
+  }
+
+  const { data, error } = await supabase
+    .from("visitors")
+    .select(`*, apartments (id, unit_number), profiles (id, full_name)`)
+    .eq("building_id", profile.building_id)
+    .eq("access_code", code.toUpperCase())
+    .single();
+
+  if (error) return { error: "not_found" };
+  return { data };
+}

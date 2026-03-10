@@ -15,6 +15,10 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
+  Wrench,
+  UserCheck,
+  FileText,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -70,6 +74,30 @@ const adminItems: NavItem[] = [
     icon: Megaphone,
     roles: ["super_admin", "admin"],
   },
+  {
+    titleKey: "maintenance",
+    href: "/admin/maintenance",
+    icon: Wrench,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "visitors",
+    href: "/admin/visitors",
+    icon: UserCheck,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "documents",
+    href: "/admin/documents",
+    icon: FileText,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "fees",
+    href: "/admin/fees",
+    icon: DollarSign,
+    roles: ["super_admin", "admin"],
+  },
 ];
 
 const portalItems: NavItem[] = [
@@ -89,6 +117,30 @@ const portalItems: NavItem[] = [
     titleKey: "reservations",
     href: "/portal/reservations",
     icon: CalendarDays,
+    roles: ["owner", "resident"],
+  },
+  {
+    titleKey: "maintenance",
+    href: "/portal/maintenance",
+    icon: Wrench,
+    roles: ["owner", "resident"],
+  },
+  {
+    titleKey: "visitors",
+    href: "/portal/visitors",
+    icon: UserCheck,
+    roles: ["owner", "resident"],
+  },
+  {
+    titleKey: "documents",
+    href: "/portal/documents",
+    icon: FileText,
+    roles: ["owner", "resident"],
+  },
+  {
+    titleKey: "fees",
+    href: "/portal/fees",
+    icon: DollarSign,
     roles: ["owner", "resident"],
   },
   {

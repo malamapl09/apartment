@@ -170,6 +170,164 @@ export interface AuditLog {
   created_at: string;
 }
 
+// Document Sharing
+export type DocumentCategory = "rules" | "minutes" | "contracts" | "notices" | "forms";
+export type DocumentTarget = "all" | "owners" | "residents";
+
+export interface Document {
+  id: string;
+  building_id: string;
+  title: string;
+  description: string | null;
+  category: DocumentCategory;
+  file_url: string;
+  file_name: string;
+  file_size: number | null;
+  mime_type: string | null;
+  version: number;
+  previous_version_id: string | null;
+  target: DocumentTarget;
+  uploaded_by: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DocumentWithUploader extends Document {
+  profiles: Pick<Profile, "id" | "full_name"> | null;
+}
+
+// Maintenance Requests
+export type MaintenanceCategory = "plumbing" | "electrical" | "hvac" | "structural" | "pest_control" | "general";
+export type MaintenancePriority = "low" | "medium" | "high" | "urgent";
+export type MaintenanceStatus = "open" | "in_progress" | "waiting_parts" | "resolved" | "closed";
+
+export interface MaintenanceRequest {
+  id: string;
+  building_id: string;
+  apartment_id: string | null;
+  requested_by: string;
+  title: string;
+  description: string;
+  category: MaintenanceCategory;
+  priority: MaintenancePriority;
+  status: MaintenanceStatus;
+  photos: string[];
+  assigned_to: string | null;
+  assigned_at: string | null;
+  resolved_at: string | null;
+  closed_at: string | null;
+  reference_code: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MaintenanceComment {
+  id: string;
+  request_id: string;
+  user_id: string;
+  body: string;
+  is_internal: boolean;
+  created_at: string;
+}
+
+export interface MaintenanceRequestWithDetails extends MaintenanceRequest {
+  profiles: Pick<Profile, "id" | "full_name" | "email">;
+  apartments: Pick<Apartment, "id" | "unit_number"> | null;
+  maintenance_comments: (MaintenanceComment & { profiles: Pick<Profile, "id" | "full_name"> })[];
+}
+
+// Visitor Management
+export type VisitorStatus = "expected" | "checked_in" | "checked_out" | "expired" | "cancelled";
+export type RecurrencePattern = "daily" | "weekly" | "monthly";
+
+export interface Visitor {
+  id: string;
+  building_id: string;
+  apartment_id: string;
+  registered_by: string;
+  visitor_name: string;
+  visitor_id_number: string | null;
+  visitor_phone: string | null;
+  vehicle_plate: string | null;
+  vehicle_description: string | null;
+  purpose: string | null;
+  access_code: string;
+  valid_from: string;
+  valid_until: string;
+  is_recurring: boolean;
+  recurrence_pattern: RecurrencePattern | null;
+  recurrence_end_date: string | null;
+  status: VisitorStatus;
+  checked_in_at: string | null;
+  checked_out_at: string | null;
+  checked_in_by: string | null;
+  checked_out_by: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VisitorWithDetails extends Visitor {
+  profiles: Pick<Profile, "id" | "full_name">;
+  apartments: Pick<Apartment, "id" | "unit_number">;
+}
+
+// Expense/Fee Tracking
+export type FeeCategory = "maintenance_fee" | "common_area" | "parking" | "special_assessment" | "other";
+export type ChargeStatus = "pending" | "paid" | "overdue" | "partial";
+export type PaymentMethod = "bank_transfer" | "cash" | "check" | "other";
+
+export interface FeeType {
+  id: string;
+  building_id: string;
+  name: string;
+  category: FeeCategory;
+  default_amount: number;
+  is_recurring: boolean;
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Charge {
+  id: string;
+  building_id: string;
+  apartment_id: string;
+  fee_type_id: string;
+  amount: number;
+  due_date: string;
+  period_month: number;
+  period_year: number;
+  status: ChargeStatus;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChargeWithDetails extends Charge {
+  fee_types: FeeType;
+  apartments: Pick<Apartment, "id" | "unit_number">;
+  payments: Payment[];
+}
+
+export interface Payment {
+  id: string;
+  charge_id: string;
+  building_id: string;
+  apartment_id: string;
+  amount: number;
+  payment_date: string;
+  payment_method: PaymentMethod | null;
+  reference_number: string | null;
+  proof_url: string | null;
+  recorded_by: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
 // Extended types with joins
 export interface ApartmentWithOwners extends Apartment {
   apartment_owners: (ApartmentOwner & { profiles: Profile })[];
