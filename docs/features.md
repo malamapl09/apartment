@@ -108,7 +108,38 @@
 - Validates that the password is at least 8 characters and matches the confirmation field.
 - Calls `supabase.auth.updateUser` to set the new password.
 
-### 2.4 Sign Out
+### 2.4 Self-Service Registration
+
+| Property | Value |
+|---|---|
+| **Route** | `/register` |
+| **Server Action** | `lib/actions/register.ts` -- `registerBuilding(formData)` |
+| **Component** | `components/register/register-wizard.tsx` |
+| **i18n** | `messages/{locale}/register.json` |
+
+**3-Step Wizard**:
+
+1. **Account** (Step 1): Full name, email, password, confirm password.
+2. **Building** (Step 2): Building name, address (optional), total units, timezone.
+3. **Complete** (Step 3): Success confirmation with "Go to Dashboard" button.
+
+**Validation**:
+
+- Step 1: Full name ≥ 2 chars, valid email, password ≥ 8 chars, passwords match.
+- Step 2: Building name required, total units ≥ 1, timezone required.
+- Server-side: Zod schema validates all fields again.
+
+**Server Action Behavior** (`registerBuilding`):
+
+1. Creates auth user via `adminClient.auth.admin.createUser()` with `email_confirm: true`.
+2. Creates a building record.
+3. Creates a profile with `role: "admin"` (never `super_admin`).
+4. Creates default email preferences.
+5. Signs in the user automatically.
+6. **Atomic rollback**: If any step fails, previously created records are cleaned up (user, building).
+7. **Error sanitization**: Auth errors like "User already registered" are mapped to a generic message to prevent enumeration.
+
+### 2.5 Sign Out
 
 | Property | Value |
 |---|---|

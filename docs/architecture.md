@@ -290,6 +290,7 @@ app/
   [locale]/                          # Dynamic locale segment (en, es)
     (auth)/                          # Public authentication routes
       login/page.tsx
+      register/page.tsx               # Self-service building registration
       forgot-password/page.tsx
       set-password/page.tsx
     (setup)/                         # First-time setup wizard
@@ -351,7 +352,7 @@ The middleware (`middleware.ts`) processes every request that matches `/((?!api|
 
 3. **Route protection**:
    - Unauthenticated users accessing dashboard routes (`/admin/*`, `/portal/*`, `/super-admin/*`) are redirected to `/login`.
-   - Authenticated users accessing auth routes (`/login`, `/forgot-password`, `/set-password`, `/setup`) are redirected to `/`.
+   - Authenticated users accessing auth routes (`/login`, `/register`, `/forgot-password`, `/set-password`, `/setup`) are redirected to `/`.
    - The root path (`/`) is excluded from the unauthenticated redirect to allow the root page component to handle its own redirect logic.
 
 4. **Cookie merging**: Supabase sets session cookies on its response. These cookies are merged into the `next-intl` response so both middleware layers' effects are preserved in the final response.
@@ -1060,6 +1061,7 @@ export async function doSomething(input) {
 | File | Domain | Key Actions |
 |------|--------|-------------|
 | `auth.ts` | Authentication | login, signOut, forgotPassword, setPassword, updateMyProfile |
+| `register.ts` | Self-service registration | registerBuilding |
 | `setup.ts` | Initial setup | checkBuildingsExist, completeSetup |
 | `admin-users.ts` | User management | inviteOwner |
 | `apartments.ts` | Apartment CRUD | createApartment, updateApartment, deleteApartment |
@@ -1442,6 +1444,25 @@ Additional indexes were added in migration `20260310000001_dashboard_indexes.sql
 ### RLS Function Caching
 
 The `get_my_building_id()` and `get_my_role()` functions are marked `STABLE`, telling PostgreSQL they return the same result within a single transaction. This allows the planner to cache the result when a single query triggers multiple RLS policy evaluations.
+
+### PostgREST FK Hints (Ambiguous Relationships)
+
+Several tables have multiple foreign keys pointing to `profiles`, which causes PostgREST to throw **"Could not embed because more than one relationship was found"** errors. You must use explicit FK column hints in `.select()` queries:
+
+| Table | FK Columns to `profiles` | Hint Syntax |
+|-------|--------------------------|-------------|
+| `reservations` | `user_id`, `payment_verified_by`, `cancelled_by` | `profiles!user_id(...)` |
+| `visitors` | `registered_by`, `checked_in_by`, `checked_out_by` | `profiles!registered_by(...)` |
+| `packages` | `received_by`, `picked_up_by` | `profiles!packages_received_by_fkey(...)` |
+
+Example:
+```typescript
+// WRONG — ambiguous, will error at runtime
+.select(`*, profiles (id, full_name, email)`)
+
+// CORRECT — explicit FK hint
+.select(`*, profiles!user_id(id, full_name, email)`)
+```
 
 ### Cache Invalidation
 

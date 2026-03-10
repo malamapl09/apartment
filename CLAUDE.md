@@ -84,6 +84,10 @@ export default async function Page({
 - Migrations: `supabase/migrations/` with timestamp prefix `YYYYMMDDHHMMSS_description.sql`
 - Always enable RLS on new tables
 - Use `SECURITY DEFINER` sparingly and set `search_path = ''`
+- **FK hints required**: When a table has multiple FKs to the same target (e.g. `reservations` → `profiles` via `user_id`, `payment_verified_by`, `cancelled_by`), use explicit FK hints in `.select()`: `profiles!user_id(id, full_name)`. Without hints, PostgREST throws "ambiguous relationship" errors.
+  - `reservations` → `profiles`: use `profiles!user_id(...)`
+  - `visitors` → `profiles`: use `profiles!registered_by(...)`
+  - `packages` → `profiles`: use `profiles!packages_received_by_fkey(...)` / `profiles!packages_picked_up_by_fkey(...)`
 
 ## Components
 
