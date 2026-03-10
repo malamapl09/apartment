@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
+import { createNotification } from "@/lib/notifications/create";
 
 const logPackageSchema = z.object({
   apartment_id: z.string().uuid("Invalid apartment ID"),
@@ -88,6 +89,14 @@ export async function logPackage(data: {
           buildingName: building?.name ?? "",
           receivedAt: new Date().toLocaleString(),
         },
+      }).catch(() => {});
+
+      createNotification({
+        userId: owner.profile_id,
+        type: "package",
+        title: "Package received",
+        body: `A package has arrived for unit ${apartment?.unit_number ?? ""}: ${data.description}`,
+        data: { action_url: "/portal/packages" },
       }).catch(() => {});
     }
   }

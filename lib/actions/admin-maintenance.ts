@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { MaintenanceStatus } from "@/types";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
+import { createNotification } from "@/lib/notifications/create";
 
 export async function getMaintenanceRequests(filters?: {
   status?: string;
@@ -96,7 +97,7 @@ export async function updateMaintenanceStatus(
 
   if (error) return { error: error.message };
 
-  // Fire-and-forget: send maintenance update email to requester
+  // Fire-and-forget: send maintenance update email and in-app notification
   if (request) {
     sendNotificationEmail({
       userId: request.requested_by,
@@ -106,6 +107,14 @@ export async function updateMaintenanceStatus(
         title: request.title,
         newStatus: status,
       },
+    }).catch(() => {});
+
+    createNotification({
+      userId: request.requested_by,
+      type: "maintenance_update",
+      title: `Maintenance request updated`,
+      body: `${request.reference_code}: ${request.title} — status changed to ${status.replace("_", " ")}`,
+      data: { action_url: `/portal/maintenance/${id}` },
     }).catch(() => {});
   }
 

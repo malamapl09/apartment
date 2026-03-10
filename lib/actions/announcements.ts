@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 import { getAdminProfile } from "@/lib/actions/helpers";
+import { createBulkNotifications } from "@/lib/notifications/create";
 
 const announcementSchema = z.object({
   title: z.string().min(1),
@@ -68,7 +69,7 @@ export async function createAnnouncement(formData: FormData) {
 
   const { data: members } = await membersQuery;
 
-  if (members) {
+  if (members && members.length > 0) {
     for (const member of members) {
       sendNotificationEmail({
         userId: member.id,
@@ -80,6 +81,16 @@ export async function createAnnouncement(formData: FormData) {
         },
       }).catch(() => {});
     }
+
+    createBulkNotifications(
+      members.map((m) => m.id),
+      {
+        type: "announcement",
+        title: result.data.title,
+        body: result.data.body,
+        data: { action_url: "/portal/announcements" },
+      }
+    ).catch(() => {});
   }
 
   revalidatePath("/admin/announcements");

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminProfile } from "@/lib/actions/helpers";
+import { createNotification } from "@/lib/notifications/create";
 
 export async function getReservations(filters?: {
   status?: string;
@@ -63,6 +64,15 @@ export async function verifyPayment(reservationId: string) {
   const { error: authError, supabase, user, profile } = await getAdminProfile();
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
+  const { data: reservation } = await supabase
+    .from("reservations")
+    .select("user_id, reference_code")
+    .eq("id", reservationId)
+    .eq("building_id", profile.building_id)
+    .single();
+
+  if (!reservation) return { error: "Reservation not found" };
+
   const { error } = await supabase
     .from("reservations")
     .update({
@@ -76,6 +86,14 @@ export async function verifyPayment(reservationId: string) {
 
   if (error) return { error: error.message };
 
+  createNotification({
+      userId: reservation.user_id,
+      type: "reservation_status",
+      title: "Payment verified",
+      body: `Your reservation ${reservation.reference_code} has been confirmed`,
+      data: { action_url: `/portal/reservations/${reservationId}` },
+  }).catch(() => {});
+
   revalidatePath("/admin/reservations");
   revalidatePath("/admin/reservations/pending");
   return { success: true };
@@ -84,6 +102,15 @@ export async function verifyPayment(reservationId: string) {
 export async function rejectPayment(reservationId: string, reason: string) {
   const { error: authError, supabase, profile } = await getAdminProfile();
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
+
+  const { data: reservation } = await supabase
+    .from("reservations")
+    .select("user_id, reference_code")
+    .eq("id", reservationId)
+    .eq("building_id", profile.building_id)
+    .single();
+
+  if (!reservation) return { error: "Reservation not found" };
 
   const { error } = await supabase
     .from("reservations")
@@ -98,6 +125,14 @@ export async function rejectPayment(reservationId: string, reason: string) {
 
   if (error) return { error: error.message };
 
+  createNotification({
+    userId: reservation.user_id,
+    type: "reservation_status",
+    title: "Payment rejected",
+    body: `Your payment for reservation ${reservation.reference_code} was rejected: ${reason}`,
+    data: { action_url: `/portal/reservations/${reservationId}` },
+  }).catch(() => {});
+
   revalidatePath("/admin/reservations");
   revalidatePath("/admin/reservations/pending");
   return { success: true };
@@ -106,6 +141,15 @@ export async function rejectPayment(reservationId: string, reason: string) {
 export async function adminCancelReservation(reservationId: string, reason: string) {
   const { error: authError, supabase, user, profile } = await getAdminProfile();
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
+
+  const { data: reservation } = await supabase
+    .from("reservations")
+    .select("user_id, reference_code")
+    .eq("id", reservationId)
+    .eq("building_id", profile.building_id)
+    .single();
+
+  if (!reservation) return { error: "Reservation not found" };
 
   const { error } = await supabase
     .from("reservations")
@@ -119,6 +163,14 @@ export async function adminCancelReservation(reservationId: string, reason: stri
     .in("status", ["pending_payment", "payment_submitted", "confirmed"]);
 
   if (error) return { error: error.message };
+
+  createNotification({
+    userId: reservation.user_id,
+    type: "reservation_status",
+    title: "Reservation cancelled",
+    body: `Your reservation ${reservation.reference_code} was cancelled: ${reason}`,
+    data: { action_url: `/portal/reservations/${reservationId}` },
+  }).catch(() => {});
 
   revalidatePath("/admin/reservations");
   revalidatePath("/admin/reservations/pending");

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
+import { createNotification } from "@/lib/notifications/create";
 
 export async function getAllVisitors(filters?: {
   status?: string;
@@ -85,7 +86,7 @@ export async function checkInVisitor(id: string) {
 
   if (error) return { error: error.message };
 
-  // Fire-and-forget: send visitor check-in email to the registering user
+  // Fire-and-forget: send visitor check-in email and in-app notification
   if (visitor) {
     // Get building name
     const { data: building } = await supabase
@@ -102,6 +103,14 @@ export async function checkInVisitor(id: string) {
         buildingName: building?.name ?? "",
         checkedInAt: new Date(checkedInAt).toLocaleString(),
       },
+    }).catch(() => {});
+
+    createNotification({
+      userId: visitor.registered_by,
+      type: "visitor_checkin",
+      title: `${visitor.visitor_name} has checked in`,
+      body: `Your visitor arrived at ${new Date(checkedInAt).toLocaleTimeString()}`,
+      data: { action_url: "/portal/visitors" },
     }).catch(() => {});
   }
 

@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Check, CheckCheck, Calendar, AlertCircle, MessageSquare, Info } from "lucide-react";
+import { Bell, CheckCheck, Calendar, AlertCircle, MessageSquare, Info, Package, Wrench, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+
 import { toast } from "sonner";
 import { getNotifications, getUnreadCount, markAsRead, markAllAsRead } from "@/lib/actions/notifications";
 import { useRealtimeNotifications } from "@/lib/hooks/use-realtime-notifications";
@@ -34,6 +34,12 @@ const getNotificationIcon = (type: string) => {
       return AlertCircle;
     case "comment":
       return MessageSquare;
+    case "maintenance_update":
+      return Wrench;
+    case "package":
+      return Package;
+    case "visitor_checkin":
+      return UserCheck;
     default:
       return Bell;
   }
