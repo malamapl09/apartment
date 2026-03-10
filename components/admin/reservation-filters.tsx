@@ -23,7 +23,7 @@ export function ReservationFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentStatus = searchParams.get("status") || "";
+  const currentStatus = searchParams.get("status") || "all";
   const currentSpaceId = searchParams.get("space_id") || "";
   const currentDateFrom = searchParams.get("date_from") || "";
   const currentDateTo = searchParams.get("date_to") || "";
@@ -50,12 +50,12 @@ export function ReservationFilters() {
         {/* Status Filter */}
         <div className="space-y-2">
           <Label htmlFor="status">{t("status")}</Label>
-          <Select value={currentStatus} onValueChange={(value) => updateFilter("status", value)}>
+          <Select value={currentStatus} onValueChange={(value) => updateFilter("status", value === "all" ? "" : value)}>
             <SelectTrigger id="status">
               <SelectValue placeholder={t("statusPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">{t("allStatuses")}</SelectItem>
+              <SelectItem value="all">{t("allStatuses")}</SelectItem>
               {statusOptions.map((status) => (
                 <SelectItem key={status} value={status}>
                   {t(`statusOptions.${status}`)}
