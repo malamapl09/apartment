@@ -23,6 +23,7 @@ import {
   Package,
   Vote,
   FileBarChart,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,12 @@ const adminItems: NavItem[] = [
     titleKey: "audit",
     href: "/admin/audit",
     icon: History,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "settings",
+    href: "/admin/settings",
+    icon: Settings,
     roles: ["super_admin", "admin"],
   },
 ];

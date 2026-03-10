@@ -928,6 +928,41 @@
         "atLeastTwoOptions": "Se requieren al menos 2 opciones"
       }
     },
+    "settings": {
+      "title": "Configuración del Edificio",
+      "description": "Configura la información del edificio y los ajustes de pago",
+      "general": {
+        "title": "Información General",
+        "description": "Datos básicos y configuración del edificio",
+        "name": "Nombre del Edificio",
+        "namePlaceholder": "ej. Torres del Sol",
+        "address": "Dirección",
+        "addressPlaceholder": "Dirección completa del edificio...",
+        "totalUnits": "Total de Unidades",
+        "timezone": "Zona Horaria",
+        "timezonePlaceholder": "Seleccionar zona horaria",
+        "paymentDeadline": "Plazo de Pago (horas)",
+        "paymentDeadlineDescription": "Horas otorgadas para completar el pago después de una reservación"
+      },
+      "bank": {
+        "title": "Información Bancaria",
+        "description": "Datos de pago mostrados a los residentes para transferencias bancarias",
+        "bankName": "Nombre del Banco",
+        "bankNamePlaceholder": "ej. Banco Popular",
+        "accountNumber": "Número de Cuenta",
+        "accountNumberPlaceholder": "ej. 1234567890",
+        "accountType": "Tipo de Cuenta",
+        "accountTypePlaceholder": "Seleccionar tipo de cuenta",
+        "checking": "Corriente",
+        "savings": "Ahorros",
+        "holderName": "Nombre del Titular",
+        "holderNamePlaceholder": "ej. HOA Residencial Sunset"
+      },
+      "saveButton": "Guardar Configuración",
+      "saving": "Guardando...",
+      "saveSuccess": "Configuración actualizada exitosamente",
+      "saveError": "Error al actualizar la configuración"
+    },
     "reports": {
       "title": "Reportes y Exportación",
       "description": "Genera reportes y exporta datos",

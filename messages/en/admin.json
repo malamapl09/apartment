@@ -928,6 +928,41 @@
         "atLeastTwoOptions": "At least 2 options are required"
       }
     },
+    "settings": {
+      "title": "Building Settings",
+      "description": "Configure your building information and payment settings",
+      "general": {
+        "title": "General Information",
+        "description": "Basic building details and configuration",
+        "name": "Building Name",
+        "namePlaceholder": "e.g., Sunset Towers",
+        "address": "Address",
+        "addressPlaceholder": "Full building address...",
+        "totalUnits": "Total Units",
+        "timezone": "Timezone",
+        "timezonePlaceholder": "Select timezone",
+        "paymentDeadline": "Payment Deadline (hours)",
+        "paymentDeadlineDescription": "Hours given to complete payment after a reservation"
+      },
+      "bank": {
+        "title": "Bank Account Information",
+        "description": "Payment details shown to residents for bank transfers",
+        "bankName": "Bank Name",
+        "bankNamePlaceholder": "e.g., Banco Popular",
+        "accountNumber": "Account Number",
+        "accountNumberPlaceholder": "e.g., 1234567890",
+        "accountType": "Account Type",
+        "accountTypePlaceholder": "Select account type",
+        "checking": "Checking",
+        "savings": "Savings",
+        "holderName": "Account Holder Name",
+        "holderNamePlaceholder": "e.g., Residencial Sunset HOA"
+      },
+      "saveButton": "Save Settings",
+      "saving": "Saving...",
+      "saveSuccess": "Settings updated successfully",
+      "saveError": "Failed to update settings"
+    },
     "reports": {
       "title": "Reports & Export",
       "description": "Generate reports and export data",
