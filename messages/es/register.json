@@ -1,0 +1,52 @@
+{
+  "register": {
+    "steps": {
+      "account": "Tu Cuenta",
+      "building": "Datos del Edificio",
+      "complete": "Listo"
+    },
+    "account": {
+      "title": "Crea tu cuenta",
+      "description": "Ingresa tus datos para registrarte como administrador de edificio",
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Juan Perez",
+      "email": "Correo Electronico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "password": "Contrasena",
+      "passwordPlaceholder": "Minimo 8 caracteres",
+      "confirmPassword": "Confirmar Contrasena",
+      "confirmPasswordPlaceholder": "Vuelve a escribir tu contrasena",
+      "next": "Continuar",
+      "alreadyHaveAccount": "Ya tienes una cuenta?",
+      "logIn": "Iniciar sesion"
+    },
+    "building": {
+      "title": "Configura tu edificio",
+      "description": "Ingresa los datos del edificio que deseas administrar",
+      "name": "Nombre del Edificio",
+      "namePlaceholder": "ej. Torres del Sol",
+      "address": "Direccion",
+      "addressPlaceholder": "Direccion completa del edificio...",
+      "totalUnits": "Total de Unidades",
+      "timezone": "Zona Horaria",
+      "timezonePlaceholder": "Seleccionar zona horaria",
+      "back": "Atras",
+      "submit": "Crear Edificio",
+      "submitting": "Creando..."
+    },
+    "complete": {
+      "title": "Registro completado!",
+      "description": "Tu edificio ha sido creado y ahora eres su administrador.",
+      "goToDashboard": "Ir al Panel de Administrador"
+    },
+    "validation": {
+      "fullNameMin": "El nombre debe tener al menos 2 caracteres",
+      "emailInvalid": "Ingresa un correo electronico valido",
+      "passwordMin": "La contrasena debe tener al menos 8 caracteres",
+      "passwordMismatch": "Las contrasenas no coinciden",
+      "buildingNameRequired": "El nombre del edificio es obligatorio",
+      "totalUnitsMin": "Debe tener al menos 1 unidad",
+      "timezoneRequired": "Selecciona una zona horaria"
+    }
+  }
+}

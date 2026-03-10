@@ -5,7 +5,7 @@ import { updateSession } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-const PUBLIC_PATHS = ["/login", "/forgot-password", "/set-password", "/setup"];
+const PUBLIC_PATHS = ["/login", "/forgot-password", "/set-password", "/setup", "/register"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some(

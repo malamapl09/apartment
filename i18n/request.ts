@@ -16,6 +16,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       ...(await import(`../messages/${locale}/admin.json`)).default,
       ...(await import(`../messages/${locale}/portal.json`)).default,
       ...(await import(`../messages/${locale}/setup.json`)).default,
+      ...(await import(`../messages/${locale}/register.json`)).default,
       ...(await import(`../messages/${locale}/superAdmin.json`)).default,
     },
   };
