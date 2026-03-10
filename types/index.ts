@@ -422,3 +422,8 @@ export interface EmailPreferences {
   new_announcements: boolean;
   overdue_reminders: boolean;
 }
+
+export interface BuildingWithStats extends Building {
+  user_count: number;
+  admin_count: number;
+}

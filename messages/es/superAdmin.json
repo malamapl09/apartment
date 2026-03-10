@@ -1,0 +1,81 @@
+{
+  "superAdmin": {
+    "nav": {
+      "dashboard": "Panel",
+      "buildings": "Edificios"
+    },
+    "dashboard": {
+      "title": "Super Administrador",
+      "description": "Gestiona todos los edificios y administradores",
+      "totalBuildings": "Total de Edificios",
+      "totalUsers": "Total de Usuarios",
+      "totalAdmins": "Total de Admins",
+      "recentBuildings": "Edificios",
+      "noBuildings": "Sin edificios",
+      "createFirst": "Crea tu primer edificio para comenzar"
+    },
+    "buildings": {
+      "new": "Nuevo Edificio",
+      "name": "Nombre",
+      "address": "Direccion",
+      "units": "Unidades",
+      "users": "Usuarios",
+      "admins": "Admins",
+      "created": "Creado",
+      "viewDetails": "Ver Detalles",
+      "noBuildings": "No se encontraron edificios"
+    },
+    "createBuilding": {
+      "title": "Crear Nuevo Edificio",
+      "description": "Configura un nuevo edificio e invita a su primer administrador",
+      "buildingInfo": "Informacion del Edificio",
+      "buildingInfoDescription": "Datos basicos del nuevo edificio",
+      "adminInfo": "Primer Administrador",
+      "adminInfoDescription": "Se enviara un correo de invitacion a esta persona",
+      "name": "Nombre del Edificio",
+      "namePlaceholder": "ej. Torres del Sol",
+      "address": "Direccion",
+      "addressPlaceholder": "Direccion completa del edificio...",
+      "totalUnits": "Total de Unidades",
+      "timezone": "Zona Horaria",
+      "timezonePlaceholder": "Seleccionar zona horaria",
+      "adminEmail": "Correo del Admin",
+      "adminEmailPlaceholder": "admin@ejemplo.com",
+      "adminName": "Nombre Completo del Admin",
+      "adminNamePlaceholder": "Maria Garcia",
+      "submit": "Crear Edificio",
+      "submitting": "Creando...",
+      "cancel": "Cancelar",
+      "success": "Edificio creado exitosamente. Se ha enviado una invitacion al administrador.",
+      "error": "Error al crear el edificio"
+    },
+    "buildingDetail": {
+      "title": "Detalles del Edificio",
+      "description": "Ver y gestionar la informacion del edificio",
+      "info": "Informacion",
+      "infoDescription": "Configuracion y detalles del edificio",
+      "users": "Usuarios",
+      "usersDescription": "Personas con acceso a este edificio",
+      "name": "Nombre",
+      "address": "Direccion",
+      "totalUnits": "Total de Unidades",
+      "timezone": "Zona Horaria",
+      "paymentDeadline": "Plazo de Pago",
+      "hours": "horas",
+      "createdAt": "Creado",
+      "updatedAt": "Ultima Actualizacion",
+      "edit": "Editar Edificio",
+      "save": "Guardar Cambios",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "updateSuccess": "Edificio actualizado exitosamente",
+      "updateError": "Error al actualizar el edificio",
+      "userName": "Nombre",
+      "userEmail": "Correo",
+      "userRole": "Rol",
+      "userStatus": "Estado",
+      "noUsers": "Sin usuarios en este edificio",
+      "back": "Volver a Edificios"
+    }
+  }
+}

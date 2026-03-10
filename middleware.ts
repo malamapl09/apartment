@@ -5,7 +5,7 @@ import { updateSession } from "./lib/supabase/middleware";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-const PUBLIC_PATHS = ["/login", "/forgot-password", "/set-password"];
+const PUBLIC_PATHS = ["/login", "/forgot-password", "/set-password", "/setup"];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some(
@@ -53,6 +53,7 @@ export async function middleware(request: NextRequest) {
   const isDashboardRoute =
     strippedPath.startsWith("/admin") ||
     strippedPath.startsWith("/portal") ||
+    strippedPath.startsWith("/super-admin") ||
     strippedPath === "/";
   const isAuthRoute = isPublicPath(strippedPath);
 

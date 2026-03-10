@@ -1,0 +1,81 @@
+{
+  "superAdmin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "buildings": "Buildings"
+    },
+    "dashboard": {
+      "title": "Super Admin",
+      "description": "Manage all buildings and administrators",
+      "totalBuildings": "Total Buildings",
+      "totalUsers": "Total Users",
+      "totalAdmins": "Total Admins",
+      "recentBuildings": "Buildings",
+      "noBuildings": "No buildings yet",
+      "createFirst": "Create your first building to get started"
+    },
+    "buildings": {
+      "new": "New Building",
+      "name": "Name",
+      "address": "Address",
+      "units": "Units",
+      "users": "Users",
+      "admins": "Admins",
+      "created": "Created",
+      "viewDetails": "View Details",
+      "noBuildings": "No buildings found"
+    },
+    "createBuilding": {
+      "title": "Create New Building",
+      "description": "Set up a new building and invite its first administrator",
+      "buildingInfo": "Building Information",
+      "buildingInfoDescription": "Basic details about the new building",
+      "adminInfo": "First Administrator",
+      "adminInfoDescription": "An invitation email will be sent to this person",
+      "name": "Building Name",
+      "namePlaceholder": "e.g., Sunset Towers",
+      "address": "Address",
+      "addressPlaceholder": "Full building address...",
+      "totalUnits": "Total Units",
+      "timezone": "Timezone",
+      "timezonePlaceholder": "Select timezone",
+      "adminEmail": "Admin Email",
+      "adminEmailPlaceholder": "admin@example.com",
+      "adminName": "Admin Full Name",
+      "adminNamePlaceholder": "Jane Smith",
+      "submit": "Create Building",
+      "submitting": "Creating...",
+      "cancel": "Cancel",
+      "success": "Building created successfully. An invitation has been sent to the administrator.",
+      "error": "Failed to create building"
+    },
+    "buildingDetail": {
+      "title": "Building Details",
+      "description": "View and manage building information",
+      "info": "Information",
+      "infoDescription": "Building configuration and details",
+      "users": "Users",
+      "usersDescription": "People with access to this building",
+      "name": "Name",
+      "address": "Address",
+      "totalUnits": "Total Units",
+      "timezone": "Timezone",
+      "paymentDeadline": "Payment Deadline",
+      "hours": "hours",
+      "createdAt": "Created",
+      "updatedAt": "Last Updated",
+      "edit": "Edit Building",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "updateSuccess": "Building updated successfully",
+      "updateError": "Failed to update building",
+      "userName": "Name",
+      "userEmail": "Email",
+      "userRole": "Role",
+      "userStatus": "Status",
+      "noUsers": "No users in this building",
+      "back": "Back to Buildings"
+    }
+  }
+}

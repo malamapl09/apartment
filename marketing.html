@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResidenceHub — Smart Apartment Building Management</title>
+  <meta name="description" content="Streamline operations, delight residents, and simplify administration — all in one modern platform." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #4F46E5;
+      --primary-dark: #4338CA;
+      --primary-light: #6366F1;
+      --primary-ultra-light: #EEF2FF;
+      --slate-50: #F8FAFC;
+      --slate-100: #F1F5F9;
+      --slate-200: #E2E8F0;
+      --slate-300: #CBD5E1;
+      --slate-400: #94A3B8;
+      --slate-500: #64748B;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1E293B;
+      --slate-900: #0F172A;
+      --white: #FFFFFF;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      color: var(--slate-700);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--slate-900);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo svg { flex-shrink: 0; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--slate-600);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--primary); }
+
+    .nav-cta {
+      background: var(--primary);
+      color: var(--white) !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover { background: var(--primary-dark) !important; color: var(--white) !important; }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .nav-hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--slate-700);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--slate-200);
+      gap: 4px;
+    }
+
+    .nav-mobile a {
+      text-decoration: none;
+      color: var(--slate-700);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--slate-100);
+    }
+
+    .nav-mobile a:last-child { border-bottom: none; }
+
+    .nav-mobile.open { display: flex; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #1e1b4b 100%);
+      padding: 100px 24px 120px;
+      text-align: center;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.04;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99,102,241,0.2);
+      border: 1px solid rgba(99,102,241,0.4);
+      color: #A5B4FC;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #6366F1;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .hero-tagline {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: #A5B4FC;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--slate-300);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: var(--white);
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(79,70,229,0.4);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(79,70,229,0.5);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.14);
+      transform: translateY(-1px);
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      padding: 96px 24px;
+    }
+
+    .section-alt {
+      background: var(--slate-50);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.05rem;
+      color: var(--slate-500);
+      max-width: 560px;
+      line-height: 1.75;
+    }
+
+    .section-header {
+      margin-bottom: 64px;
+    }
+
+    .section-header.centered {
+      text-align: center;
+    }
+
+    .section-header.centered .section-subtitle {
+      margin: 0 auto;
+    }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+    }
+
+    .feature-card:hover {
+      border-color: #C7D2FE;
+      box-shadow: 0 8px 30px rgba(79,70,229,0.1);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--primary-ultra-light);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .feature-icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--primary);
+    }
+
+    .feature-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--slate-500);
+      line-height: 1.65;
+    }
+
+    /* ── HIGHLIGHTS ── */
+    .highlight-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      padding: 64px 0;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .highlight-row:last-child { border-bottom: none; }
+
+    .highlight-row.reverse .highlight-visual { order: -1; }
+
+    .highlight-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-ultra-light);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+
+    .highlight-text h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+
+    .highlight-text p {
+      font-size: 1rem;
+      color: var(--slate-500);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: var(--slate-600);
+      font-weight: 500;
+    }
+
+    .feature-list li svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--primary);
+    }
+
+    .highlight-visual {
+      background: linear-gradient(135deg, #F0F0FF 0%, #E8E8FF 100%);
+      border-radius: 20px;
+      padding: 40px;
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #D0D0FF;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .mock-ui {
+      background: var(--white);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .mock-header {
+      background: var(--slate-900);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mock-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .mock-dot.red { background: #FF5F57; }
+    .mock-dot.yellow { background: #FFBD2E; }
+    .mock-dot.green { background: #28C840; }
+
+    .mock-body { padding: 20px; }
+
+    .mock-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--slate-800);
+      margin-bottom: 16px;
+    }
+
+    .mock-stat-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .mock-stat {
+      background: var(--slate-50);
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid var(--slate-200);
+    }
+
+    .mock-stat-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.02em;
+    }
+
+    .mock-stat-label {
+      font-size: 0.7rem;
+      color: var(--slate-400);
+      margin-top: 2px;
+    }
+
+    .mock-bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mock-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mock-bar-label {
+      font-size: 0.7rem;
+      color: var(--slate-500);
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .mock-bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--slate-100);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mock-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    .mock-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--slate-100);
+    }
+
+    .mock-list-item:last-child { border-bottom: none; }
+
+    .mock-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .mock-item-info { flex: 1; }
+
+    .mock-item-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--slate-700);
+    }
+
+    .mock-item-sub {
+      font-size: 0.65rem;
+      color: var(--slate-400);
+    }
+
+    .mock-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .mock-badge.green { background: #DCFCE7; color: #16A34A; }
+    .mock-badge.amber { background: #FEF3C7; color: #D97706; }
+    .mock-badge.blue { background: #DBEAFE; color: #2563EB; }
+    .mock-badge.indigo { background: var(--primary-ultra-light); color: var(--primary); }
+
+    /* ── TECH STACK ── */
+    .tech-section {
+      background: var(--slate-900);
+      padding: 72px 24px;
+      text-align: center;
+    }
+
+    .tech-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--slate-400);
+      margin-bottom: 40px;
+    }
+
+    .tech-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .tech-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--slate-800);
+      border: 1px solid var(--slate-700);
+      color: var(--slate-100);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .tech-badge:hover {
+      border-color: var(--primary-light);
+      background: var(--slate-700);
+    }
+
+    .tech-badge svg { flex-shrink: 0; }
+
+    /* ── FEATURES BAR ── */
+    .features-bar {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 32px 24px;
+      overflow: hidden;
+    }
+
+    .features-bar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+
+    .bar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 10px 24px;
+    }
+
+    .bar-item svg { flex-shrink: 0; opacity: 0.8; }
+
+    .bar-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--slate-900);
+      padding: 60px 24px 40px;
+      color: var(--slate-400);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--slate-800);
+      flex-wrap: wrap;
+    }
+
+    .footer-brand .nav-logo {
+      color: var(--white);
+      margin-bottom: 12px;
+      display: inline-flex;
+    }
+
+    .footer-brand p {
+      font-size: 0.875rem;
+      color: var(--slate-500);
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    .footer-links-group { display: flex; gap: 48px; flex-wrap: wrap; }
+
+    .footer-col h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--slate-300);
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-col a {
+      text-decoration: none;
+      color: var(--slate-500);
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: var(--slate-200); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-bottom p { font-size: 0.825rem; color: var(--slate-600); }
+
+    .footer-built {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.825rem;
+      color: var(--slate-600);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .highlight-row { grid-template-columns: 1fr; gap: 40px; }
+      .highlight-row.reverse .highlight-visual { order: unset; }
+      .footer-top { flex-direction: column; }
+    }
+
+    @media (max-width: 640px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .hero { padding: 72px 20px 88px; }
+      .section { padding: 64px 20px; }
+      .bar-item { padding: 8px 14px; font-size: 0.8rem; }
+      .bar-divider { display: none; }
+      .footer-links-group { gap: 32px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+      .tech-row { gap: 10px; }
+      .tech-badge { padding: 10px 14px; font-size: 0.825rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <!-- Building icon -->
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="6" width="20" height="18" rx="2" fill="#4F46E5" opacity="0.15"/>
+          <rect x="4" y="6" width="20" height="18" rx="2" stroke="#4F46E5" stroke-width="1.8"/>
+          <rect x="8" y="10" width="4" height="4" rx="0.8" fill="#4F46E5"/>
+          <rect x="16" y="10" width="4" height="4" rx="0.8" fill="#4F46E5"/>
+          <rect x="8" y="18" width="4" height="4" rx="0.8" fill="#4F46E5"/>
+          <rect x="16" y="18" width="4" height="4" rx="0.8" fill="#4F46E5"/>
+          <rect x="11" y="4" width="6" height="4" rx="1" fill="#4F46E5"/>
+          <rect x="11" y="20" width="6" height="4" rx="0.5" fill="#4F46E5" opacity="0.6"/>
+        </svg>
+        ResidenceHub
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#highlights">Platform</a></li>
+        <li><a href="#tech">Tech Stack</a></li>
+        <li><a href="#features" class="nav-cta">Get Started</a></li>
+      </ul>
+      <button class="nav-hamburger" aria-label="Toggle menu" onclick="document.getElementById('mobileNav').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="mobileNav">
+      <a href="#features" onclick="document.getElementById('mobileNav').classList.remove('open')">Features</a>
+      <a href="#highlights" onclick="document.getElementById('mobileNav').classList.remove('open')">Platform</a>
+      <a href="#tech" onclick="document.getElementById('mobileNav').classList.remove('open')">Tech Stack</a>
+      <a href="#features" onclick="document.getElementById('mobileNav').classList.remove('open')">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Platform v1.0 — Now Live
+      </div>
+      <h1>Smart Apartment Building<br/>Management</h1>
+      <p class="hero-tagline">ResidenceHub</p>
+      <p>Streamline operations, delight residents, and simplify administration — all in one modern platform.</p>
+      <div class="hero-actions">
+        <a href="#features" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5L14.5 8L8 14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1.5 8H14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Get Started
+        </a>
+        <a href="#features" class="btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 5V8.5L10.5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          See Features
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header centered">
+        <span class="section-label">Everything you need</span>
+        <h2 class="section-title">A complete platform for every role</h2>
+        <p class="section-subtitle">Twelve integrated modules covering every aspect of residential building management, from finances to visitor access.</p>
+      </div>
+      <div class="features-grid">
+
+        <!-- 1: Dashboard -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="8" rx="1.5"/>
+              <rect x="14" y="3" width="7" height="5" rx="1.5"/>
+              <rect x="14" y="12" width="7" height="9" rx="1.5"/>
+              <rect x="3" y="15" width="7" height="6" rx="1.5"/>
+            </svg>
+          </div>
+          <h3>Dashboard Analytics</h3>
+          <p>Real-time insights into collection rates, maintenance trends, occupancy, and visitor statistics across your building.</p>
+        </div>
+
+        <!-- 2: Apartments -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21V7l9-4 9 4v14"/>
+              <path d="M9 21V13h6v8"/>
+              <rect x="9" y="9" width="2.5" height="2.5" rx="0.5"/>
+              <rect x="12.5" y="9" width="2.5" height="2.5" rx="0.5"/>
+            </svg>
+          </div>
+          <h3>Apartment Management</h3>
+          <p>Track units, assign owners, manage occupancy status and comprehensive unit details in a centralized registry.</p>
+        </div>
+
+        <!-- 3: Residents -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="7" r="3.5"/>
+              <path d="M3 20c0-4 2.7-6 6-6s6 2 6 6"/>
+              <circle cx="17.5" cy="8" r="2.5"/>
+              <path d="M20.5 18c0-2.5-1.3-4-3-4.5"/>
+            </svg>
+          </div>
+          <h3>Resident Directory</h3>
+          <p>Complete owner and resident profiles with emergency contacts, communication preferences, and apartment links.</p>
+        </div>
+
+        <!-- 4: Common Spaces -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="8" width="18" height="13" rx="2"/>
+              <path d="M8 8V6a4 4 0 0 1 8 0v2"/>
+              <path d="M12 13v3"/>
+              <circle cx="12" cy="12.5" r="1.5"/>
+            </svg>
+          </div>
+          <h3>Common Spaces</h3>
+          <p>Configure amenities with pricing, booking rules, availability schedules, capacity limits, and blackout date management.</p>
+        </div>
+
+        <!-- 5: Reservations -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <path d="M16 2v4M8 2v4M3 10h18"/>
+              <path d="M8 14h2m2 0h4M8 18h2"/>
+            </svg>
+          </div>
+          <h3>Reservation System</h3>
+          <p>Full booking flow with payment verification, approval workflows, conflict detection, and automatic cancellation of unpaid holds.</p>
+        </div>
+
+        <!-- 6: Fees -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <path d="M2 10h20"/>
+              <path d="M6 15h2m4 0h4"/>
+            </svg>
+          </div>
+          <h3>Fees &amp; Payments</h3>
+          <p>Generate charges, track payment status, record transactions across multiple payment methods, and automate overdue detection.</p>
+        </div>
+
+        <!-- 7: Maintenance -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <h3>Maintenance Requests</h3>
+          <p>Submit, assign, and track requests with priority levels, categories, photo attachments, and real-time status updates.</p>
+        </div>
+
+        <!-- 8: Visitors -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+              <circle cx="9.5" cy="7" r="4"/>
+              <path d="M20 8v6M23 11h-6"/>
+            </svg>
+          </div>
+          <h3>Visitor Management</h3>
+          <p>Register visitors with unique access codes, check-in and check-out tracking, and support for recurring visitor schedules.</p>
+        </div>
+
+        <!-- 9: Packages -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10V7a2 2 0 0 0-1-1.73L13 2.27a2 2 0 0 0-2 0L4 5.27A2 2 0 0 0 3 7v10a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l4-2.27"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+              <circle cx="18.5" cy="18.5" r="3.5"/>
+              <path d="M18.5 17v1.5l1 1"/>
+            </svg>
+          </div>
+          <h3>Package Tracking</h3>
+          <p>Log incoming deliveries, automatically notify residents, and track pickup status from arrival to collection.</p>
+        </div>
+
+        <!-- 10: Polls -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 20V10M12 20V4M6 20v-6"/>
+            </svg>
+          </div>
+          <h3>Polls &amp; Voting</h3>
+          <p>Create polls with single or multiple choice formats, publish results on a schedule, and support anonymous voting for sensitive topics.</p>
+        </div>
+
+        <!-- 11: Documents -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="12" y2="17"/>
+            </svg>
+          </div>
+          <h3>Document Library</h3>
+          <p>Categorized document storage for building rules, meeting minutes, contracts, legal notices, and resident-facing forms.</p>
+        </div>
+
+        <!-- 12: Announcements -->
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <h3>Announcements</h3>
+          <p>Building-wide notices with targeted audience segmentation, priority levels, and automated email delivery to all residents.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHTS -->
+  <section class="section section-alt" id="highlights">
+    <div class="container">
+      <div class="section-header centered">
+        <span class="section-label">Built for everyone</span>
+        <h2 class="section-title">Designed for every stakeholder</h2>
+        <p class="section-subtitle">Different roles, different needs — ResidenceHub gives everyone exactly the tools they require.</p>
+      </div>
+
+      <!-- For Administrators -->
+      <div class="highlight-row">
+        <div class="highlight-text">
+          <span class="highlight-tag">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1L7.5 4.5L11 5L8.5 7.5L9 11L6 9.5L3 11L3.5 7.5L1 5L4.5 4.5L6 1Z" fill="currentColor"/>
+            </svg>
+            For Administrators
+          </span>
+          <h2>Total control over every building operation</h2>
+          <p>Administrators get a comprehensive command center — from financial reporting to access management — with a complete audit trail of every action taken.</p>
+          <ul class="feature-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Comprehensive dashboard with 4 live analytics charts
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Full audit trail tracking every change and action
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Report generation with one-click CSV export
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Global building settings and configuration panel
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Role-based access control for staff and managers
+            </li>
+          </ul>
+        </div>
+        <div class="highlight-visual">
+          <div class="mock-ui">
+            <div class="mock-header">
+              <span class="mock-dot red"></span>
+              <span class="mock-dot yellow"></span>
+              <span class="mock-dot green"></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-title">Admin Dashboard</div>
+              <div class="mock-stat-row">
+                <div class="mock-stat">
+                  <div class="mock-stat-value">94%</div>
+                  <div class="mock-stat-label">Collection Rate</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-value">48</div>
+                  <div class="mock-stat-label">Total Units</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-value">7</div>
+                  <div class="mock-stat-label">Open Requests</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-value">12</div>
+                  <div class="mock-stat-label">Visitors Today</div>
+                </div>
+              </div>
+              <div class="mock-bar-row">
+                <div class="mock-bar-item">
+                  <span class="mock-bar-label">Paid</span>
+                  <div class="mock-bar-track"><div class="mock-bar-fill" style="width:88%"></div></div>
+                </div>
+                <div class="mock-bar-item">
+                  <span class="mock-bar-label">Pending</span>
+                  <div class="mock-bar-track"><div class="mock-bar-fill" style="width:52%; background:#F59E0B"></div></div>
+                </div>
+                <div class="mock-bar-item">
+                  <span class="mock-bar-label">Overdue</span>
+                  <div class="mock-bar-track"><div class="mock-bar-fill" style="width:18%; background:#EF4444"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- For Residents -->
+      <div class="highlight-row reverse">
+        <div class="highlight-text">
+          <span class="highlight-tag">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <circle cx="6" cy="4" r="2.5" fill="currentColor"/>
+              <path d="M2 11c0-2.5 1.8-4 4-4s4 1.5 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            For Residents
+          </span>
+          <h2>Everything a resident needs, at their fingertips</h2>
+          <p>Residents get a clean, intuitive portal to manage their building life — from reporting an issue to reserving the rooftop terrace — without ever needing to call the office.</p>
+          <ul class="feature-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Personal dashboard with pending items and quick actions
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Submit maintenance requests and track progress live
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Reserve common areas with integrated online payment
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Register visitors and share unique access codes
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Vote on building polls and view real-time results
+            </li>
+          </ul>
+        </div>
+        <div class="highlight-visual">
+          <div class="mock-ui">
+            <div class="mock-header">
+              <span class="mock-dot red"></span>
+              <span class="mock-dot yellow"></span>
+              <span class="mock-dot green"></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-title">Resident Portal</div>
+              <div class="mock-list-item">
+                <div class="mock-avatar">JR</div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Leaky faucet — Bathroom</div>
+                  <div class="mock-item-sub">Maintenance Request</div>
+                </div>
+                <span class="mock-badge amber">In Progress</span>
+              </div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#10B981,#059669)">VR</div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Rooftop — Apr 15, 3pm</div>
+                  <div class="mock-item-sub">Reservation</div>
+                </div>
+                <span class="mock-badge green">Confirmed</span>
+              </div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#F59E0B,#D97706)">PK</div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Package from Amazon</div>
+                  <div class="mock-item-sub">Ready for pickup</div>
+                </div>
+                <span class="mock-badge indigo">New</span>
+              </div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#8B5CF6,#7C3AED)">PO</div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">New BBQ area rules vote</div>
+                  <div class="mock-item-sub">Poll closes in 3 days</div>
+                </div>
+                <span class="mock-badge blue">Vote</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time -->
+      <div class="highlight-row">
+        <div class="highlight-text">
+          <span class="highlight-tag">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1v2M6 9v2M1 6h2M9 6h2M2.8 2.8l1.4 1.4M7.8 7.8l1.4 1.4M2.8 9.2l1.4-1.4M7.8 4.2l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Real-time &amp; Automated
+          </span>
+          <h2>Live updates and intelligent automation</h2>
+          <p>ResidenceHub keeps every user in sync with real-time data subscriptions and handles repetitive administrative tasks automatically, so nothing falls through the cracks.</p>
+          <ul class="feature-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Live updates via real-time database subscriptions
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Automated overdue charge detection via scheduled jobs
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Auto-cancellation of unpaid reservation holds
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Email notifications for all key events and status changes
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#EEF2FF"/><path d="M5 8l2 2 4-4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Global search across all entities with Cmd+K shortcut
+            </li>
+          </ul>
+        </div>
+        <div class="highlight-visual">
+          <div class="mock-ui">
+            <div class="mock-header">
+              <span class="mock-dot red"></span>
+              <span class="mock-dot yellow"></span>
+              <span class="mock-dot green"></span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-title">Activity Feed — Live</div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#10B981,#059669); font-size:0.7rem">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" fill="rgba(255,255,255,0.3)"/><path d="M4 7l2 2 4-4" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Reservation #R-044 confirmed</div>
+                  <div class="mock-item-sub">2 minutes ago</div>
+                </div>
+              </div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#F59E0B,#D97706); font-size:0.7rem">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v4l2.5 2.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><circle cx="7" cy="7" r="5.5" stroke="rgba(255,255,255,0.5)" stroke-width="1"/></svg>
+                </div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Overdue fee flagged — Apt 12B</div>
+                  <div class="mock-item-sub">Automated · 8 minutes ago</div>
+                </div>
+              </div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#6366F1,#4F46E5); font-size:0.7rem">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2l1.5 3.5L12 6l-2.5 2.5.5 3.5L7 10.5 4 12l.5-3.5L2 6l3.5-.5L7 2z" fill="rgba(255,255,255,0.7)"/></svg>
+                </div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Package logged — Apt 3A</div>
+                  <div class="mock-item-sub">Email sent · 15 minutes ago</div>
+                </div>
+              </div>
+              <div class="mock-list-item">
+                <div class="mock-avatar" style="background: linear-gradient(135deg,#EF4444,#DC2626)">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3v4M7 9.5v.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/><circle cx="7" cy="7" r="5.5" stroke="rgba(255,255,255,0.4)"/></svg>
+                </div>
+                <div class="mock-item-info">
+                  <div class="mock-item-name">Maintenance escalated — Apt 7C</div>
+                  <div class="mock-item-sub">High priority · 22 minutes ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="tech-section" id="tech">
+    <p class="tech-label">Powered by a modern, production-grade stack</p>
+    <div class="tech-row">
+
+      <div class="tech-badge">
+        <!-- Next.js wordmark (N) -->
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect width="20" height="20" rx="4" fill="white"/>
+          <path d="M3 16V4l10.5 12.5V4" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M17 4v12" stroke="#000" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Next.js
+      </div>
+
+      <div class="tech-badge">
+        <!-- Supabase arrow -->
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect width="20" height="20" rx="4" fill="#1C1C1C"/>
+          <path d="M11.5 3L5 11.5h6V17L17 8.5h-6L11.5 3z" fill="#3ECF8E"/>
+        </svg>
+        Supabase
+      </div>
+
+      <div class="tech-badge">
+        <!-- Tailwind CSS -->
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect width="20" height="20" rx="4" fill="#0EA5E9" opacity="0.15"/>
+          <path d="M5 10.5c.5-2 2-3 3.5-2.5s2 2 1.5 3.5c-.5 2 1 3 2.5 2.5s2.5-1.5 3-3" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"/>
+          <path d="M5 6.5c.5-2 2-3 3.5-2.5s2 2 1.5 3.5c-.5 2 1 3 2.5 2.5s2.5-1.5 3-3" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Tailwind CSS
+      </div>
+
+      <div class="tech-badge">
+        <!-- Vercel triangle -->
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect width="20" height="20" rx="4" fill="#000"/>
+          <path d="M10 4l8 12H2L10 4z" fill="white"/>
+        </svg>
+        Vercel
+      </div>
+
+      <div class="tech-badge">
+        <!-- TypeScript TS -->
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect width="20" height="20" rx="4" fill="#3178C6"/>
+          <path d="M4 8.5h7M7.5 8.5V15" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M10.5 13.5c.5.8 1.3 1.3 2.3 1.3 1.1 0 2-.5 2-1.5 0-2.5-4-1.5-4-4 0-1 .9-1.8 2.5-1.8.8 0 1.6.3 2 .8" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        TypeScript
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURES BAR -->
+  <section class="features-bar">
+    <div class="features-bar-inner">
+
+      <div class="bar-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        PWA Support
+      </div>
+      <div class="bar-divider"></div>
+
+      <div class="bar-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 2c-1.5 2-2 3.5-2 6s.5 4 2 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Bilingual (EN/ES)
+      </div>
+      <div class="bar-divider"></div>
+
+      <div class="bar-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2L10 6H14L11 9L12 13L8 10.5L4 13L5 9L2 6H6L8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        Role-Based Access
+      </div>
+      <div class="bar-divider"></div>
+
+      <div class="bar-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="3" y="7" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="10.5" r="1" fill="currentColor"/>
+        </svg>
+        Row-Level Security
+      </div>
+      <div class="bar-divider"></div>
+
+      <div class="bar-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M14 10.67C14 11 13.87 11.3 13.64 11.52C13.41 11.74 13.1 11.86 12.77 11.87H4.6C4.27 11.86 3.96 11.74 3.73 11.52C3.5 11.3 3.37 11 3.37 10.67V5.33C3.37 5 3.5 4.7 3.73 4.48C3.96 4.26 4.27 4.14 4.6 4.13H12.77C13.1 4.14 13.41 4.26 13.64 4.48C13.87 4.7 14 5 14 5.33V10.67Z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8.68 7.33L10 5.33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M6 9.33L8.68 7.33L11.36 9.33" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Email Notifications
+      </div>
+      <div class="bar-divider"></div>
+
+      <div class="bar-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M14 10l-4 4-4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 14V6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M2 6l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 3v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        CSV Export
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="#" class="nav-logo">
+            <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+              <rect x="4" y="6" width="20" height="18" rx="2" fill="#4F46E5" opacity="0.2"/>
+              <rect x="4" y="6" width="20" height="18" rx="2" stroke="#6366F1" stroke-width="1.8"/>
+              <rect x="8" y="10" width="4" height="4" rx="0.8" fill="#6366F1"/>
+              <rect x="16" y="10" width="4" height="4" rx="0.8" fill="#6366F1"/>
+              <rect x="8" y="18" width="4" height="4" rx="0.8" fill="#6366F1"/>
+              <rect x="16" y="18" width="4" height="4" rx="0.8" fill="#6366F1"/>
+              <rect x="11" y="4" width="6" height="4" rx="1" fill="#6366F1"/>
+            </svg>
+            ResidenceHub
+          </a>
+          <p>Smart apartment building management for modern residential communities.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#highlights">Platform Overview</a></li>
+              <li><a href="#tech">Tech Stack</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Portal</h4>
+            <ul>
+              <li><a href="#">Admin Panel</a></li>
+              <li><a href="#">Owner Portal</a></li>
+              <li><a href="#">Documentation</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>Copyright 2024 ResidenceHub. All rights reserved.</p>
+        <div class="footer-built">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#64748B" stroke-width="1.2"/>
+            <path d="M4 6l2 2-2 2M7 10h3" stroke="#64748B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Built with Next.js &amp; Supabase
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

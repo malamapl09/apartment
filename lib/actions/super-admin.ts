@@ -1,0 +1,223 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import type { Building, Profile } from "@/types";
+
+// --- Auth helper ---
+
+async function getSuperAdminProfile() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Unauthorized" as const, supabase, profile: null };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id, building_id, role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "super_admin") {
+    return { error: "Unauthorized" as const, supabase, profile: null };
+  }
+
+  return { error: null, supabase, profile };
+}
+
+// --- Buildings ---
+
+export async function getAllBuildings() {
+  const { error } = await getSuperAdminProfile();
+  if (error) return { error };
+
+  const adminClient = createAdminClient();
+
+  const { data: buildings, error: buildingsError } = await adminClient
+    .from("buildings")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (buildingsError || !buildings) {
+    return { error: "Failed to fetch buildings" };
+  }
+
+  const { data: profiles } = await adminClient
+    .from("profiles")
+    .select("building_id, role")
+    .not("building_id", "is", null);
+
+  const countMap = new Map<string, { user_count: number; admin_count: number }>();
+
+  for (const p of profiles ?? []) {
+    if (!p.building_id) continue;
+    const entry = countMap.get(p.building_id) ?? { user_count: 0, admin_count: 0 };
+    entry.user_count++;
+    if (p.role === "admin" || p.role === "super_admin") {
+      entry.admin_count++;
+    }
+    countMap.set(p.building_id, entry);
+  }
+
+  const buildingsWithStats = buildings.map((b: Building) => ({
+    ...b,
+    user_count: countMap.get(b.id)?.user_count ?? 0,
+    admin_count: countMap.get(b.id)?.admin_count ?? 0,
+  }));
+
+  return { data: buildingsWithStats };
+}
+
+// --- Create building with admin ---
+
+const createBuildingSchema = z.object({
+  name: z.string().min(1).max(200),
+  address: z.string().max(500).optional().default(""),
+  total_units: z.coerce.number().int().min(1).max(9999),
+  timezone: z.string().min(1),
+  admin_email: z.string().email(),
+  admin_name: z.string().min(2).max(200),
+});
+
+export async function createBuildingWithAdmin(formData: FormData) {
+  const { error } = await getSuperAdminProfile();
+  if (error) return { error };
+
+  const raw = Object.fromEntries(formData.entries());
+  const parsed = createBuildingSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
+  const { name, address, total_units, timezone, admin_email, admin_name } = parsed.data;
+  const adminClient = createAdminClient();
+
+  // Step 1: Create building
+  const { data: building, error: buildingError } = await adminClient
+    .from("buildings")
+    .insert({
+      name,
+      address: address || null,
+      total_units,
+      timezone,
+    })
+    .select("id")
+    .single();
+
+  if (buildingError || !building) {
+    return { error: "Failed to create building" };
+  }
+
+  // Step 2: Invite admin user
+  const { data: newUser, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(admin_email, {
+    data: {
+      full_name: admin_name,
+      building_id: building.id,
+    },
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/set-password`,
+  });
+
+  if (inviteError || !newUser.user) {
+    // Cleanup: delete building
+    await adminClient.from("buildings").delete().eq("id", building.id);
+    return { error: inviteError?.message ?? "Failed to invite admin" };
+  }
+
+  // Step 3: Create profile
+  const { error: profileError } = await adminClient
+    .from("profiles")
+    .insert({
+      id: newUser.user.id,
+      building_id: building.id,
+      role: "admin",
+      full_name: admin_name,
+      email: admin_email,
+    });
+
+  if (profileError) {
+    // Cleanup: delete user and building
+    await adminClient.auth.admin.deleteUser(newUser.user.id);
+    await adminClient.from("buildings").delete().eq("id", building.id);
+    return { error: profileError.message };
+  }
+
+  // Step 4: Create email preferences
+  await adminClient.from("email_preferences").insert({ user_id: newUser.user.id });
+
+  revalidatePath("/super-admin");
+
+  return { success: true, buildingId: building.id };
+}
+
+// --- Building detail ---
+
+export async function getBuildingDetail(buildingId: string) {
+  const { error } = await getSuperAdminProfile();
+  if (error) return { error };
+
+  const adminClient = createAdminClient();
+
+  const { data: building, error: buildingError } = await adminClient
+    .from("buildings")
+    .select("*")
+    .eq("id", buildingId)
+    .single();
+
+  if (buildingError || !building) {
+    return { error: "Building not found" };
+  }
+
+  const { data: profiles, error: profilesError } = await adminClient
+    .from("profiles")
+    .select("*")
+    .eq("building_id", buildingId)
+    .order("created_at", { ascending: true });
+
+  if (profilesError) {
+    return { error: "Failed to fetch profiles" };
+  }
+
+  return { data: { building: building as Building, profiles: (profiles ?? []) as Profile[] } };
+}
+
+// --- Update building ---
+
+const updateBuildingSchema = z.object({
+  name: z.string().min(1).max(200),
+  address: z.string().max(500).optional().default(""),
+  total_units: z.coerce.number().int().min(1).max(9999),
+  timezone: z.string().min(1),
+});
+
+export async function updateBuilding(buildingId: string, formData: FormData) {
+  const { error } = await getSuperAdminProfile();
+  if (error) return { error };
+
+  const raw = Object.fromEntries(formData.entries());
+  const parsed = updateBuildingSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
+  const { name, address, total_units, timezone } = parsed.data;
+  const adminClient = createAdminClient();
+
+  const { error: updateError } = await adminClient
+    .from("buildings")
+    .update({
+      name,
+      address: address || null,
+      total_units,
+      timezone,
+    })
+    .eq("id", buildingId);
+
+  if (updateError) {
+    return { error: "Failed to update building" };
+  }
+
+  revalidatePath("/super-admin");
+
+  return { success: true };
+}

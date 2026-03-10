@@ -22,7 +22,9 @@
     "fees": "Cuotas y Pagos",
     "polls": "Encuestas",
     "reports": "Reportes",
-    "audit": "Registro de Auditoría"
+    "audit": "Registro de Auditoría",
+    "superAdmin": "Super Admin",
+    "buildings": "Edificios"
   },
   "actions": {
     "save": "Guardar",

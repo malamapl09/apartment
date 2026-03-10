@@ -1,0 +1,57 @@
+{
+  "setup": {
+    "title": "Bienvenido a ResidenceHub",
+    "subtitle": "Configura tu plataforma en unos simples pasos",
+    "steps": {
+      "account": "Tu Cuenta",
+      "building": "Datos del Edificio",
+      "complete": "Listo"
+    },
+    "account": {
+      "title": "Crea tu cuenta de administrador",
+      "description": "Esta sera la cuenta de super administrador de la plataforma",
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Juan Perez",
+      "email": "Correo Electronico",
+      "emailPlaceholder": "admin@ejemplo.com",
+      "password": "Contrasena",
+      "passwordPlaceholder": "Minimo 8 caracteres",
+      "confirmPassword": "Confirmar Contrasena",
+      "confirmPasswordPlaceholder": "Vuelve a ingresar tu contrasena",
+      "next": "Continuar"
+    },
+    "building": {
+      "title": "Configura tu primer edificio",
+      "description": "Puedes agregar mas edificios despues desde el panel de super administrador",
+      "name": "Nombre del Edificio",
+      "namePlaceholder": "ej. Torres del Sol",
+      "address": "Direccion",
+      "addressPlaceholder": "Direccion completa del edificio...",
+      "totalUnits": "Total de Unidades",
+      "timezone": "Zona Horaria",
+      "timezonePlaceholder": "Seleccionar zona horaria",
+      "back": "Atras",
+      "submit": "Completar Configuracion",
+      "submitting": "Configurando..."
+    },
+    "complete": {
+      "title": "Todo listo!",
+      "description": "Tu plataforma esta lista. Ahora puedes gestionar tu edificio o crear edificios adicionales desde el panel de super administrador.",
+      "goToDashboard": "Ir al Panel de Super Administrador"
+    },
+    "validation": {
+      "fullNameMin": "El nombre debe tener al menos 2 caracteres",
+      "emailInvalid": "Ingresa un correo electronico valido",
+      "passwordMin": "La contrasena debe tener al menos 8 caracteres",
+      "passwordMismatch": "Las contrasenas no coinciden",
+      "buildingNameRequired": "El nombre del edificio es requerido",
+      "totalUnitsMin": "Debe tener al menos 1 unidad",
+      "timezoneRequired": "Selecciona una zona horaria"
+    },
+    "errors": {
+      "alreadySetup": "La configuracion ya fue completada. Por favor inicia sesion.",
+      "failed": "La configuracion fallo. Intenta de nuevo.",
+      "signInFailed": "La cuenta fue creada pero el inicio de sesion fallo. Inicia sesion manualmente."
+    }
+  }
+}

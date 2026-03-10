@@ -1,0 +1,57 @@
+{
+  "setup": {
+    "title": "Welcome to ResidenceHub",
+    "subtitle": "Set up your platform in a few simple steps",
+    "steps": {
+      "account": "Your Account",
+      "building": "Building Details",
+      "complete": "All Done"
+    },
+    "account": {
+      "title": "Create your admin account",
+      "description": "This will be the super administrator account for the platform",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "admin@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Minimum 8 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "next": "Continue"
+    },
+    "building": {
+      "title": "Set up your first building",
+      "description": "You can add more buildings later from the super admin panel",
+      "name": "Building Name",
+      "namePlaceholder": "e.g., Sunset Towers",
+      "address": "Address",
+      "addressPlaceholder": "Full building address...",
+      "totalUnits": "Total Units",
+      "timezone": "Timezone",
+      "timezonePlaceholder": "Select timezone",
+      "back": "Back",
+      "submit": "Complete Setup",
+      "submitting": "Setting up..."
+    },
+    "complete": {
+      "title": "You're all set!",
+      "description": "Your platform is ready. You can now manage your building or create additional ones from the super admin panel.",
+      "goToDashboard": "Go to Super Admin Panel"
+    },
+    "validation": {
+      "fullNameMin": "Full name must be at least 2 characters",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "buildingNameRequired": "Building name is required",
+      "totalUnitsMin": "Must have at least 1 unit",
+      "timezoneRequired": "Please select a timezone"
+    },
+    "errors": {
+      "alreadySetup": "Setup has already been completed. Please log in.",
+      "failed": "Setup failed. Please try again.",
+      "signInFailed": "Account created but sign-in failed. Please log in manually."
+    }
+  }
+}

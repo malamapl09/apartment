@@ -24,6 +24,7 @@ import {
   Vote,
   FileBarChart,
   Settings,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -286,6 +287,23 @@ export function Sidebar({ userRole, isMobile = false, onClose }: SidebarProps) {
           })}
         </nav>
       </ScrollArea>
+
+      {userRole === "super_admin" && (
+        <div className="border-t px-3 py-2">
+          <Link
+            href="/super-admin"
+            onClick={isMobile ? onClose : undefined}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "hover:bg-accent hover:text-accent-foreground text-muted-foreground",
+              collapsed && !isMobile && "justify-center px-2"
+            )}
+          >
+            <Shield className="h-5 w-5 shrink-0" />
+            {(!collapsed || isMobile) && <span>{t("superAdmin")}</span>}
+          </Link>
+        </div>
+      )}
 
       {!isMobile && (
         <div className="border-t p-3">

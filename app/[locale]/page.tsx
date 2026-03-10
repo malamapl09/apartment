@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkBuildingsExist } from "@/lib/actions/setup";
 
 export default async function RootPage({
   params,
@@ -9,6 +10,12 @@ export default async function RootPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  // Check if any buildings exist; if not, redirect to setup wizard
+  const { exists } = await checkBuildingsExist();
+  if (!exists) {
+    redirect(`/${locale}/setup`);
+  }
 
   const supabase = await createClient();
 
@@ -33,7 +40,10 @@ export default async function RootPage({
   }
 
   // Redirect based on role
-  if (profile.role === "admin" || profile.role === "super_admin") {
+  if (profile.role === "super_admin") {
+    redirect(`/${locale}/super-admin`);
+  }
+  if (profile.role === "admin") {
     redirect(`/${locale}/admin`);
   }
 

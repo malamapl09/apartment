@@ -22,7 +22,9 @@
     "fees": "Fees & Payments",
     "polls": "Polls",
     "reports": "Reports",
-    "audit": "Audit Trail"
+    "audit": "Audit Trail",
+    "superAdmin": "Super Admin",
+    "buildings": "Buildings"
   },
   "actions": {
     "save": "Save",
