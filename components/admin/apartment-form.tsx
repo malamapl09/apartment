@@ -143,7 +143,7 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                   <FormItem>
                     <FormLabel>{t("floorLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="1" {...field} />
+                      <Input type="number" placeholder="1" {...field} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
                     </FormControl>
                     <FormDescription>
                       {t("floorDescription")}
@@ -160,7 +160,7 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                   <FormItem>
                     <FormLabel>{t("areaLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="85.5" {...field} />
+                      <Input type="number" step="0.01" placeholder="85.5" {...field} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
                     </FormControl>
                     <FormDescription>
                       {t("areaDescription")}
@@ -177,7 +177,7 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                   <FormItem>
                     <FormLabel>{t("bedroomsLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="2" {...field} />
+                      <Input type="number" placeholder="2" {...field} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
                     </FormControl>
                     <FormDescription>
                       {t("bedroomsDescription")}
@@ -194,7 +194,7 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
                   <FormItem>
                     <FormLabel>{t("bathroomsLabel")}</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="2" {...field} />
+                      <Input type="number" placeholder="2" {...field} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
                     </FormControl>
                     <FormDescription>
                       {t("bathroomsDescription")}
