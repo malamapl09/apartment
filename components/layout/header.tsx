@@ -16,6 +16,7 @@ import { MobileSidebar } from "./sidebar";
 import { LanguageSwitcher } from "./language-switcher";
 import { ThemeToggle } from "./theme-toggle";
 import { NotificationList } from "@/components/notifications/notification-list";
+import { CommandPalette } from "@/components/shared/command-palette";
 
 interface HeaderProps {
   user: {
@@ -59,6 +60,7 @@ export function Header({ user }: HeaderProps) {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
+          <CommandPalette />
           <LanguageSwitcher />
           <NotificationList />
           <ThemeToggle />

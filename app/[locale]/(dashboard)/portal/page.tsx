@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Home, Bell, ArrowRight } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
+import { getPortalSummary } from "@/lib/actions/analytics";
+import PortalSummaryCards from "@/components/portal/summary-cards";
 
 export default async function PortalDashboardPage({
   params,
@@ -78,6 +80,10 @@ export default async function PortalDashboardPage({
   const apartmentInfo = profile?.apartment_owners?.[0]?.apartments;
   const buildingInfo = apartmentInfo?.building;
 
+  // Fetch portal summary
+  const summaryResult = await getPortalSummary();
+  const summary = summaryResult.data;
+
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
@@ -92,6 +98,11 @@ export default async function PortalDashboardPage({
           </p>
         )}
       </div>
+
+      {/* Summary Cards */}
+      {summary && (
+        <PortalSummaryCards data={summary} locale={locale} />
+      )}
 
       {/* Quick Actions */}
       <Card>

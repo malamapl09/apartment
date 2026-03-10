@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { PWARegister } from "@/components/shared/pwa-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,6 +16,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ResidenceHub",
   description: "Smart apartment management platform",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ResidenceHub",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    apple: "/icons/icon-192x192.svg",
+  },
 };
 
 export default function RootLayout({
@@ -24,10 +37,14 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning>
+      <head>
+        <meta name="theme-color" content="#0f172a" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <PWARegister />
       </body>
     </html>
   );

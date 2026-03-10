@@ -3,6 +3,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getMaintenanceRequests, getMaintenanceStats } from "@/lib/actions/admin-maintenance";
 import { MaintenanceTable } from "@/components/admin/maintenance-table";
 import { MaintenanceFilters } from "@/components/admin/maintenance-filters";
+import { RealtimeRefreshWrapper } from "@/components/admin/realtime-refresh-wrapper";
 import {
   Card,
   CardContent,
@@ -56,82 +57,84 @@ export default async function AdminMaintenancePage({
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
-      </div>
-
-      {/* Stats Cards */}
-      {stats && (
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="p-2 rounded-full bg-orange-500/10">
-                <Wrench className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("stats.open")}
-                </p>
-                <p className="text-2xl font-bold">{stats.open}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="p-2 rounded-full bg-blue-500/10">
-                <Clock className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("stats.inProgress")}
-                </p>
-                <p className="text-2xl font-bold">{stats.in_progress}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 p-6">
-              <div className="p-2 rounded-full bg-green-500/10">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("stats.resolved")}
-                </p>
-                <p className="text-2xl font-bold">{stats.resolved}</p>
-              </div>
-            </CardContent>
-          </Card>
+    <RealtimeRefreshWrapper watchMaintenance>
+      <div className="container mx-auto py-6 space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
         </div>
-      )}
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("filters.title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<Skeleton className="h-20 w-full" />}>
-            <MaintenanceFilters />
-          </Suspense>
-        </CardContent>
-      </Card>
+        {/* Stats Cards */}
+        {stats && (
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="p-2 rounded-full bg-orange-500/10">
+                  <Wrench className="h-5 w-5 text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {t("stats.open")}
+                  </p>
+                  <p className="text-2xl font-bold">{stats.open}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="p-2 rounded-full bg-blue-500/10">
+                  <Clock className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {t("stats.inProgress")}
+                  </p>
+                  <p className="text-2xl font-bold">{stats.in_progress}</p>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="p-2 rounded-full bg-green-500/10">
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    {t("stats.resolved")}
+                  </p>
+                  <p className="text-2xl font-bold">{stats.resolved}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-      {/* Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-          <CardDescription>{t("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <MaintenanceTable
-            requests={requests ?? []}
-            locale={locale}
-          />
-        </CardContent>
-      </Card>
-    </div>
+        {/* Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("filters.title")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<Skeleton className="h-20 w-full" />}>
+              <MaintenanceFilters />
+            </Suspense>
+          </CardContent>
+        </Card>
+
+        {/* Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MaintenanceTable
+              requests={requests ?? []}
+              locale={locale}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </RealtimeRefreshWrapper>
   );
 }

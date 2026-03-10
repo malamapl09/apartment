@@ -8,6 +8,7 @@ import {
 } from "@/lib/actions/admin-fees";
 import { FinancialSummary } from "@/components/admin/financial-summary";
 import { FeesDashboard } from "@/components/admin/fees-dashboard";
+import { RealtimeRefreshWrapper } from "@/components/admin/realtime-refresh-wrapper";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import type { ChargeWithDetails, FeeType } from "@/types";
@@ -44,21 +45,23 @@ export default async function AdminFeesPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
+    <RealtimeRefreshWrapper watchPayments>
+      <div className="container mx-auto py-6 space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
+        </div>
+
+        {/* Financial Summary Cards */}
+        {summary && <FinancialSummary summary={summary} />}
+
+        {/* Main Interactive Dashboard */}
+        <FeesDashboard
+          feeTypes={(feeTypes || []) as FeeType[]}
+          charges={(charges || []) as ChargeWithDetails[]}
+          payments={(payments || []) as FeesDashboardPayments}
+        />
       </div>
-
-      {/* Financial Summary Cards */}
-      {summary && <FinancialSummary summary={summary} />}
-
-      {/* Main Interactive Dashboard */}
-      <FeesDashboard
-        feeTypes={(feeTypes || []) as FeeType[]}
-        charges={(charges || []) as ChargeWithDetails[]}
-        payments={(payments || []) as FeesDashboardPayments}
-      />
-    </div>
+    </RealtimeRefreshWrapper>
   );
 }

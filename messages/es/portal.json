@@ -17,6 +17,13 @@
     "announcements": "Anuncios",
     "announcements_description": "\u00daltimas noticias de tu edificio",
     "priority_high": "Importante",
+    "summary": {
+      "pendingCharges": "Cargos Pendientes",
+      "activeRequests": "Solicitudes Activas",
+      "upcomingVisitors": "Visitantes Próximos",
+      "unreadNotifications": "Notificaciones Sin Leer",
+      "viewAll": "Ver todo"
+    },
     "dashboard": {
       "title": "Bienvenido",
       "subtitle": "Gestiona tu apartamento y reservaciones",
@@ -386,6 +393,48 @@
       "notesPlaceholder": "Notas adicionales...",
       "dateRangeError": "La fecha de fin debe ser posterior a la fecha de inicio"
     },
+    "packages": {
+      "title": "Mis Paquetes",
+      "description": "Consulta los paquetes entregados a tu apartamento",
+      "noPackages": "Sin Paquetes",
+      "noPackagesDescription": "Aún no se han entregado paquetes a tu apartamento",
+      "trackingNumber": "Número de Rastreo",
+      "receivedAt": "Recibido",
+      "pickedUpAt": "Recogido",
+      "status": {
+        "pending": "Pendiente de Recoger",
+        "notified": "Notificado",
+        "picked_up": "Recogido"
+      }
+    },
+    "polls": {
+      "title": "Encuestas y Votaciones",
+      "description": "Participa en las encuestas del edificio y consulta resultados",
+      "noPolls": "Sin Encuestas Disponibles",
+      "noPollsDescription": "No hay encuestas activas en este momento",
+      "vote": "Votar",
+      "submitVote": "Enviar Voto",
+      "voted": "Ya has votado",
+      "viewResults": "Ver Resultados",
+      "results": "Resultados",
+      "totalVotes": "Total de Votos",
+      "votes": "votos",
+      "alreadyVoted": "Ya has votado en esta encuesta",
+      "pollClosed": "Esta encuesta está cerrada",
+      "voteSuccess": "Tu voto ha sido registrado",
+      "selectOption": "Por favor selecciona una opción",
+      "endsAt": "Finaliza",
+      "anonymous": "Anónima",
+      "status": {
+        "active": "Activa",
+        "closed": "Cerrada"
+      },
+      "type": {
+        "single_choice": "Opción Única",
+        "multiple_choice": "Opción Múltiple",
+        "yes_no": "Sí / No"
+      }
+    },
     "documents": {
       "title": "Documentos",
       "description": "Explora los documentos y archivos del edificio",
@@ -484,6 +533,57 @@
         "incorrect_password": "La contrase\u00f1a actual es incorrecta",
         "password_change_failed": "Error al cambiar la contrase\u00f1a",
         "update_failed": "Error al actualizar el perfil"
+      }
+    },
+    "polls": {
+      "title": "Encuestas",
+      "description": "Vota en asuntos del edificio y consulta resultados",
+      "vote": "Votar",
+      "viewResults": "Resultados",
+      "alreadyVoted": "Ya has votado en esta encuesta",
+      "submitVote": "Enviar Voto",
+      "submitting": "Enviando...",
+      "selectOne": "Selecciona una opción",
+      "selectMultiple": "Selecciona una o más opciones",
+      "pollEnds": "Finaliza",
+      "pollClosed": "Encuesta cerrada",
+      "noActivePolls": "Sin Encuestas Disponibles",
+      "noActivePollsDescription": "No hay encuestas activas en este momento",
+      "noClosedPollsDescription": "Aún no hay encuestas cerradas",
+      "voteSuccess": "Tu voto ha sido enviado",
+      "totalVotes": "votos",
+      "noVotesYet": "Aún no hay votos",
+      "active": "Activa",
+      "closed": "Cerrada",
+      "voted": "Votado",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "emailPreferences": {
+      "title": "Notificaciones por Correo",
+      "description": "Elige qué notificaciones por correo electrónico deseas recibir.",
+      "saved": "Preferencias de correo guardadas",
+      "types": {
+        "new_charges": {
+          "label": "Nuevos Cargos",
+          "description": "Recibe notificación cuando se genere un nuevo cargo para tu apartamento"
+        },
+        "maintenance_updates": {
+          "label": "Actualizaciones de Mantenimiento",
+          "description": "Recibe notificación cuando cambie el estado de tu solicitud de mantenimiento"
+        },
+        "visitor_checkins": {
+          "label": "Ingreso de Visitantes",
+          "description": "Recibe notificación cuando un visitante que registraste ingrese al edificio"
+        },
+        "new_announcements": {
+          "label": "Nuevos Anuncios",
+          "description": "Recibe notificación cuando se publique un nuevo anuncio del edificio"
+        },
+        "overdue_reminders": {
+          "label": "Recordatorios de Mora",
+          "description": "Recibe recordatorios sobre cargos vencidos"
+        }
       }
     }
   }

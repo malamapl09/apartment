@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
 
 interface SendEmailOptions {
   to: string;
@@ -10,6 +14,9 @@ interface SendEmailOptions {
 
 export async function sendEmail({ to, subject, react }: SendEmailOptions) {
   try {
+    const resend = getResendClient();
+    if (!resend) return { error: "Email not configured" };
+
     const { data, error } = await resend.emails.send({
       from: "ResidenceHub <notifications@residencehub.app>",
       to,

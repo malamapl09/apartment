@@ -17,8 +17,12 @@
     "pendingPayments": "Pending Payments",
     "maintenance": "Maintenance",
     "visitors": "Visitors",
+    "packages": "Packages",
     "documents": "Documents",
-    "fees": "Fees & Payments"
+    "fees": "Fees & Payments",
+    "polls": "Polls",
+    "reports": "Reports",
+    "audit": "Audit Trail"
   },
   "actions": {
     "save": "Save",
@@ -119,6 +123,28 @@
   "language": {
     "en": "English",
     "es": "Spanish"
+  },
+  "realtime": {
+    "dataUpdated": "Data updated",
+    "newNotification": "New notification"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "noResults": "No results found",
+    "recentSearches": "Recent Searches",
+    "clearRecent": "Clear",
+    "loading": "Searching...",
+    "types": {
+      "apartment": "Apartment",
+      "owner": "Owner",
+      "maintenance": "Maintenance",
+      "visitor": "Visitor",
+      "announcement": "Announcement",
+      "package": "Package",
+      "poll": "Poll",
+      "document": "Document"
+    },
+    "hint": "Search apartments, owners, requests..."
   },
   "reservations": {
     "status": {

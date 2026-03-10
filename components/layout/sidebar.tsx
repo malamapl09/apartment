@@ -19,6 +19,10 @@ import {
   UserCheck,
   FileText,
   DollarSign,
+  History,
+  Package,
+  Vote,
+  FileBarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -87,6 +91,18 @@ const adminItems: NavItem[] = [
     roles: ["super_admin", "admin"],
   },
   {
+    titleKey: "packages",
+    href: "/admin/packages",
+    icon: Package,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "polls",
+    href: "/admin/polls",
+    icon: Vote,
+    roles: ["super_admin", "admin"],
+  },
+  {
     titleKey: "documents",
     href: "/admin/documents",
     icon: FileText,
@@ -96,6 +112,18 @@ const adminItems: NavItem[] = [
     titleKey: "fees",
     href: "/admin/fees",
     icon: DollarSign,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "reports",
+    href: "/admin/reports",
+    icon: FileBarChart,
+    roles: ["super_admin", "admin"],
+  },
+  {
+    titleKey: "audit",
+    href: "/admin/audit",
+    icon: History,
     roles: ["super_admin", "admin"],
   },
 ];
@@ -129,6 +157,18 @@ const portalItems: NavItem[] = [
     titleKey: "visitors",
     href: "/portal/visitors",
     icon: UserCheck,
+    roles: ["owner", "resident"],
+  },
+  {
+    titleKey: "packages",
+    href: "/portal/packages",
+    icon: Package,
+    roles: ["owner", "resident"],
+  },
+  {
+    titleKey: "polls",
+    href: "/portal/polls",
+    icon: Vote,
     roles: ["owner", "resident"],
   },
   {

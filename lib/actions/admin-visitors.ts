@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 
 export async function getAllVisitors(filters?: {
   status?: string;
@@ -63,17 +64,46 @@ export async function checkInVisitor(id: string) {
     return { error: "Unauthorized" };
   }
 
+  // Get visitor info before updating
+  const { data: visitor } = await supabase
+    .from("visitors")
+    .select("registered_by, visitor_name, building_id")
+    .eq("id", id)
+    .single();
+
+  const checkedInAt = new Date().toISOString();
+
   const { error } = await supabase
     .from("visitors")
     .update({
       status: "checked_in",
-      checked_in_at: new Date().toISOString(),
+      checked_in_at: checkedInAt,
       checked_in_by: user.id,
     })
     .eq("id", id)
     .eq("status", "expected");
 
   if (error) return { error: error.message };
+
+  // Fire-and-forget: send visitor check-in email to the registering user
+  if (visitor) {
+    // Get building name
+    const { data: building } = await supabase
+      .from("buildings")
+      .select("name")
+      .eq("id", visitor.building_id)
+      .single();
+
+    sendNotificationEmail({
+      userId: visitor.registered_by,
+      type: "visitor_checkins",
+      templateProps: {
+        visitorName: visitor.visitor_name,
+        buildingName: building?.name ?? "",
+        checkedInAt: new Date(checkedInAt).toLocaleString(),
+      },
+    }).catch(() => {});
+  }
 
   revalidatePath("/admin/visitors");
   return { success: true };

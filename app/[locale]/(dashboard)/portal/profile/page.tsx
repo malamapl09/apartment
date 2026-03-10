@@ -5,7 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import ProfileForm from "@/components/portal/profile-form";
 import ChangePasswordForm from "@/components/portal/change-password-form";
-import { User, Lock } from "lucide-react";
+import { User, Lock, Mail } from "lucide-react";
+import EmailPreferencesForm from "@/components/portal/email-preferences-form";
+import { getEmailPreferences } from "@/lib/actions/email-preferences";
 
 export default async function ProfilePage({
   params,
@@ -15,6 +17,7 @@ export default async function ProfilePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("portal.profile");
+  const tEmail = await getTranslations("portal.emailPreferences");
 
   const supabase = await createClient();
 
@@ -45,6 +48,9 @@ export default async function ProfilePage({
     `)
     .eq("id", user.id)
     .single();
+
+  // Fetch email preferences
+  const { data: emailPreferences } = await getEmailPreferences();
 
   const apartments = profile?.apartment_owners?.map((ao: any) => ({
     number: ao.apartments?.apartment_number,
@@ -108,6 +114,24 @@ export default async function ProfilePage({
           <ChangePasswordForm />
         </CardContent>
       </Card>
+
+      <Separator />
+
+      {/* Email Preferences */}
+      {emailPreferences && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              {tEmail("title")}
+            </CardTitle>
+            <CardDescription>{tEmail("description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EmailPreferencesForm preferences={emailPreferences} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

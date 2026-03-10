@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { MaintenanceStatus } from "@/types";
+import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 
 export async function getMaintenanceRequests(filters?: {
   status?: string;
@@ -78,12 +79,31 @@ export async function updateMaintenanceStatus(
     }
   }
 
+  const { data: request } = await supabase
+    .from("maintenance_requests")
+    .select("requested_by, reference_code, title")
+    .eq("id", id)
+    .single();
+
   const { error } = await supabase
     .from("maintenance_requests")
     .update(updates)
     .eq("id", id);
 
   if (error) return { error: error.message };
+
+  // Fire-and-forget: send maintenance update email to requester
+  if (request) {
+    sendNotificationEmail({
+      userId: request.requested_by,
+      type: "maintenance_updates",
+      templateProps: {
+        referenceCode: request.reference_code,
+        title: request.title,
+        newStatus: status,
+      },
+    }).catch(() => {});
+  }
 
   revalidatePath("/admin/maintenance");
   revalidatePath(`/admin/maintenance/${id}`);

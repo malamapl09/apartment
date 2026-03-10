@@ -5,6 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Building2, Users, Calendar, CreditCard } from "lucide-react";
+import {
+  getCollectionRatesByMonth,
+  getMaintenanceTrends,
+  getVisitorStats,
+  getOccupancyStats,
+} from "@/lib/actions/analytics";
+import CollectionRateChart from "@/components/admin/charts/collection-rate-chart";
+import MaintenanceTrendChart from "@/components/admin/charts/maintenance-trend-chart";
+import VisitorStatsChart from "@/components/admin/charts/visitor-stats-chart";
+import OccupancyChart from "@/components/admin/charts/occupancy-chart";
 
 export default async function AdminDashboard({
   params,
@@ -37,6 +47,16 @@ export default async function AdminDashboard({
     .from("reservations")
     .select("*", { count: "exact", head: true })
     .eq("status", "payment_submitted");
+
+  // Fetch analytics data
+  const currentYear = new Date().getFullYear();
+  const [collectionRates, maintenanceTrends, visitorStats, occupancyStats] =
+    await Promise.all([
+      getCollectionRatesByMonth(currentYear),
+      getMaintenanceTrends(6),
+      getVisitorStats(6),
+      getOccupancyStats(),
+    ]);
 
   const stats = [
     {
@@ -103,6 +123,14 @@ export default async function AdminDashboard({
             </Card>
           );
         })}
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <CollectionRateChart data={collectionRates.data || []} />
+        <OccupancyChart data={occupancyStats.data} />
+        <MaintenanceTrendChart data={maintenanceTrends.data || []} />
+        <VisitorStatsChart data={visitorStats.data || []} />
       </div>
 
       {/* Quick Actions */}

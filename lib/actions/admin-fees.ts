@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { FeeCategory, FeeType, PaymentMethod } from "@/types";
+import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 
 async function getAdminProfile() {
   const supabase = await createClient();
@@ -139,6 +140,28 @@ export async function generateMonthlyCharges(
 
     if (!insertError) {
       createdCount++;
+
+      // Fire-and-forget: send new charge email to apartment owners
+      const { data: owners } = await supabase
+        .from("apartment_owners")
+        .select("profile_id, apartments (unit_number)")
+        .eq("apartment_id", apartment.id);
+
+      if (owners) {
+        for (const owner of owners) {
+          const unitNumber = (owner as any).apartments?.unit_number ?? "";
+          sendNotificationEmail({
+            userId: owner.profile_id,
+            type: "new_charges",
+            templateProps: {
+              amount: String(feeType.default_amount),
+              feeType: feeType.name,
+              dueDate: dueDateStr,
+              apartmentUnit: unitNumber,
+            },
+          }).catch(() => {});
+        }
+      }
     }
     // Silently skip unique constraint violations (charge already exists for this period)
   }

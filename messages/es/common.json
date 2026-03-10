@@ -17,8 +17,12 @@
     "pendingPayments": "Pagos Pendientes",
     "maintenance": "Mantenimiento",
     "visitors": "Visitantes",
+    "packages": "Paquetes",
     "documents": "Documentos",
-    "fees": "Cuotas y Pagos"
+    "fees": "Cuotas y Pagos",
+    "polls": "Encuestas",
+    "reports": "Reportes",
+    "audit": "Registro de Auditoría"
   },
   "actions": {
     "save": "Guardar",
@@ -119,6 +123,28 @@
   "language": {
     "en": "Ingl\u00e9s",
     "es": "Espa\u00f1ol"
+  },
+  "realtime": {
+    "dataUpdated": "Datos actualizados",
+    "newNotification": "Nueva notificaci\u00f3n"
+  },
+  "search": {
+    "placeholder": "Buscar...",
+    "noResults": "Sin resultados",
+    "recentSearches": "Búsquedas Recientes",
+    "clearRecent": "Limpiar",
+    "loading": "Buscando...",
+    "types": {
+      "apartment": "Apartamento",
+      "owner": "Propietario",
+      "maintenance": "Mantenimiento",
+      "visitor": "Visitante",
+      "announcement": "Anuncio",
+      "package": "Paquete",
+      "poll": "Encuesta",
+      "document": "Documento"
+    },
+    "hint": "Buscar apartamentos, propietarios, solicitudes..."
   },
   "reservations": {
     "status": {

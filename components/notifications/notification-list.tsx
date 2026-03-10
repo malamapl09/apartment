@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Bell, Check, CheckCheck, Calendar, AlertCircle, MessageSquare, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 import { getNotifications, getUnreadCount, markAsRead, markAllAsRead } from "@/lib/actions/notifications";
+import { useRealtimeNotifications } from "@/lib/hooks/use-realtime-notifications";
+import { useUser } from "@/lib/hooks/use-user";
 import type { Notification } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -34,6 +37,18 @@ export function NotificationList() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { profile } = useUser();
+
+  const handleNewNotification = useCallback(() => {
+    loadNotifications();
+    loadUnreadCount();
+    toast.info("New notification");
+  }, []);
+
+  useRealtimeNotifications({
+    userId: profile?.id ?? null,
+    onNewNotification: handleNewNotification,
+  });
 
   useEffect(() => {
     loadNotifications();

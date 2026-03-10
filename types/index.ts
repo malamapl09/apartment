@@ -337,3 +337,88 @@ export interface ReservationWithDetails extends Reservation {
   public_spaces: PublicSpace;
   profiles: Profile;
 }
+
+// Polls & Voting
+export type PollType = "single_choice" | "multiple_choice" | "yes_no";
+export type PollStatus = "draft" | "active" | "closed";
+
+export interface Poll {
+  id: string;
+  building_id: string;
+  title: string;
+  description: string | null;
+  poll_type: PollType;
+  target: "all" | "owners" | "residents";
+  created_by: string | null;
+  starts_at: string;
+  ends_at: string;
+  is_anonymous: boolean;
+  status: PollStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PollOption {
+  id: string;
+  poll_id: string;
+  label: string;
+  sort_order: number;
+}
+
+export interface PollVote {
+  id: string;
+  poll_id: string;
+  option_id: string;
+  user_id: string;
+  apartment_id: string | null;
+  created_at: string;
+}
+
+export interface PollWithDetails extends Poll {
+  poll_options: PollOption[];
+  poll_votes: PollVote[];
+  created_by_profile?: { full_name: string } | null;
+}
+
+export interface PollListItem extends Poll {
+  poll_options: PollOption[];
+  poll_votes: { count: number }[];
+  created_by_profile?: { full_name: string } | null;
+}
+
+// Package/Delivery Tracking
+export type PackageStatus = "pending" | "notified" | "picked_up";
+
+export interface Package {
+  id: string;
+  building_id: string;
+  apartment_id: string;
+  tracking_number: string | null;
+  carrier: string | null;
+  description: string;
+  received_by: string | null;
+  received_at: string;
+  picked_up_by: string | null;
+  picked_up_at: string | null;
+  status: PackageStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PackageWithDetails extends Package {
+  apartments: { id: string; unit_number: string };
+  received_by_profile?: { id: string; full_name: string } | null;
+  picked_up_by_profile?: { id: string; full_name: string } | null;
+}
+
+// Email Preferences
+export interface EmailPreferences {
+  id: string;
+  user_id: string;
+  new_charges: boolean;
+  maintenance_updates: boolean;
+  visitor_checkins: boolean;
+  new_announcements: boolean;
+  overdue_reminders: boolean;
+}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 
 const announcementSchema = z.object({
   title: z.string().min(1),
@@ -43,6 +44,42 @@ export async function createAnnouncement(formData: FormData) {
   });
 
   if (error) return { error: error.message };
+
+  // Fire-and-forget: batch-send announcement emails to building members
+  const { data: building } = await supabase
+    .from("buildings")
+    .select("name")
+    .eq("id", profile.building_id)
+    .single();
+
+  let membersQuery = supabase
+    .from("profiles")
+    .select("id")
+    .eq("building_id", profile.building_id)
+    .eq("is_active", true)
+    .neq("id", user.id);
+
+  if (result.data.target === "owners") {
+    membersQuery = membersQuery.in("role", ["owner"]);
+  } else if (result.data.target === "residents") {
+    membersQuery = membersQuery.in("role", ["resident"]);
+  }
+
+  const { data: members } = await membersQuery;
+
+  if (members) {
+    for (const member of members) {
+      sendNotificationEmail({
+        userId: member.id,
+        type: "new_announcements",
+        templateProps: {
+          announcementTitle: result.data.title,
+          announcementBody: result.data.body,
+          buildingName: building?.name ?? "",
+        },
+      }).catch(() => {});
+    }
+  }
 
   revalidatePath("/admin/announcements");
   return { success: true };

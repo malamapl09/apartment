@@ -17,6 +17,13 @@
     "announcements": "Announcements",
     "announcements_description": "Latest news from your building",
     "priority_high": "Important",
+    "summary": {
+      "pendingCharges": "Pending Charges",
+      "activeRequests": "Active Requests",
+      "upcomingVisitors": "Upcoming Visitors",
+      "unreadNotifications": "Unread Notifications",
+      "viewAll": "View all"
+    },
     "dashboard": {
       "title": "Welcome",
       "subtitle": "Manage your apartment and reservations",
@@ -386,6 +393,48 @@
       "notesPlaceholder": "Any additional notes...",
       "dateRangeError": "Valid until must be after valid from"
     },
+    "packages": {
+      "title": "My Packages",
+      "description": "View packages delivered to your apartment",
+      "noPackages": "No Packages",
+      "noPackagesDescription": "No packages have been delivered to your apartment yet",
+      "trackingNumber": "Tracking Number",
+      "receivedAt": "Received",
+      "pickedUpAt": "Picked Up",
+      "status": {
+        "pending": "Pending Pickup",
+        "notified": "Notified",
+        "picked_up": "Picked Up"
+      }
+    },
+    "polls": {
+      "title": "Polls & Voting",
+      "description": "Participate in building polls and view results",
+      "noPolls": "No Polls Available",
+      "noPollsDescription": "There are no active polls at this time",
+      "vote": "Vote",
+      "submitVote": "Submit Vote",
+      "voted": "You have voted",
+      "viewResults": "View Results",
+      "results": "Results",
+      "totalVotes": "Total Votes",
+      "votes": "votes",
+      "alreadyVoted": "You have already voted on this poll",
+      "pollClosed": "This poll is closed",
+      "voteSuccess": "Your vote has been recorded",
+      "selectOption": "Please select an option",
+      "endsAt": "Ends",
+      "anonymous": "Anonymous",
+      "status": {
+        "active": "Active",
+        "closed": "Closed"
+      },
+      "type": {
+        "single_choice": "Single Choice",
+        "multiple_choice": "Multiple Choice",
+        "yes_no": "Yes / No"
+      }
+    },
     "documents": {
       "title": "Documents",
       "description": "Browse building documents and files",
@@ -484,6 +533,57 @@
         "incorrect_password": "Current password is incorrect",
         "password_change_failed": "Failed to change password",
         "update_failed": "Failed to update profile"
+      }
+    },
+    "polls": {
+      "title": "Polls",
+      "description": "Vote on building matters and view results",
+      "vote": "Vote",
+      "viewResults": "Results",
+      "alreadyVoted": "You have already voted on this poll",
+      "submitVote": "Submit Vote",
+      "submitting": "Submitting...",
+      "selectOne": "Select one option",
+      "selectMultiple": "Select one or more options",
+      "pollEnds": "Ends",
+      "pollClosed": "Poll is closed",
+      "noActivePolls": "No Polls Available",
+      "noActivePollsDescription": "There are no active polls at this time",
+      "noClosedPollsDescription": "There are no closed polls yet",
+      "voteSuccess": "Your vote has been submitted",
+      "totalVotes": "votes",
+      "noVotesYet": "No votes yet",
+      "active": "Active",
+      "closed": "Closed",
+      "voted": "Voted",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "emailPreferences": {
+      "title": "Email Notifications",
+      "description": "Choose which email notifications you would like to receive.",
+      "saved": "Email preferences saved",
+      "types": {
+        "new_charges": {
+          "label": "New Charges",
+          "description": "Get notified when a new charge is generated for your apartment"
+        },
+        "maintenance_updates": {
+          "label": "Maintenance Updates",
+          "description": "Get notified when your maintenance request status changes"
+        },
+        "visitor_checkins": {
+          "label": "Visitor Check-ins",
+          "description": "Get notified when a visitor you registered checks in"
+        },
+        "new_announcements": {
+          "label": "New Announcements",
+          "description": "Get notified when a new building announcement is posted"
+        },
+        "overdue_reminders": {
+          "label": "Overdue Reminders",
+          "description": "Get reminded about overdue charges"
+        }
       }
     }
   }

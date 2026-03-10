@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ResidenceHub
+
+Smart apartment building management platform built with Next.js, Supabase, and Vercel.
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router, Turbopack)
+- **Database & Auth:** Supabase (PostgreSQL, Auth, Storage, Realtime)
+- **Styling:** Tailwind CSS + shadcn/ui
+- **i18n:** next-intl (English & Spanish)
+- **Email:** Resend + React Email
+- **Charts:** Recharts
+- **Deployment:** Vercel
+
+## Features
+
+### Admin Panel (`/admin`)
+- **Dashboard** — Analytics charts (collection rates, maintenance trends, occupancy, visitors)
+- **Apartments** — Unit management with owner assignments
+- **Owners** — Resident directory and profiles
+- **Spaces** — Common area management and reservations
+- **Fees & Payments** — Charge generation, payment tracking, overdue automation
+- **Maintenance** — Request management with real-time updates
+- **Visitors** — Visitor log with check-in/check-out tracking
+- **Packages** — Package/delivery logging and notification
+- **Polls & Voting** — Create polls (single/multiple choice), publish results
+- **Announcements** — Building-wide announcements with email notifications
+- **Documents** — Shared document management
+- **Reports** — Financial and maintenance reports with CSV export
+- **Audit Trail** — Activity log with filters by user, action, date range
+- **Settings** — Building configuration
+
+### Owner Portal (`/portal`)
+- **Dashboard** — Summary cards (pending charges, maintenance, visitors, packages)
+- **Pending Payments** — View and pay charges
+- **Maintenance** — Submit and track maintenance requests
+- **Visitors** — Register expected visitors
+- **Packages** — View received packages
+- **Polls** — Vote on active polls, view results
+- **Spaces** — Reserve common areas
+- **Documents** — Access shared documents
+- **Announcements** — Read building announcements
+- **Profile** — Update personal info and email notification preferences
+
+### Platform Features
+- **Real-time Updates** — Supabase Realtime subscriptions for live data
+- **Email Notifications** — Transactional emails for charges, maintenance updates, announcements, overdue reminders, visitor check-ins, package arrivals
+- **Automated Cron Jobs** — Daily overdue charge detection, reservation auto-cancellation
+- **Global Search** — Cmd+K command palette searching across all entities
+- **PWA Support** — Installable app with offline fallback
+- **Role-Based Access** — super_admin, admin, owner, resident roles with RLS
+- **i18n** — Full English and Spanish translations
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Resend (email)
+RESEND_API_KEY=
 
-## Learn More
+# Cron
+CRON_SECRET=
 
-To learn more about Next.js, take a look at the following resources:
+# App
+NEXT_PUBLIC_APP_URL=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Database Migrations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Migrations are in `supabase/migrations/`. Apply them with:
 
-## Deploy on Vercel
+```bash
+npx supabase db push
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  [locale]/
+    (dashboard)/
+      admin/          # Admin panel pages
+      portal/         # Owner portal pages
+  api/
+    auth/             # Auth callbacks
+    cron/             # Cron job endpoints
+components/
+  admin/              # Admin-specific components
+  portal/             # Portal-specific components
+  shared/             # Shared components (command palette, PWA)
+  layout/             # Sidebar, header
+  ui/                 # shadcn/ui primitives
+lib/
+  actions/            # Server actions
+  email/              # Email templates and sending
+  hooks/              # Real-time subscription hooks
+  supabase/           # Supabase client utilities
+messages/
+  en/                 # English translations
+  es/                 # Spanish translations
+supabase/
+  migrations/         # SQL migration files
+types/                # TypeScript type definitions
+```
+
+## Deployment
+
+Deployed on Vercel with automatic builds from `main`. Cron jobs configured in `vercel.json`.
