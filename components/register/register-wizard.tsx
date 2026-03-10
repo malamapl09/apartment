@@ -118,8 +118,8 @@ function FieldError({ message }: { message?: string }) {
 export function RegisterWizard() {
   const t = useTranslations("register");
   const router = useRouter();
-  const params = useParams();
-  const locale = (params.locale as string) ?? "en";
+  const params = useParams<{ locale: string }>();
+  const locale = params.locale ?? "en";
 
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [isPending, startTransition] = useTransition();

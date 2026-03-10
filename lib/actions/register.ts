@@ -32,7 +32,10 @@ export async function registerBuilding(formData: FormData) {
   });
 
   if (authError || !authData.user) {
-    return { error: authError?.message ?? "Failed to create account" };
+    if (authError?.message?.toLowerCase().includes("already")) {
+      return { error: "An account with this email already exists. Please log in instead." };
+    }
+    return { error: "Failed to create account. Please try again." };
   }
 
   const userId = authData.user.id;
