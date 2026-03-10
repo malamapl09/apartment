@@ -78,15 +78,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <div className="text-center text-sm text-muted-foreground">
-            {t("noAccount")}{" "}
-            <Link
-              href="/register"
-              className="text-primary hover:underline underline-offset-4"
-            >
-              {t("register")}
-            </Link>
-          </div>
         </form>
       </CardContent>
     </Card>
