@@ -412,6 +412,11 @@
       "title": "Package Tracking",
       "description": "Log and manage delivered packages",
       "logPackage": "Log Package",
+      "stats": {
+        "pending": "Awaiting Pickup",
+        "notified": "Owner Notified",
+        "pickedUp": "Picked Up"
+      },
       "logPackageDescription": "Record a new package delivery for an apartment",
       "apartment": "Apartment",
       "selectApartment": "Select apartment...",
@@ -428,6 +433,7 @@
       "noPackagesDescription": "No packages have been logged yet",
       "logSuccess": "Package logged successfully",
       "pickupSuccess": "Package marked as picked up",
+      "genericError": "Something went wrong. Please try again.",
       "cancel": "Cancel",
       "submitting": "Submitting...",
       "status": {
@@ -752,7 +758,8 @@
       "actions": "Actions",
       "cancel": "Cancel",
       "creating": "Creating...",
-      "yesNoDescription": "This poll will automatically have 'Yes' and 'No' as options"
+      "yesNoDescription": "This poll will automatically have 'Yes' and 'No' as options",
+      "backToPolls": "Back to polls"
     },
     "reports": {
       "title": "Reports & Export",

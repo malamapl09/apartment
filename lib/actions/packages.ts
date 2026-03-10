@@ -17,7 +17,7 @@ export async function getMyPackages() {
     .eq("profile_id", user.id);
 
   if (!ownerRecords || ownerRecords.length === 0) {
-    return { data: [] };
+    return { error: null, data: [] };
   }
 
   const apartmentIds = ownerRecords.map((r) => r.apartment_id);
@@ -31,5 +31,5 @@ export async function getMyPackages() {
     .order("received_at", { ascending: false });
 
   if (error) return { error: error.message, data: [] };
-  return { data: data || [] };
+  return { error: null, data: data || [] };
 }

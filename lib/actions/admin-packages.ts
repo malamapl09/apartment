@@ -79,7 +79,7 @@ export async function logPackage(data: {
   }
 
   revalidatePath("/admin/packages");
-  return { success: true, data: pkg };
+  return { error: null, data: pkg };
 }
 
 export async function getPackages(filters?: {
@@ -116,7 +116,7 @@ export async function getPackages(filters?: {
 
   const { data, error } = await query;
   if (error) return { error: error.message, data: [] };
-  return { data: data || [] };
+  return { error: null, data: data || [] };
 }
 
 export async function markPickedUp(id: string) {
@@ -149,7 +149,7 @@ export async function markPickedUp(id: string) {
   if (error) return { error: error.message };
 
   revalidatePath("/admin/packages");
-  return { success: true };
+  return { error: null };
 }
 
 export async function getPackageStats() {
@@ -188,5 +188,5 @@ export async function getPackageStats() {
     }
   }
 
-  return { data: stats };
+  return { error: null, data: stats };
 }

@@ -557,7 +557,9 @@
       "closed": "Closed",
       "voted": "Voted",
       "yes": "Yes",
-      "no": "No"
+      "no": "No",
+      "viewPoll": "View poll",
+      "backToPolls": "Back to polls"
     },
     "emailPreferences": {
       "title": "Email Notifications",

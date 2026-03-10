@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Package, AlertCircle, Clock, Bell, CheckCircle } from "lucide-react";
 import type { PackageWithDetails } from "@/types";
 
@@ -48,7 +48,6 @@ export default async function AdminPackagesPage({ searchParams }: PageProps) {
       <div className="container mx-auto py-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
           <AlertDescription>{packagesResult.error}</AlertDescription>
         </Alert>
       </div>

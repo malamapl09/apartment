@@ -66,6 +66,7 @@ interface PollFormProps {
 
 export function PollForm({ onSuccess }: PollFormProps) {
   const t = useTranslations("admin.polls");
+  const tCommon = useTranslations("labels");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -157,7 +158,7 @@ export function PollForm({ onSuccess }: PollFormProps) {
               <FormLabel>
                 {t("pollDescription")}{" "}
                 <span className="text-muted-foreground font-normal text-xs">
-                  (optional)
+                  {tCommon("optional")}
                 </span>
               </FormLabel>
               <FormControl>

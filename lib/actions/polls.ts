@@ -39,7 +39,7 @@ export async function getActivePolls() {
     };
   });
 
-  return { data: enrichedPolls };
+  return { error: null, data: enrichedPolls };
 }
 
 export async function castVote(pollId: string, optionIds: string[]) {
@@ -113,7 +113,7 @@ export async function castVote(pollId: string, optionIds: string[]) {
 
   revalidatePath("/portal/polls");
   revalidatePath(`/portal/polls/${pollId}`);
-  return { success: true };
+  return { error: null };
 }
 
 export async function getPollResults(pollId: string) {
@@ -153,6 +153,7 @@ export async function getPollResults(pollId: string) {
     });
 
   return {
+    error: null,
     data: {
       ...poll,
       results,

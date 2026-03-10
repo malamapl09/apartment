@@ -60,7 +60,7 @@ export default async function PortalPollDetailPage({ params }: PageProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button asChild variant="ghost" size="icon">
-          <Link href={`/${locale}/portal/polls`} aria-label="Back to polls">
+          <Link href={`/${locale}/portal/polls`} aria-label={t("backToPolls")}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

@@ -88,7 +88,7 @@ export function PackageLogForm({ apartments }: PackageLogFormProps) {
       setOpen(false);
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error(t("genericError"));
     } finally {
       setIsSubmitting(false);
     }

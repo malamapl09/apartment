@@ -98,7 +98,7 @@ export default async function PortalPollsPage({ params }: PageProps) {
               variant="ghost"
               size="icon"
               className="shrink-0"
-              aria-label={`View ${poll.title}`}
+              aria-label={t("viewPoll")}
             >
               <Link href={`/${locale}/portal/polls/${poll.id}`}>
                 <ArrowRight className="h-4 w-4" />

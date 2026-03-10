@@ -68,7 +68,7 @@ export async function createPoll(data: {
   if (optionsError) return { error: optionsError.message };
 
   revalidatePath("/admin/polls");
-  return { success: true, data: poll };
+  return { error: null, data: poll };
 }
 
 export async function publishPoll(id: string) {
@@ -101,7 +101,7 @@ export async function publishPoll(id: string) {
 
   revalidatePath("/admin/polls");
   revalidatePath(`/admin/polls/${id}`);
-  return { success: true };
+  return { error: null };
 }
 
 export async function closePoll(id: string) {
@@ -131,7 +131,7 @@ export async function closePoll(id: string) {
 
   revalidatePath("/admin/polls");
   revalidatePath(`/admin/polls/${id}`);
-  return { success: true };
+  return { error: null };
 }
 
 export async function getPolls() {
@@ -160,7 +160,7 @@ export async function getPolls() {
     .order("created_at", { ascending: false });
 
   if (error) return { error: error.message, data: [] };
-  return { data: data || [] };
+  return { error: null, data: data || [] };
 }
 
 export async function getPollResults(id: string) {
@@ -244,6 +244,7 @@ export async function getPollResults(id: string) {
     });
 
   return {
+    error: null,
     data: {
       ...poll,
       created_by_profile: creatorName ? { full_name: creatorName } : null,

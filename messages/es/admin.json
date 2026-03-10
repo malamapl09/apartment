@@ -413,6 +413,11 @@
       "title": "Seguimiento de Paquetes",
       "description": "Registra y gestiona los paquetes entregados",
       "logPackage": "Registrar Paquete",
+      "stats": {
+        "pending": "Esperando Recogida",
+        "notified": "Propietario Notificado",
+        "pickedUp": "Recogido"
+      },
       "logPackageDescription": "Registrar la entrega de un nuevo paquete para un apartamento",
       "apartment": "Apartamento",
       "selectApartment": "Seleccionar apartamento...",
@@ -429,6 +434,7 @@
       "noPackagesDescription": "Aún no se han registrado paquetes",
       "logSuccess": "Paquete registrado exitosamente",
       "pickupSuccess": "Paquete marcado como recogido",
+      "genericError": "Algo salió mal. Por favor intenta nuevamente.",
       "cancel": "Cancelar",
       "submitting": "Enviando...",
       "status": {
@@ -753,7 +759,8 @@
       "actions": "Acciones",
       "cancel": "Cancelar",
       "creating": "Creando...",
-      "yesNoDescription": "Esta encuesta tendrá automáticamente 'Sí' y 'No' como opciones"
+      "yesNoDescription": "Esta encuesta tendrá automáticamente 'Sí' y 'No' como opciones",
+      "backToPolls": "Volver a encuestas"
     },
     "reports": {
       "title": "Reportes y Exportación",

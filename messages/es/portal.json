@@ -557,7 +557,9 @@
       "closed": "Cerrada",
       "voted": "Votado",
       "yes": "Sí",
-      "no": "No"
+      "no": "No",
+      "viewPoll": "Ver encuesta",
+      "backToPolls": "Volver a encuestas"
     },
     "emailPreferences": {
       "title": "Notificaciones por Correo",
