@@ -1,19 +1,21 @@
 import { Text, Button } from "@react-email/components";
-import { BaseLayout } from "./base-layout";
+import { BaseLayout, ctaButtonStyle } from "./base-layout";
 
 interface InvitationEmailProps {
   fullName: string;
   buildingName: string;
   setPasswordUrl: string;
+  appUrl?: string;
 }
 
 export function InvitationEmail({
   fullName,
   buildingName,
   setPasswordUrl,
+  appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app",
 }: InvitationEmailProps) {
   return (
-    <BaseLayout previewText={`Welcome to ${buildingName}`}>
+    <BaseLayout previewText={`Welcome to ${buildingName}`} appUrl={appUrl}>
       <Text style={{ fontSize: "18px", fontWeight: "bold" }}>
         Welcome, {fullName}!
       </Text>
@@ -23,17 +25,7 @@ export function InvitationEmail({
       <Text>
         Click the button below to set your password and access your account:
       </Text>
-      <Button
-        href={setPasswordUrl}
-        style={{
-          backgroundColor: "#0f172a",
-          color: "#fff",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          textDecoration: "none",
-          display: "inline-block",
-        }}
-      >
+      <Button href={setPasswordUrl} style={ctaButtonStyle}>
         Set Your Password
       </Button>
       <Text

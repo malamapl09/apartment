@@ -1,11 +1,13 @@
-import { Text, Hr } from "@react-email/components";
-import { BaseLayout } from "./base-layout";
+import { Text, Hr, Button } from "@react-email/components";
+import { BaseLayout, hrStyle, ctaButtonStyle } from "./base-layout";
 
 interface MaintenanceUpdateEmailProps {
   fullName: string;
   referenceCode: string;
   title: string;
   newStatus: string;
+  requestId?: string;
+  appUrl?: string;
 }
 
 export function MaintenanceUpdateEmail({
@@ -13,19 +15,24 @@ export function MaintenanceUpdateEmail({
   referenceCode,
   title,
   newStatus,
+  requestId,
+  appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app",
 }: MaintenanceUpdateEmailProps) {
+  const ctaUrl = requestId
+    ? `${appUrl}/portal/maintenance/${requestId}`
+    : `${appUrl}/portal/maintenance`;
+
   return (
     <BaseLayout
       previewText={`Maintenance request ${referenceCode} updated to ${newStatus}`}
+      appUrl={appUrl}
     >
       <Text style={{ fontSize: "18px", fontWeight: "bold" }}>
         Maintenance Request Updated
       </Text>
       <Text>Hi {fullName},</Text>
-      <Text>
-        Your maintenance request has been updated:
-      </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
+      <Text>Your maintenance request has been updated:</Text>
+      <Hr style={hrStyle} />
       <Text style={{ margin: "4px 0" }}>
         <strong>Reference:</strong> {referenceCode}
       </Text>
@@ -46,16 +53,10 @@ export function MaintenanceUpdateEmail({
           {newStatus}
         </span>
       </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
-      <Text>
-        You can check the full details and add comments through your
-        ResidenceHub portal.
-      </Text>
-      <Text
-        style={{ fontSize: "14px", color: "#71717a", marginTop: "16px" }}
-      >
-        If you have any questions, please contact your building management.
-      </Text>
+      <Hr style={hrStyle} />
+      <Button href={ctaUrl} style={ctaButtonStyle}>
+        View Request
+      </Button>
     </BaseLayout>
   );
 }

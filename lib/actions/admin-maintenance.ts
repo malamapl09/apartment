@@ -114,6 +114,7 @@ export async function updateMaintenanceStatus(
         referenceCode: request.reference_code,
         title: request.title,
         newStatus: status,
+        requestId: id,
       },
     }).catch(() => {});
 

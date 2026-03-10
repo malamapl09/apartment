@@ -1,5 +1,5 @@
-import { Text, Hr } from "@react-email/components";
-import { BaseLayout } from "./base-layout";
+import { Text, Hr, Button } from "@react-email/components";
+import { BaseLayout, hrStyle, ctaButtonStyle } from "./base-layout";
 
 interface PackageReceivedEmailProps {
   fullName: string;
@@ -8,6 +8,7 @@ interface PackageReceivedEmailProps {
   carrier: string;
   buildingName: string;
   receivedAt: string;
+  appUrl?: string;
 }
 
 export function PackageReceivedEmail({
@@ -17,9 +18,13 @@ export function PackageReceivedEmail({
   carrier,
   buildingName,
   receivedAt,
+  appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app",
 }: PackageReceivedEmailProps) {
   return (
-    <BaseLayout previewText={`A package has arrived for apartment ${unitNumber}`}>
+    <BaseLayout
+      previewText={`A package has arrived for apartment ${unitNumber}`}
+      appUrl={appUrl}
+    >
       <Text style={{ fontSize: "18px", fontWeight: "bold" }}>
         Package Received
       </Text>
@@ -28,7 +33,7 @@ export function PackageReceivedEmail({
         A package has arrived for apartment {unitNumber}. Please pick it up at
         the front desk.
       </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
+      <Hr style={hrStyle} />
       <Text style={{ margin: "4px 0" }}>
         <strong>Description:</strong> {description}
       </Text>
@@ -43,12 +48,10 @@ export function PackageReceivedEmail({
       <Text style={{ margin: "4px 0" }}>
         <strong>Received At:</strong> {receivedAt}
       </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
-      <Text
-        style={{ fontSize: "14px", color: "#71717a", marginTop: "16px" }}
-      >
-        You can view package details through your ResidenceHub portal.
-      </Text>
+      <Hr style={hrStyle} />
+      <Button href={`${appUrl}/portal/packages`} style={ctaButtonStyle}>
+        View Packages
+      </Button>
     </BaseLayout>
   );
 }

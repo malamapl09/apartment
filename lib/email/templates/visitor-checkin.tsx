@@ -1,11 +1,12 @@
-import { Text, Hr } from "@react-email/components";
-import { BaseLayout } from "./base-layout";
+import { Text, Hr, Button } from "@react-email/components";
+import { BaseLayout, hrStyle, ctaButtonStyle } from "./base-layout";
 
 interface VisitorCheckinEmailProps {
   fullName: string;
   visitorName: string;
   buildingName: string;
   checkedInAt: string;
+  appUrl?: string;
 }
 
 export function VisitorCheckinEmail({
@@ -13,17 +14,19 @@ export function VisitorCheckinEmail({
   visitorName,
   buildingName,
   checkedInAt,
+  appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app",
 }: VisitorCheckinEmailProps) {
   return (
-    <BaseLayout previewText={`${visitorName} has checked in at your building`}>
+    <BaseLayout
+      previewText={`${visitorName} has checked in at your building`}
+      appUrl={appUrl}
+    >
       <Text style={{ fontSize: "18px", fontWeight: "bold" }}>
         Visitor Checked In
       </Text>
       <Text>Hi {fullName},</Text>
-      <Text>
-        A visitor you registered has checked in at your building:
-      </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
+      <Text>A visitor you registered has checked in at your building:</Text>
+      <Hr style={hrStyle} />
       <Text style={{ margin: "4px 0" }}>
         <strong>Visitor:</strong> {visitorName}
       </Text>
@@ -33,12 +36,10 @@ export function VisitorCheckinEmail({
       <Text style={{ margin: "4px 0" }}>
         <strong>Checked In At:</strong> {checkedInAt}
       </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
-      <Text
-        style={{ fontSize: "14px", color: "#71717a", marginTop: "16px" }}
-      >
-        You can view visitor details through your ResidenceHub portal.
-      </Text>
+      <Hr style={hrStyle} />
+      <Button href={`${appUrl}/portal/visitors`} style={ctaButtonStyle}>
+        View Visitors
+      </Button>
     </BaseLayout>
   );
 }

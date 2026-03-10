@@ -1,19 +1,31 @@
-import { Text, Section, Hr } from "@react-email/components";
-import { BaseLayout } from "./base-layout";
+import { Text, Hr, Button } from "@react-email/components";
+import { BaseLayout, hrStyle, ctaButtonStyle } from "./base-layout";
 
 interface PaymentSubmittedAdminProps {
   ownerName: string;
   spaceName: string;
   referenceCode: string;
   amount: string;
+  reservationId?: string;
+  appUrl?: string;
 }
 
-export function PaymentSubmittedAdminEmail(
-  props: PaymentSubmittedAdminProps
-) {
+export function PaymentSubmittedAdminEmail({
+  ownerName,
+  spaceName,
+  referenceCode,
+  amount,
+  reservationId,
+  appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app",
+}: PaymentSubmittedAdminProps) {
+  const ctaUrl = reservationId
+    ? `${appUrl}/admin/reservations/${reservationId}`
+    : `${appUrl}/admin/reservations/pending`;
+
   return (
     <BaseLayout
-      previewText={`Payment proof uploaded by ${props.ownerName}`}
+      previewText={`Payment proof uploaded by ${ownerName}`}
+      appUrl={appUrl}
     >
       <Text style={{ fontSize: "18px", fontWeight: "bold" }}>
         Payment Proof Submitted
@@ -21,26 +33,23 @@ export function PaymentSubmittedAdminEmail(
       <Text>
         A payment proof has been uploaded and requires your review.
       </Text>
-      <Hr />
-      <Section>
-        <Text>
-          <strong>Owner:</strong> {props.ownerName}
-        </Text>
-        <Text>
-          <strong>Space:</strong> {props.spaceName}
-        </Text>
-        <Text>
-          <strong>Reference:</strong> {props.referenceCode}
-        </Text>
-        <Text>
-          <strong>Amount:</strong> {props.amount}
-        </Text>
-      </Section>
-      <Hr />
-      <Text>
-        Please log in to the admin panel to review and approve or reject
-        this payment.
+      <Hr style={hrStyle} />
+      <Text style={{ margin: "4px 0" }}>
+        <strong>Owner:</strong> {ownerName}
       </Text>
+      <Text style={{ margin: "4px 0" }}>
+        <strong>Space:</strong> {spaceName}
+      </Text>
+      <Text style={{ margin: "4px 0" }}>
+        <strong>Reference:</strong> {referenceCode}
+      </Text>
+      <Text style={{ margin: "4px 0" }}>
+        <strong>Amount:</strong> {amount}
+      </Text>
+      <Hr style={hrStyle} />
+      <Button href={ctaUrl} style={ctaButtonStyle}>
+        Review Payment
+      </Button>
     </BaseLayout>
   );
 }

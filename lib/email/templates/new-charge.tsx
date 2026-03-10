@@ -1,5 +1,5 @@
-import { Text, Hr } from "@react-email/components";
-import { BaseLayout } from "./base-layout";
+import { Text, Hr, Button } from "@react-email/components";
+import { BaseLayout, hrStyle, ctaButtonStyle } from "./base-layout";
 
 interface NewChargeEmailProps {
   fullName: string;
@@ -7,6 +7,7 @@ interface NewChargeEmailProps {
   feeType: string;
   dueDate: string;
   apartmentUnit: string;
+  appUrl?: string;
 }
 
 export function NewChargeEmail({
@@ -15,9 +16,10 @@ export function NewChargeEmail({
   feeType,
   dueDate,
   apartmentUnit,
+  appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app",
 }: NewChargeEmailProps) {
   return (
-    <BaseLayout previewText={`New charge: ${amount} for ${feeType}`}>
+    <BaseLayout previewText={`New charge: $${amount} for ${feeType}`} appUrl={appUrl}>
       <Text style={{ fontSize: "18px", fontWeight: "bold" }}>
         New Charge Generated
       </Text>
@@ -25,7 +27,7 @@ export function NewChargeEmail({
       <Text>
         A new charge has been generated for your apartment ({apartmentUnit}):
       </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
+      <Hr style={hrStyle} />
       <Text style={{ margin: "4px 0" }}>
         <strong>Fee Type:</strong> {feeType}
       </Text>
@@ -35,16 +37,13 @@ export function NewChargeEmail({
       <Text style={{ margin: "4px 0" }}>
         <strong>Due Date:</strong> {dueDate}
       </Text>
-      <Hr style={{ borderColor: "#e4e4e7", margin: "16px 0" }} />
+      <Hr style={hrStyle} />
       <Text>
         Please ensure payment is made before the due date to avoid late fees.
       </Text>
-      <Text
-        style={{ fontSize: "14px", color: "#71717a", marginTop: "16px" }}
-      >
-        You can view your charges and make payments through your ResidenceHub
-        portal.
-      </Text>
+      <Button href={`${appUrl}/portal/fees`} style={ctaButtonStyle}>
+        View Charges
+      </Button>
     </BaseLayout>
   );
 }

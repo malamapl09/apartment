@@ -7,6 +7,8 @@ import { NewAnnouncementEmail } from "@/lib/email/templates/new-announcement";
 import { OverdueReminderEmail } from "@/lib/email/templates/overdue-reminder";
 import { PackageReceivedEmail } from "@/lib/email/templates/package-received";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app";
+
 type NotificationType =
   | "new_charges"
   | "maintenance_updates"
@@ -21,6 +23,7 @@ interface NewChargeProps {
   feeType: string;
   dueDate: string;
   apartmentUnit: string;
+  appUrl: string;
 }
 
 interface MaintenanceUpdateProps {
@@ -28,6 +31,8 @@ interface MaintenanceUpdateProps {
   referenceCode: string;
   title: string;
   newStatus: string;
+  requestId?: string;
+  appUrl: string;
 }
 
 interface VisitorCheckinProps {
@@ -35,6 +40,7 @@ interface VisitorCheckinProps {
   visitorName: string;
   buildingName: string;
   checkedInAt: string;
+  appUrl: string;
 }
 
 interface NewAnnouncementProps {
@@ -42,6 +48,7 @@ interface NewAnnouncementProps {
   announcementTitle: string;
   announcementBody: string;
   buildingName: string;
+  appUrl: string;
 }
 
 interface OverdueReminderProps {
@@ -50,6 +57,7 @@ interface OverdueReminderProps {
   feeType: string;
   dueDate: string;
   apartmentUnit: string;
+  appUrl: string;
 }
 
 interface PackageReceivedProps {
@@ -59,6 +67,7 @@ interface PackageReceivedProps {
   carrier: string;
   buildingName: string;
   receivedAt: string;
+  appUrl: string;
 }
 
 type NotificationPayload =
@@ -155,8 +164,12 @@ export async function sendNotificationEmail({
       return;
     }
 
-    // Build template with user's name
-    const propsWithName = { fullName: profile.full_name, ...templateProps };
+    // Build template with user's name and app URL
+    const propsWithName = {
+      fullName: profile.full_name,
+      ...templateProps,
+      appUrl: APP_URL,
+    };
     const subject = subjectMap[type](propsWithName);
     const react = buildTemplate({ type, props: propsWithName } as NotificationPayload);
 
