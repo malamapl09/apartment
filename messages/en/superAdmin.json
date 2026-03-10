@@ -2,7 +2,8 @@
   "superAdmin": {
     "nav": {
       "dashboard": "Dashboard",
-      "buildings": "Buildings"
+      "buildings": "Buildings",
+      "myBuilding": "My Building"
     },
     "dashboard": {
       "title": "Super Admin",
@@ -15,6 +16,8 @@
       "createFirst": "Create your first building to get started"
     },
     "buildings": {
+      "title": "Buildings",
+      "description": "Manage all buildings in the system",
       "new": "New Building",
       "name": "Name",
       "address": "Address",
@@ -74,6 +77,9 @@
       "userEmail": "Email",
       "userRole": "Role",
       "userStatus": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "notFound": "Building not found",
       "noUsers": "No users in this building",
       "back": "Back to Buildings"
     }

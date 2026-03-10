@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { Building, Profile } from "@/types";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // --- Auth helper ---
 
 async function getSuperAdminProfile() {
@@ -43,10 +45,12 @@ export async function getAllBuildings() {
     return { error: "Failed to fetch buildings" };
   }
 
+  const buildingIds = buildings.map((b: Building) => b.id);
+
   const { data: profiles } = await adminClient
     .from("profiles")
     .select("building_id, role")
-    .not("building_id", "is", null);
+    .in("building_id", buildingIds);
 
   const countMap = new Map<string, { user_count: number; admin_count: number }>();
 
@@ -110,12 +114,15 @@ export async function createBuildingWithAdmin(formData: FormData) {
   }
 
   // Step 2: Invite admin user
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+
   const { data: newUser, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(admin_email, {
     data: {
       full_name: admin_name,
       building_id: building.id,
     },
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/set-password`,
+    redirectTo: `${appUrl}/set-password`,
   });
 
   if (inviteError || !newUser.user) {
@@ -142,8 +149,11 @@ export async function createBuildingWithAdmin(formData: FormData) {
     return { error: profileError.message };
   }
 
-  // Step 4: Create email preferences
-  await adminClient.from("email_preferences").insert({ user_id: newUser.user.id });
+  // Step 4: Create email preferences (non-critical)
+  const { error: emailPrefError } = await adminClient.from("email_preferences").insert({ user_id: newUser.user.id });
+  if (emailPrefError) {
+    console.warn("Failed to create email preferences for user:", newUser.user.id, emailPrefError.message);
+  }
 
   revalidatePath("/super-admin");
 
@@ -153,6 +163,8 @@ export async function createBuildingWithAdmin(formData: FormData) {
 // --- Building detail ---
 
 export async function getBuildingDetail(buildingId: string) {
+  if (!UUID_REGEX.test(buildingId)) return { error: "Invalid building ID" };
+
   const { error } = await getSuperAdminProfile();
   if (error) return { error };
 
@@ -191,6 +203,8 @@ const updateBuildingSchema = z.object({
 });
 
 export async function updateBuilding(buildingId: string, formData: FormData) {
+  if (!UUID_REGEX.test(buildingId)) return { error: "Invalid building ID" };
+
   const { error } = await getSuperAdminProfile();
   if (error) return { error };
 

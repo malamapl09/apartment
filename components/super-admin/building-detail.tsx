@@ -36,22 +36,7 @@ import { Pencil, X, Loader2, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
 import type { Building, Profile } from "@/types";
-
-const TIMEZONES = [
-  "America/Santo_Domingo",
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Bogota",
-  "America/Mexico_City",
-  "America/Sao_Paulo",
-  "America/Buenos_Aires",
-  "Europe/London",
-  "Europe/Madrid",
-  "Europe/Paris",
-  "Asia/Tokyo",
-] as const;
+import { TIMEZONES } from "@/lib/constants";
 
 interface BuildingDetailProps {
   building: Building;
@@ -322,7 +307,7 @@ export function BuildingDetail({ building, profiles }: BuildingDetailProps) {
                       <Badge
                         variant={profile.is_active ? "default" : "secondary"}
                       >
-                        {profile.is_active ? "active" : "inactive"}
+                        {profile.is_active ? t("active") : t("inactive")}
                       </Badge>
                     </TableCell>
                   </TableRow>

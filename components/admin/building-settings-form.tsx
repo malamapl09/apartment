@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { TIMEZONES } from "@/lib/constants";
 
 interface BuildingSettingsFormProps {
   building: {
@@ -40,22 +41,6 @@ interface BuildingSettingsFormProps {
     timezone: string;
   };
 }
-
-const TIMEZONES = [
-  "America/Santo_Domingo",
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Bogota",
-  "America/Mexico_City",
-  "America/Sao_Paulo",
-  "America/Buenos_Aires",
-  "Europe/London",
-  "Europe/Madrid",
-  "Europe/Paris",
-  "Asia/Tokyo",
-] as const;
 
 export function BuildingSettingsForm({ building }: BuildingSettingsFormProps) {
   const t = useTranslations("admin.settings");

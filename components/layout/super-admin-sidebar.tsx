@@ -108,7 +108,7 @@ export function SuperAdminSidebar({
             )}
           >
             <ArrowLeftRight className="h-5 w-5 shrink-0" />
-            {(!collapsed || isMobile) && <span>My Building</span>}
+            {(!collapsed || isMobile) && <span>{t("myBuilding")}</span>}
           </Link>
         </div>
       </ScrollArea>

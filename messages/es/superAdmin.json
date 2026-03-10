@@ -2,7 +2,8 @@
   "superAdmin": {
     "nav": {
       "dashboard": "Panel",
-      "buildings": "Edificios"
+      "buildings": "Edificios",
+      "myBuilding": "Mi Edificio"
     },
     "dashboard": {
       "title": "Super Administrador",
@@ -15,6 +16,8 @@
       "createFirst": "Crea tu primer edificio para comenzar"
     },
     "buildings": {
+      "title": "Edificios",
+      "description": "Gestiona todos los edificios del sistema",
       "new": "Nuevo Edificio",
       "name": "Nombre",
       "address": "Direccion",
@@ -74,6 +77,9 @@
       "userEmail": "Correo",
       "userRole": "Rol",
       "userStatus": "Estado",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "notFound": "Edificio no encontrado",
       "noUsers": "Sin usuarios en este edificio",
       "back": "Volver a Edificios"
     }

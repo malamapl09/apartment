@@ -291,7 +291,7 @@ export function Sidebar({ userRole, isMobile = false, onClose }: SidebarProps) {
       {userRole === "super_admin" && (
         <div className="border-t px-3 py-2">
           <Link
-            href="/super-admin"
+            href={`/${locale}/super-admin`}
             onClick={isMobile ? onClose : undefined}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",

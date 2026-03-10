@@ -84,8 +84,11 @@ export async function completeSetup(formData: FormData) {
     return { error: "Failed to create profile" };
   }
 
-  // Step 4: Create email preferences
-  await adminClient.from("email_preferences").insert({ user_id: userId });
+  // Step 4: Create email preferences (non-critical)
+  const { error: emailPrefError } = await adminClient.from("email_preferences").insert({ user_id: userId });
+  if (emailPrefError) {
+    console.warn("Failed to create email preferences for user:", userId, emailPrefError.message);
+  }
 
   // Step 5: Sign in the user
   const supabase = await createClient();

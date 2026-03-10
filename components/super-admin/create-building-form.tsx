@@ -25,22 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
-const TIMEZONES = [
-  "America/Santo_Domingo",
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Bogota",
-  "America/Mexico_City",
-  "America/Sao_Paulo",
-  "America/Buenos_Aires",
-  "Europe/London",
-  "Europe/Madrid",
-  "Europe/Paris",
-  "Asia/Tokyo",
-] as const;
+import { TIMEZONES } from "@/lib/constants";
 
 export function CreateBuildingForm() {
   const t = useTranslations("superAdmin.createBuilding");

@@ -24,7 +24,7 @@ export default async function BuildingDetailPage({
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {result.error ?? "Building not found"}
+            {result.error ?? t("notFound")}
           </AlertDescription>
         </Alert>
       </div>

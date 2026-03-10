@@ -24,28 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Building2, Loader2, User, Check } from "lucide-react";
-
-// Usage:
-// <SetupWizard />
-// Renders a 3-step wizard: account details -> building details -> success screen.
-// On completion, calls completeSetup() server action and redirects to super-admin.
-// Translation keys live under the "setup" namespace in messages/*.json.
-
-const TIMEZONES = [
-  "America/Santo_Domingo",
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "America/Bogota",
-  "America/Mexico_City",
-  "America/Sao_Paulo",
-  "America/Buenos_Aires",
-  "Europe/London",
-  "Europe/Madrid",
-  "Europe/Paris",
-  "Asia/Tokyo",
-] as const;
+import { TIMEZONES } from "@/lib/constants";
 
 interface Step1Data {
   full_name: string;

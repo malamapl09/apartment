@@ -50,7 +50,7 @@ export default async function SuperAdminLayout({
   }
 
   if (profile.role !== "super_admin") {
-    redirect(`/`);
+    redirect(`/${locale}`);
   }
 
   const userInfo = {
