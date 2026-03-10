@@ -9,13 +9,15 @@ export async function getAllVisitors(filters?: {
   status?: string;
   date?: string;
   apartment_id?: string;
+  page?: number;
+  per_page?: number;
 }) {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  if (!user) return { error: "Unauthorized", data: [], total: 0 };
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -23,13 +25,19 @@ export async function getAllVisitors(filters?: {
     .eq("id", user.id)
     .single();
   if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [] };
+    return { error: "Unauthorized", data: [], total: 0 };
   }
+
+  const page = Math.max(1, Math.floor(filters?.page ?? 1));
+  const perPage = filters?.per_page ?? 25;
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
 
   let query = supabase
     .from("visitors")
     .select(
-      `*, profiles!registered_by(id, full_name), apartments (id, unit_number)`
+      `*, profiles!registered_by(id, full_name), apartments (id, unit_number)`,
+      { count: "exact" }
     )
     .eq("building_id", profile.building_id)
     .order("valid_from", { ascending: false });
@@ -43,9 +51,9 @@ export async function getAllVisitors(filters?: {
     query = query.gte("valid_from", dateStart).lte("valid_from", dateEnd);
   }
 
-  const { data, error } = await query.limit(500);
-  if (error) return { error: error.message, data: [] };
-  return { data: data || [] };
+  const { data, error, count } = await query.range(from, to);
+  if (error) return { error: error.message, data: [], total: 0 };
+  return { data: data || [], total: count ?? 0 };
 }
 
 export async function checkInVisitor(id: string) {

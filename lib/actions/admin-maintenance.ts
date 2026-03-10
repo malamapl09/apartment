@@ -10,13 +10,15 @@ export async function getMaintenanceRequests(filters?: {
   status?: string;
   priority?: string;
   category?: string;
+  page?: number;
+  per_page?: number;
 }) {
   const supabase = await createClient();
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  if (!user) return { error: "Unauthorized", data: [], total: 0 };
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -24,13 +26,19 @@ export async function getMaintenanceRequests(filters?: {
     .eq("id", user.id)
     .single();
   if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [] };
+    return { error: "Unauthorized", data: [], total: 0 };
   }
+
+  const page = Math.max(1, Math.floor(filters?.page ?? 1));
+  const perPage = filters?.per_page ?? 25;
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
 
   let query = supabase
     .from("maintenance_requests")
     .select(
-      `*, profiles (id, full_name, email), apartments (id, unit_number)`
+      `*, profiles (id, full_name, email), apartments (id, unit_number)`,
+      { count: "exact" }
     )
     .eq("building_id", profile.building_id)
     .order("created_at", { ascending: false });
@@ -39,9 +47,9 @@ export async function getMaintenanceRequests(filters?: {
   if (filters?.priority) query = query.eq("priority", filters.priority);
   if (filters?.category) query = query.eq("category", filters.category);
 
-  const { data, error } = await query.limit(500);
-  if (error) return { error: error.message, data: [] };
-  return { data: data || [] };
+  const { data, error, count } = await query.range(from, to);
+  if (error) return { error: error.message, data: [], total: 0 };
+  return { data: data || [], total: count ?? 0 };
 }
 
 export async function updateMaintenanceStatus(

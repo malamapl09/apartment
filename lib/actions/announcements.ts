@@ -97,29 +97,37 @@ export async function createAnnouncement(formData: FormData) {
   return { success: true };
 }
 
-export async function getAnnouncements() {
+export async function getAnnouncements(params?: {
+  page?: number;
+  per_page?: number;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  if (!user) return { error: "Unauthorized", data: [], total: 0 };
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("building_id")
     .eq("id", user.id)
     .single();
-  if (!profile) return { error: "Profile not found", data: [] };
+  if (!profile) return { error: "Profile not found", data: [], total: 0 };
 
-  const { data, error } = await supabase
+  const page = Math.max(1, Math.floor(params?.page ?? 1));
+  const perPage = params?.per_page ?? 25;
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
+
+  const { data, error, count } = await supabase
     .from("announcements")
-    .select("*, profiles (full_name)")
+    .select("*, profiles (full_name)", { count: "exact" })
     .eq("building_id", profile.building_id)
     .order("published_at", { ascending: false })
-    .limit(500);
+    .range(from, to);
 
-  if (error) return { error: error.message, data: [] };
-  return { data: data || [] };
+  if (error) return { error: error.message, data: [], total: 0 };
+  return { data: data || [], total: count ?? 0 };
 }
 
 export async function deleteAnnouncement(id: string) {

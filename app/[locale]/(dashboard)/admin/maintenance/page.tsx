@@ -14,12 +14,17 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Wrench, Clock, CheckCircle2 } from "lucide-react";
 
+import { PaginationControls } from "@/components/shared/pagination-controls";
+
+const PER_PAGE = 25;
+
 interface PageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{
     status?: string;
     priority?: string;
     category?: string;
+    page?: string;
   }>;
 }
 
@@ -31,12 +36,15 @@ export default async function AdminMaintenancePage({
   const filters = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("admin.maintenance");
+  const page = Math.max(1, parseInt(filters.page ?? "1", 10) || 1);
 
-  const [{ data: requests, error }, { data: stats }] = await Promise.all([
+  const [{ data: requests, error, total }, { data: stats }] = await Promise.all([
     getMaintenanceRequests({
       status: filters.status,
       priority: filters.priority,
       category: filters.category,
+      page,
+      per_page: PER_PAGE,
     }),
     getMaintenanceStats(),
   ]);
@@ -127,11 +135,12 @@ export default async function AdminMaintenancePage({
             <CardTitle>{t("title")}</CardTitle>
             <CardDescription>{t("description")}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <MaintenanceTable
               requests={requests ?? []}
               locale={locale}
             />
+            <PaginationControls total={total ?? 0} page={page} perPage={PER_PAGE} />
           </CardContent>
         </Card>
       </div>

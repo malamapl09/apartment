@@ -2,9 +2,12 @@ import { Suspense } from "react";
 import { getReservations } from "@/lib/actions/admin-reservations";
 import { ReservationFilters } from "@/components/admin/reservation-filters";
 import { ReservationTable } from "@/components/admin/reservation-table";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+
+const PER_PAGE = 25;
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -13,6 +16,7 @@ interface PageProps {
     space_id?: string;
     date_from?: string;
     date_to?: string;
+    page?: string;
   }>;
 }
 
@@ -22,14 +26,17 @@ export default async function AdminReservationsPage({ params, searchParams }: Pa
   const t = await getTranslations("admin.reservations");
 
   const resolvedSearchParams = await searchParams;
+  const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);
   const filters = {
     status: resolvedSearchParams.status,
     space_id: resolvedSearchParams.space_id,
     date_from: resolvedSearchParams.date_from,
     date_to: resolvedSearchParams.date_to,
+    page,
+    per_page: PER_PAGE,
   };
 
-  const { data: reservations, error } = await getReservations(filters);
+  const { data: reservations, error, total } = await getReservations(filters);
 
   if (error) {
     return (
@@ -67,11 +74,12 @@ export default async function AdminReservationsPage({ params, searchParams }: Pa
         <CardHeader>
           <CardTitle>{t("list.title")}</CardTitle>
           <CardDescription>
-            {t("list.description", { count: reservations.length })}
+            {t("list.description", { count: total })}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <ReservationTable reservations={reservations} />
+          <PaginationControls total={total} page={page} perPage={PER_PAGE} />
         </CardContent>
       </Card>
     </div>

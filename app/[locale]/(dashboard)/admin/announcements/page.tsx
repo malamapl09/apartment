@@ -1,6 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -41,16 +42,22 @@ interface AnnouncementWithProfile {
   profiles: { full_name: string } | null;
 }
 
+const PER_PAGE = 25;
+
 export default async function AnnouncementsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale } = await params;
+  const resolvedSearchParams = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("admin.announcements");
+  const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);
 
-  const { data: announcements } = await getAnnouncements();
+  const { data: announcements, total } = await getAnnouncements({ page, per_page: PER_PAGE });
 
   return (
     <div className="space-y-6">
@@ -151,6 +158,7 @@ export default async function AnnouncementsPage({
               </TableBody>
             </Table>
           )}
+          <PaginationControls total={total ?? 0} page={page} perPage={PER_PAGE} />
         </CardContent>
       </Card>
     </div>

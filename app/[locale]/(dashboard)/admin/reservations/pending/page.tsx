@@ -1,21 +1,28 @@
 import { getPendingPayments } from "@/lib/actions/admin-reservations";
 import { PaymentVerification } from "@/components/admin/payment-verification";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Clock, AlertCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+const PER_PAGE = 25;
+
 export default async function PendingPaymentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale } = await params;
+  const resolvedSearchParams = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("admin.reservations.pending");
+  const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);
 
-  const { data: pendingPayments, error } = await getPendingPayments();
+  const { data: pendingPayments, error, total } = await getPendingPayments({ page, per_page: PER_PAGE });
 
   if (error) {
     return (
@@ -38,7 +45,7 @@ export default async function PendingPaymentsPage({
         </div>
         <Badge variant="secondary" className="gap-2">
           <Clock className="h-4 w-4" />
-          {t("badge", { count: pendingPayments.length })}
+          {t("badge", { count: total })}
         </Badge>
       </div>
 
@@ -57,6 +64,7 @@ export default async function PendingPaymentsPage({
               reservation={reservation}
             />
           ))}
+          <PaginationControls total={total} page={page} perPage={PER_PAGE} />
         </div>
       )}
     </div>

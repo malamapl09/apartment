@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { getAllVisitors, getTodaysVisitors } from "@/lib/actions/admin-visitors";
 import { VisitorTable } from "@/components/admin/visitor-table";
 import { VisitorLookup } from "@/components/admin/visitor-lookup";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { RealtimeRefreshWrapper } from "@/components/admin/realtime-refresh-wrapper";
 import {
   Card,
@@ -15,22 +16,28 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users, AlertCircle, Search } from "lucide-react";
 import type { VisitorWithDetails } from "@/types";
 
+const PER_PAGE = 25;
+
 interface PageProps {
   searchParams: Promise<{
     status?: string;
     date?: string;
     apartment_id?: string;
+    page?: string;
   }>;
 }
 
 export default async function AdminVisitorsPage({ searchParams }: PageProps) {
   const t = await getTranslations("admin.visitors");
   const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
   const filters = {
     status: params.status,
     date: params.date,
     apartment_id: params.apartment_id,
+    page,
+    per_page: PER_PAGE,
   };
 
   const [visitorsResult, todaysResult] = await Promise.all([
@@ -105,11 +112,12 @@ export default async function AdminVisitorsPage({ searchParams }: PageProps) {
                 <CardTitle>{t("title")}</CardTitle>
                 <CardDescription>{t("description")}</CardDescription>
               </div>
-              <Badge variant="outline">{visitors.length}</Badge>
+              <Badge variant="outline">{visitorsResult.total ?? visitors.length}</Badge>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <VisitorTable visitors={visitors} />
+            <PaginationControls total={visitorsResult.total ?? 0} page={page} perPage={PER_PAGE} />
           </CardContent>
         </Card>
       </div>

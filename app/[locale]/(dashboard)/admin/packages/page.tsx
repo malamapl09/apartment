@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getPackages, getPackageStats } from "@/lib/actions/admin-packages";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { createClient } from "@/lib/supabase/server";
 import { PackageTable } from "@/components/admin/package-table";
 import { PackageLogForm } from "@/components/admin/package-log-form";
@@ -16,11 +17,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Package, AlertCircle, Clock, Bell, CheckCircle } from "lucide-react";
 import type { PackageWithDetails } from "@/types";
 
+const PER_PAGE = 25;
+
 interface PageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{
     status?: string;
     apartment_id?: string;
+    page?: string;
   }>;
 }
 
@@ -29,10 +33,13 @@ export default async function AdminPackagesPage({ params, searchParams }: PagePr
   setRequestLocale(locale);
   const t = await getTranslations("admin.packages");
   const resolvedSearchParams = await searchParams;
+  const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);
 
   const filters = {
     status: resolvedSearchParams.status,
     apartment_id: resolvedSearchParams.apartment_id,
+    page,
+    per_page: PER_PAGE,
   };
 
   const supabase = await createClient();
@@ -126,15 +133,16 @@ export default async function AdminPackagesPage({ params, searchParams }: PagePr
                 </CardTitle>
                 <CardDescription>{t("description")}</CardDescription>
               </div>
-              <Badge variant="outline">{packages.length}</Badge>
+              <Badge variant="outline">{packagesResult.total ?? packages.length}</Badge>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             {packages.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t("noPackages")}</p>
             ) : (
               <PackageTable packages={packages} />
             )}
+            <PaginationControls total={packagesResult.total ?? 0} page={page} perPage={PER_PAGE} />
           </CardContent>
         </Card>
       </div>

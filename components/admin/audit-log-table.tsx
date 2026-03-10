@@ -1,7 +1,6 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   Table,
@@ -12,8 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { PaginationControls } from "@/components/shared/pagination-controls";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -72,14 +71,7 @@ function JsonView({ data, label }: { data: Record<string, unknown> | null; label
 
 export function AuditLogTable({ logs, total, page, perPage, locale }: AuditLogTableProps) {
   const t = useTranslations("admin.audit");
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
-  const totalPages = Math.ceil(total / perPage);
-  const from = (page - 1) * perPage + 1;
-  const to = Math.min(page * perPage, total);
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
@@ -91,16 +83,6 @@ export function AuditLogTable({ logs, total, page, perPage, locale }: AuditLogTa
       }
       return next;
     });
-  };
-
-  const goToPage = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (newPage > 1) {
-      params.set("page", newPage.toString());
-    } else {
-      params.delete("page");
-    }
-    router.push(`${pathname}?${params.toString()}`);
   };
 
   if (logs.length === 0) {
@@ -215,51 +197,7 @@ export function AuditLogTable({ logs, total, page, perPage, locale }: AuditLogTa
         </Table>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            {from}–{to} / {total}
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => goToPage(1)}
-              disabled={page <= 1}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => goToPage(page - 1)}
-              disabled={page <= 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm text-muted-foreground px-2">
-              {page} / {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => goToPage(page + 1)}
-              disabled={page >= totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => goToPage(totalPages)}
-              disabled={page >= totalPages}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+      <PaginationControls total={total} page={page} perPage={perPage} />
     </div>
   );
 }
