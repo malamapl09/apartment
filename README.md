@@ -1,119 +1,224 @@
 # ResidenceHub
 
-Smart apartment building management platform built with Next.js, Supabase, and Vercel.
+Smart apartment building management platform with multi-building support, built with Next.js, Supabase, and Vercel.
+
+ResidenceHub provides building administrators with a complete toolset for managing apartments, residents, common spaces, maintenance, finances, and communications -- while giving owners and residents a self-service portal for their daily needs.
+
+---
+
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Available Scripts](#available-scripts)
+- [Project Structure](#project-structure)
+- [Security](#security)
+- [Documentation](#documentation)
+- [License](#license)
+
+---
+
+## Key Features
+
+### Super Admin
+
+- Multi-building management dashboard
+- Create buildings and invite administrators
+- View all buildings with user and admin statistics
+
+### Building Admin
+
+- **Dashboard** -- KPIs (apartments, owners, reservations, payments) and analytics charts (collection rate, occupancy, maintenance trends, visitor stats)
+- **Apartments** -- Full CRUD for apartment units
+- **Owners and Residents** -- Directory management with email invitations
+- **Common Spaces** -- Amenity management (gym, pool, meeting rooms, etc.) with availability schedules, blackout dates, and photos
+- **Reservations** -- Booking management with payment verification
+- **Maintenance** -- Request tracking with status updates, comments, and internal notes
+- **Visitors** -- Visitor management with auto-generated access codes
+- **Packages** -- Package delivery tracking and notifications
+- **Announcements** -- Targeted messaging (all, owners, residents)
+- **Polls and Surveys** -- Single choice, multiple choice, yes/no question types with anonymous voting option
+- **Documents** -- Management of rules, minutes, contracts, notices, and forms with versioning support
+- **Fees and Payments** -- Fee type configuration, bulk charge generation, and payment recording
+- **Audit Log** -- Complete logging of all system changes
+- **Reports** -- Report generation with export capabilities
+- **Settings** -- Building configuration (general info, bank account, timezone, payment deadline)
+
+### Owner and Resident Portal
+
+- **Dashboard** -- Apartment info, upcoming reservations, and announcements at a glance
+- **Common Spaces** -- Browse and book spaces using a calendar and time slot picker
+- **Maintenance** -- Create and track requests with photo attachments
+- **Visitors** -- Register visitors with auto-generated access codes and recurring visit support
+- **Documents** -- Access building documents
+- **Polls** -- Vote on active polls and view results
+- **Fees and Payments** -- Track charges, view payment history, and upload payment proofs
+- **Profile** -- Manage personal info, password, avatar, and email notification preferences
+
+### Platform Features
+
+- **Real-time Updates** -- Supabase Realtime subscriptions for live data
+- **Email Notifications** -- Transactional emails for charges, maintenance updates, announcements, overdue reminders, visitor check-ins, and package arrivals
+- **Automated Cron Jobs** -- Daily overdue charge detection and reservation auto-cancellation
+- **Global Search** -- Cmd+K command palette searching across all entities
+- **PWA Support** -- Installable app with offline fallback
+- **Internationalization** -- Full English and Spanish translations
+
+---
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (App Router, Turbopack)
-- **Database & Auth:** Supabase (PostgreSQL, Auth, Storage, Realtime)
-- **Styling:** Tailwind CSS + shadcn/ui
-- **i18n:** next-intl (English & Spanish)
-- **Email:** Resend + React Email
-- **Charts:** Recharts
-- **Deployment:** Vercel
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5 |
+| UI | React 19, Tailwind CSS v4, shadcn/ui |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| Email | Resend + React Email |
+| i18n | next-intl (EN, ES) |
+| Charts | Recharts |
+| Forms | React Hook Form + Zod |
+| Icons | Lucide React |
+| Deployment | Vercel |
+| Testing | Vitest |
 
-## Features
+---
 
-### Admin Panel (`/admin`)
-- **Dashboard** — Analytics charts (collection rates, maintenance trends, occupancy, visitors)
-- **Apartments** — Unit management with owner assignments
-- **Owners** — Resident directory and profiles
-- **Spaces** — Common area management and reservations
-- **Fees & Payments** — Charge generation, payment tracking, overdue automation
-- **Maintenance** — Request management with real-time updates
-- **Visitors** — Visitor log with check-in/check-out tracking
-- **Packages** — Package/delivery logging and notification
-- **Polls & Voting** — Create polls (single/multiple choice), publish results
-- **Announcements** — Building-wide announcements with email notifications
-- **Documents** — Shared document management
-- **Reports** — Financial and maintenance reports with CSV export
-- **Audit Trail** — Activity log with filters by user, action, date range
-- **Settings** — Building configuration
+## Prerequisites
 
-### Owner Portal (`/portal`)
-- **Dashboard** — Summary cards (pending charges, maintenance, visitors, packages)
-- **Pending Payments** — View and pay charges
-- **Maintenance** — Submit and track maintenance requests
-- **Visitors** — Register expected visitors
-- **Packages** — View received packages
-- **Polls** — Vote on active polls, view results
-- **Spaces** — Reserve common areas
-- **Documents** — Access shared documents
-- **Announcements** — Read building announcements
-- **Profile** — Update personal info and email notification preferences
+- Node.js 18+
+- npm or pnpm
+- Supabase account (or local Supabase CLI)
+- Resend account (for emails)
 
-### Platform Features
-- **Real-time Updates** — Supabase Realtime subscriptions for live data
-- **Email Notifications** — Transactional emails for charges, maintenance updates, announcements, overdue reminders, visitor check-ins, package arrivals
-- **Automated Cron Jobs** — Daily overdue charge detection, reservation auto-cancellation
-- **Global Search** — Cmd+K command palette searching across all entities
-- **PWA Support** — Installable app with offline fallback
-- **Role-Based Access** — super_admin, admin, owner, resident roles with RLS
-- **i18n** — Full English and Spanish translations
+---
 
 ## Getting Started
 
+### 1. Clone and Install
+
 ```bash
+git clone <repo-url>
+cd apartament
 npm install
+```
+
+### 2. Environment Setup
+
+Copy `.env.example` to `.env.local` and fill in the required values:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=        # Your Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=   # Supabase anon/public key
+SUPABASE_SERVICE_ROLE_KEY=       # Supabase service role key (server-side only)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+RESEND_API_KEY=                  # Resend API key for emails
+CRON_SECRET=                     # Secret for cron job authentication
+```
+
+### 3. Database Setup
+
+```bash
+# Start local Supabase
+npx supabase start
+
+# Apply migrations
+npx supabase db push
+
+# Seed demo data (optional)
+npx supabase db reset
+```
+
+### 4. Run Development Server
+
+```bash
 npm run dev
 ```
 
-### Environment Variables
+### 5. Initial Setup
 
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+Navigate to [http://localhost:3000/setup](http://localhost:3000/setup) to create the first super admin account and building.
 
-# Resend (email)
-RESEND_API_KEY=
+---
 
-# Cron
-CRON_SECRET=
+## Available Scripts
 
-# App
-NEXT_PUBLIC_APP_URL=
+```
+npm run dev            # Start development server
+npm run build          # Production build
+npm run start          # Start production server
+npm run lint           # Run ESLint
+npm run test           # Run tests (Vitest)
+npm run test:watch     # Run tests in watch mode
+npm run test:coverage  # Run tests with coverage
 ```
 
-### Database Migrations
-
-Migrations are in `supabase/migrations/`. Apply them with:
-
-```bash
-npx supabase db push
-```
+---
 
 ## Project Structure
 
 ```
-app/
-  [locale]/
-    (dashboard)/
-      admin/          # Admin panel pages
-      portal/         # Owner portal pages
-  api/
-    auth/             # Auth callbacks
-    cron/             # Cron job endpoints
-components/
-  admin/              # Admin-specific components
-  portal/             # Portal-specific components
-  shared/             # Shared components (command palette, PWA)
-  layout/             # Sidebar, header
-  ui/                 # shadcn/ui primitives
-lib/
-  actions/            # Server actions
-  email/              # Email templates and sending
-  hooks/              # Real-time subscription hooks
-  supabase/           # Supabase client utilities
-messages/
-  en/                 # English translations
-  es/                 # Spanish translations
-supabase/
-  migrations/         # SQL migration files
-types/                # TypeScript type definitions
+apartament/
+├── app/                        # Next.js App Router
+│   ├── api/                    # API routes (auth, cron jobs)
+│   └── [locale]/               # i18n routes
+│       ├── (auth)/             # Login, forgot password, set password
+│       ├── (dashboard)/        # Protected routes
+│       │   ├── admin/          # Admin panel (28 pages)
+│       │   └── portal/         # Owner/resident portal (18 pages)
+│       ├── (setup)/            # First-time setup wizard
+│       └── (super-admin)/      # Multi-building management
+├── components/                 # React components
+│   ├── admin/                  # Admin-specific (41 components)
+│   ├── portal/                 # Portal-specific (19 components)
+│   ├── layout/                 # Sidebar, header, navigation
+│   ├── super-admin/            # Super admin components
+│   ├── setup/                  # Setup wizard
+│   ├── shared/                 # Shared components
+│   └── ui/                     # shadcn/ui components (30)
+├── lib/                        # Core logic
+│   ├── actions/                # Server actions (35+ files)
+│   ├── supabase/               # Supabase clients (server, client, admin)
+│   ├── email/                  # Email templates and sending
+│   ├── hooks/                  # Custom React hooks (realtime)
+│   └── utils/                  # Utilities (currency, date, ICS)
+├── types/                      # TypeScript types
+├── messages/                   # i18n translations (en/, es/)
+├── supabase/                   # Migrations and seed data
+│   └── migrations/             # 17 SQL migration files
+├── docs/                       # Documentation
+└── public/                     # Static assets
 ```
 
-## Deployment
+---
 
-Deployed on Vercel with automatic builds from `main`. Cron jobs configured in `vercel.json`.
+## Security
+
+- **Row-Level Security (RLS)** on every table
+- **Building-based multi-tenancy** isolation between buildings
+- **JWT custom claims** for building_id and user_role
+- **UUID validation** on all ID parameters
+- **Zod validation** on all server action inputs
+- **Role-based access control** with four roles: super_admin, admin, owner, resident
+- **Generic auth error messages** to prevent user enumeration
+- **Invite-only auth model** with no public registration
+
+---
+
+## Documentation
+
+See the `docs/` directory for detailed documentation:
+
+- [Architecture](docs/architecture.md) -- System design, database schema, RLS policies
+- [Features](docs/features.md) -- Complete feature reference
+- [Development](docs/development.md) -- Local setup, migrations, i18n workflow
+- [Deployment](docs/deployment.md) -- Vercel and Supabase configuration
+
+---
+
+## License
+
+Private
