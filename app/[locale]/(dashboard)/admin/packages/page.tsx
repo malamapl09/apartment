@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getPackages, getPackageStats } from "@/lib/actions/admin-packages";
 import { createClient } from "@/lib/supabase/server";
 import { PackageTable } from "@/components/admin/package-table";
@@ -17,19 +17,22 @@ import { Package, AlertCircle, Clock, Bell, CheckCircle } from "lucide-react";
 import type { PackageWithDetails } from "@/types";
 
 interface PageProps {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{
     status?: string;
     apartment_id?: string;
   }>;
 }
 
-export default async function AdminPackagesPage({ searchParams }: PageProps) {
+export default async function AdminPackagesPage({ params, searchParams }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("admin.packages");
-  const params = await searchParams;
+  const resolvedSearchParams = await searchParams;
 
   const filters = {
-    status: params.status,
-    apartment_id: params.apartment_id,
+    status: resolvedSearchParams.status,
+    apartment_id: resolvedSearchParams.apartment_id,
   };
 
   const supabase = await createClient();

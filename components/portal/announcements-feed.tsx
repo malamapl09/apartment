@@ -41,7 +41,9 @@ export function AnnouncementsFeed({ announcements }: AnnouncementsFeedProps) {
     }
   };
 
-  const getTargetVariant = (target: string) => {
+  type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link";
+
+  const getTargetVariant = (target: string): BadgeVariant => {
     switch (target) {
       case "all":
         return "default";
@@ -63,7 +65,7 @@ export function AnnouncementsFeed({ announcements }: AnnouncementsFeedProps) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <Megaphone className="h-4 w-4 text-blue-600" />
-                  <Badge variant={getTargetVariant(announcement.target) as any}>
+                  <Badge variant={getTargetVariant(announcement.target)}>
                     {getTargetLabel(announcement.target)}
                   </Badge>
                 </div>

@@ -9,6 +9,22 @@ import { User, Lock, Mail } from "lucide-react";
 import EmailPreferencesForm from "@/components/portal/email-preferences-form";
 import { getEmailPreferences } from "@/lib/actions/email-preferences";
 
+interface ApartmentOwnerEntry {
+  apartment_id: string;
+  apartments: {
+    apartment_number: string | null;
+    building: {
+      id: string;
+      name: string;
+    } | null;
+  } | null;
+}
+
+interface ApartmentSummary {
+  number: string | null | undefined;
+  building: string | null | undefined;
+}
+
 export default async function ProfilePage({
   params,
 }: {
@@ -52,10 +68,11 @@ export default async function ProfilePage({
   // Fetch email preferences
   const { data: emailPreferences } = await getEmailPreferences();
 
-  const apartments = profile?.apartment_owners?.map((ao: any) => ({
-    number: ao.apartments?.apartment_number,
-    building: ao.apartments?.building?.name,
-  })) || [];
+  const apartments: ApartmentSummary[] =
+    (profile?.apartment_owners as ApartmentOwnerEntry[] | null | undefined)?.map((ao) => ({
+      number: ao.apartments?.apartment_number,
+      building: ao.apartments?.building?.name,
+    })) ?? [];
 
   return (
     <div className="space-y-8">
@@ -73,7 +90,7 @@ export default async function ProfilePage({
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {apartments.map((apt: any, index: number) => (
+              {apartments.map((apt, index) => (
                 <div key={index} className="p-3 rounded-lg border bg-muted/50">
                   <p className="font-semibold">
                     {apt.building} - {t("apartment")} {apt.number}

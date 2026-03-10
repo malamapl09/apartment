@@ -2,6 +2,24 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+const createPollSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  poll_type: z.enum(["single_choice", "multiple_choice", "yes_no"], {
+    error: "Invalid poll type",
+  }),
+  target: z.enum(["all", "owners", "residents"], {
+    error: "Invalid target audience",
+  }),
+  ends_at: z.string().datetime("Invalid date format").refine(
+    (val) => new Date(val) > new Date(),
+    { message: "End date must be in the future" }
+  ),
+  is_anonymous: z.boolean(),
+  options: z.array(z.string().min(1, "Option text cannot be empty")),
+});
 
 export async function createPoll(data: {
   title: string;
@@ -12,6 +30,11 @@ export async function createPoll(data: {
   is_anonymous: boolean;
   options: string[];
 }) {
+  const parsed = createPollSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
   const supabase = await createClient();
 
   const {
@@ -157,7 +180,8 @@ export async function getPolls() {
       `*, poll_options (*), poll_votes(count)`
     )
     .eq("building_id", profile.building_id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(500);
 
   if (error) return { error: error.message, data: [] };
   return { error: null, data: data || [] };

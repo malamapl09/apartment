@@ -9,6 +9,23 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, FileText, Upload, XCircle, ArrowRight } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
+import type { ReservationStatus } from "@/types";
+
+interface ReservationWithSpace {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  status: ReservationStatus;
+  reference_code: string;
+  space: {
+    name: string;
+    photo_url: string | null;
+    building: {
+      name: string;
+    } | null;
+  } | null;
+}
 
 export default async function MyReservationsPage({
   params,
@@ -33,7 +50,7 @@ export default async function MyReservationsPage({
   const today = new Date().toISOString().split("T")[0];
 
   // Fetch upcoming reservations
-  const { data: upcomingReservations } = await supabase
+  const { data: upcomingReservationsRaw } = await supabase
     .from("reservations")
     .select(`
       *,
@@ -52,7 +69,7 @@ export default async function MyReservationsPage({
     .order("start_time", { ascending: true });
 
   // Fetch past reservations
-  const { data: pastReservations } = await supabase
+  const { data: pastReservationsRaw } = await supabase
     .from("reservations")
     .select(`
       *,
@@ -71,7 +88,7 @@ export default async function MyReservationsPage({
     .limit(20);
 
   // Fetch all reservations for "All" tab
-  const { data: allReservations } = await supabase
+  const { data: allReservationsRaw } = await supabase
     .from("reservations")
     .select(`
       *,
@@ -88,7 +105,11 @@ export default async function MyReservationsPage({
     .order("start_time", { ascending: false })
     .limit(50);
 
-  const renderReservationCard = (reservation: any) => {
+  const upcomingReservations = (upcomingReservationsRaw ?? []) as ReservationWithSpace[];
+  const pastReservations = (pastReservationsRaw ?? []) as ReservationWithSpace[];
+  const allReservations = (allReservationsRaw ?? []) as ReservationWithSpace[];
+
+  const renderReservationCard = (reservation: ReservationWithSpace) => {
     const canUploadProof = reservation.status === "pending_payment";
     const canCancel =
       reservation.status === "pending_payment" ||
@@ -193,7 +214,7 @@ export default async function MyReservationsPage({
         <TabsList>
           <TabsTrigger value="upcoming">
             {t("tabs.upcoming")}{" "}
-            {upcomingReservations && upcomingReservations.length > 0 && (
+            {upcomingReservations.length > 0 && (
               <Badge variant="secondary" className="ml-2">
                 {upcomingReservations.length}
               </Badge>
@@ -204,7 +225,7 @@ export default async function MyReservationsPage({
         </TabsList>
 
         <TabsContent value="upcoming" className="space-y-4">
-          {upcomingReservations && upcomingReservations.length > 0 ? (
+          {upcomingReservations.length > 0 ? (
             upcomingReservations.map(renderReservationCard)
           ) : (
             <Card>
@@ -227,7 +248,7 @@ export default async function MyReservationsPage({
         </TabsContent>
 
         <TabsContent value="past" className="space-y-4">
-          {pastReservations && pastReservations.length > 0 ? (
+          {pastReservations.length > 0 ? (
             pastReservations.map(renderReservationCard)
           ) : (
             <Card>
@@ -243,7 +264,7 @@ export default async function MyReservationsPage({
         </TabsContent>
 
         <TabsContent value="all" className="space-y-4">
-          {allReservations && allReservations.length > 0 ? (
+          {allReservations.length > 0 ? (
             allReservations.map(renderReservationCard)
           ) : (
             <Card>

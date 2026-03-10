@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   LayoutDashboard,
   Building2,
@@ -200,6 +200,7 @@ interface SidebarProps {
 export function Sidebar({ userRole, isMobile = false, onClose }: SidebarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
+  const locale = useLocale();
   const [collapsed, setCollapsed] = useState(false);
 
   const isAdmin = userRole === "super_admin" || userRole === "admin";
@@ -207,7 +208,7 @@ export function Sidebar({ userRole, isMobile = false, onClose }: SidebarProps) {
 
   const isActive = (href: string) => {
     // Strip locale prefix for comparison
-    const cleanPath = pathname.replace(/^\/(en|es)/, "") || "/";
+    const cleanPath = pathname.replace(`/${locale}`, "") || "/";
     if (href === "/admin" || href === "/portal") {
       return cleanPath === href;
     }

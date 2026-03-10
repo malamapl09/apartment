@@ -28,7 +28,8 @@ export async function getMyPackages() {
       `*, apartments (id, unit_number)`
     )
     .in("apartment_id", apartmentIds)
-    .order("received_at", { ascending: false });
+    .order("received_at", { ascending: false })
+    .limit(100);
 
   if (error) return { error: error.message, data: [] };
   return { error: null, data: data || [] };

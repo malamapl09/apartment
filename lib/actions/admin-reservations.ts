@@ -31,7 +31,7 @@ export async function getReservations(filters?: {
   if (filters?.date_from) query = query.gte("start_time", filters.date_from);
   if (filters?.date_to) query = query.lte("start_time", filters.date_to);
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(500);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }
@@ -52,7 +52,8 @@ export async function getPendingPayments() {
     .select(`*, public_spaces (id, name), profiles (id, full_name, email, phone)`)
     .eq("building_id", profile.building_id)
     .eq("status", "payment_submitted")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(500);
 
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };

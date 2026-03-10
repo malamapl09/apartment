@@ -2,7 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
+
+const logPackageSchema = z.object({
+  apartment_id: z.string().uuid("Invalid apartment ID"),
+  tracking_number: z.string().optional(),
+  carrier: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
+  notes: z.string().max(500).optional(),
+});
 
 export async function logPackage(data: {
   apartment_id: string;
@@ -11,6 +20,11 @@ export async function logPackage(data: {
   description: string;
   notes?: string;
 }) {
+  const parsed = logPackageSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
   const supabase = await createClient();
 
   const {
@@ -114,7 +128,7 @@ export async function getPackages(filters?: {
   if (filters?.apartment_id)
     query = query.eq("apartment_id", filters.apartment_id);
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(500);
   if (error) return { error: error.message, data: [] };
   return { error: null, data: data || [] };
 }

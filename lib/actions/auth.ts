@@ -24,7 +24,8 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(result.data);
 
   if (error) {
-    return { error: error.message };
+    // Return a generic message to prevent user enumeration (OWASP A07:2021)
+    return { error: "Invalid email or password" };
   }
 
   redirect("/");
@@ -44,13 +45,11 @@ export async function forgotPassword(formData: FormData) {
     return { error: "Email is required" };
   }
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  // Always return success to prevent email enumeration (OWASP A07:2021).
+  // If the email does not exist, Supabase will silently do nothing.
+  await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/set-password`,
   });
-
-  if (error) {
-    return { error: error.message };
-  }
 
   return { success: true };
 }

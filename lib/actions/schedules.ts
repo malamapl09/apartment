@@ -43,10 +43,12 @@ export async function updateSchedule(
   if (!space) return { error: "Space not found in your building" };
 
   // Delete existing schedules
-  await supabase
+  const { error: deleteError } = await supabase
     .from("availability_schedules")
     .delete()
     .eq("space_id", spaceId);
+
+  if (deleteError) return { error: deleteError.message };
 
   // Insert new schedules
   if (schedules.length > 0) {

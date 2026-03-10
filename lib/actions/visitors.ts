@@ -2,6 +2,22 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
+
+const registerVisitorSchema = z.object({
+  visitor_name: z.string().min(1, "Visitor name is required"),
+  visitor_id_number: z.string().optional(),
+  visitor_phone: z.string().optional(),
+  vehicle_plate: z.string().optional(),
+  vehicle_description: z.string().optional(),
+  purpose: z.string().optional(),
+  valid_from: z.string().datetime("Invalid valid_from date format"),
+  valid_until: z.string().datetime("Invalid valid_until date format"),
+  is_recurring: z.boolean().optional(),
+  recurrence_pattern: z.string().optional(),
+  recurrence_end_date: z.string().datetime().optional(),
+  notes: z.string().max(500).optional(),
+});
 
 export async function registerVisitor(data: {
   visitor_name: string;
@@ -17,6 +33,11 @@ export async function registerVisitor(data: {
   recurrence_end_date?: string;
   notes?: string;
 }) {
+  const parsed = registerVisitorSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
   const supabase = await createClient();
 
   const {
@@ -87,7 +108,7 @@ export async function getMyVisitors(filter?: "expected" | "past" | "all") {
     query = query.in("status", ["checked_out", "expired", "cancelled"]);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(100);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }

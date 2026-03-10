@@ -6,12 +6,24 @@ import { z } from "zod";
 import { validateBooking } from "@/lib/reservations/validate-booking";
 import { getAuthProfile } from "@/lib/actions/helpers";
 
+const createReservationSchema = z.object({
+  space_id: z.string().uuid("Invalid space ID"),
+  start_time: z.string().datetime("Invalid start time format"),
+  end_time: z.string().datetime("Invalid end time format"),
+  notes: z.string().max(1000).optional(),
+});
+
 export async function createReservation(data: {
   space_id: string;
   start_time: string;  // ISO string
   end_time: string;    // ISO string
   notes?: string;
 }) {
+  const parsed = createReservationSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -152,7 +164,7 @@ export async function getMyReservations(filter?: "upcoming" | "past" | "all") {
     query = query.lt("start_time", new Date().toISOString());
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(100);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }

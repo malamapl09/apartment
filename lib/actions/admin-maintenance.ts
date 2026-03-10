@@ -38,7 +38,7 @@ export async function getMaintenanceRequests(filters?: {
   if (filters?.priority) query = query.eq("priority", filters.priority);
   if (filters?.category) query = query.eq("category", filters.category);
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(500);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }

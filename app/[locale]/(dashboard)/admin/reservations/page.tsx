@@ -4,26 +4,29 @@ import { ReservationFilters } from "@/components/admin/reservation-filters";
 import { ReservationTable } from "@/components/admin/reservation-table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTranslations } from "next-intl";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 interface PageProps {
-  searchParams: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{
     status?: string;
     space_id?: string;
     date_from?: string;
     date_to?: string;
-  };
+  }>;
 }
 
-export default async function AdminReservationsPage({ searchParams }: PageProps) {
+export default async function AdminReservationsPage({ params, searchParams }: PageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("admin.reservations");
 
+  const resolvedSearchParams = await searchParams;
   const filters = {
-    status: searchParams.status,
-    space_id: searchParams.space_id,
-    date_from: searchParams.date_from,
-    date_to: searchParams.date_to,
+    status: resolvedSearchParams.status,
+    space_id: resolvedSearchParams.space_id,
+    date_from: resolvedSearchParams.date_from,
+    date_to: resolvedSearchParams.date_to,
   };
 
   const { data: reservations, error } = await getReservations(filters);

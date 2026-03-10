@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMyVisitors, cancelVisitor } from "@/lib/actions/visitors";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -127,7 +127,13 @@ function EmptyState({ t }: { t: (key: string) => string }) {
   );
 }
 
-export default async function PortalVisitorsPage() {
+export default async function PortalVisitorsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("portal.visitors");
 
   const [expectedResult, pastResult, allResult] = await Promise.all([

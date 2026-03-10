@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMyCharges, getMyBalance } from "@/lib/actions/fees";
 import { MyChargesList } from "@/components/portal/my-charges-list";
 import { MyBalanceCard } from "@/components/portal/my-balance-card";
@@ -6,10 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, History } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { ChargeWithDetails } from "@/types";
 
-export default async function PortalFeesPage() {
+export default async function PortalFeesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("portal.fees");
 
   const [

@@ -104,7 +104,8 @@ export async function getAnnouncements() {
     .from("announcements")
     .select("*, profiles (full_name)")
     .eq("building_id", profile.building_id)
-    .order("published_at", { ascending: false });
+    .order("published_at", { ascending: false })
+    .limit(500);
 
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };

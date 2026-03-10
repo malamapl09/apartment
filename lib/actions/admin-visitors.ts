@@ -42,7 +42,7 @@ export async function getAllVisitors(filters?: {
     query = query.gte("valid_from", dateStart).lte("valid_from", dateEnd);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(500);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }

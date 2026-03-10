@@ -8,6 +8,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+interface ApartmentOwnerProfile {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  is_active: boolean;
+}
+
 export default async function ApartmentDetailPage({
   params,
 }: {
@@ -44,7 +52,7 @@ export default async function ApartmentDetailPage({
         <CardContent>
           {apartment.owners && apartment.owners.length > 0 ? (
             <div className="space-y-4">
-              {apartment.owners.map((owner: any) => (
+              {(apartment.owners as ApartmentOwnerProfile[]).map((owner) => (
                 <div
                   key={owner.id}
                   className="flex items-center justify-between p-4 border rounded-lg"

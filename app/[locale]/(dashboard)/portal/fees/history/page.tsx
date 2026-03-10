@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMyPayments } from "@/lib/actions/fees";
 import {
   Card,
@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft, Receipt } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
 import { formatCurrency, formatMonth } from "@/lib/utils/currency";
 
@@ -29,7 +29,13 @@ type Payment = {
   } | null;
 };
 
-export default async function FeeHistoryPage() {
+export default async function FeeHistoryPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("portal.fees");
 
   const { data: payments, error } = await getMyPayments();

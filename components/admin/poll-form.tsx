@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -94,9 +94,15 @@ export function PollForm({ onSuccess }: PollFormProps) {
   const pollType = form.watch("poll_type");
   const options = form.watch("options");
 
+  // Stable keys for each option entry — kept in sync with the options array
+  const [optionKeys, setOptionKeys] = useState<string[]>(() =>
+    ["", ""].map(() => crypto.randomUUID())
+  );
+
   function addOption() {
     const current = form.getValues("options");
     form.setValue("options", [...current, ""], { shouldValidate: false });
+    setOptionKeys((prev) => [...prev, crypto.randomUUID()]);
   }
 
   function removeOption(index: number) {
@@ -107,6 +113,7 @@ export function PollForm({ onSuccess }: PollFormProps) {
       current.filter((_, i) => i !== index),
       { shouldValidate: false }
     );
+    setOptionKeys((prev) => prev.filter((_, i) => i !== index));
   }
 
   function onSubmit(values: PollFormValues) {
@@ -296,7 +303,7 @@ export function PollForm({ onSuccess }: PollFormProps) {
               </div>
 
               {options.map((_, index) => (
-                <div key={index} className="flex items-center gap-2">
+                <div key={optionKeys[index]} className="flex items-center gap-2">
                   <FormField
                     control={form.control}
                     name={`options.${index}`}

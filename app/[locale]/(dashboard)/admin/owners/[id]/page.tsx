@@ -7,6 +7,17 @@ import { Button } from "@/components/ui/button";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Mail, Phone, MapPin, Calendar } from "lucide-react";
+import type { ApartmentStatus } from "@/types";
+
+interface LinkedApartment {
+  id: string;
+  unit_number: string;
+  floor: number | null;
+  area_sqm: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  status: ApartmentStatus;
+}
 
 export default async function OwnerDetailPage({
   params,
@@ -95,7 +106,7 @@ export default async function OwnerDetailPage({
         <CardContent>
           {owner.apartments && owner.apartments.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {owner.apartments.map((apartment: any) => (
+              {(owner.apartments as LinkedApartment[]).map((apartment) => (
                 <div
                   key={apartment.id}
                   className="p-4 border rounded-lg space-y-2"

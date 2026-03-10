@@ -1,7 +1,13 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ReportGenerator } from "@/components/admin/report-generator";
 
-export default async function AdminReportsPage() {
+export default async function AdminReportsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("admin.reports");
 
   return (

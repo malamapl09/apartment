@@ -34,7 +34,7 @@ export async function getMyCharges(filter?: "pending" | "paid" | "all") {
     query = query.eq("status", "paid");
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(100);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }
@@ -64,7 +64,8 @@ export async function getMyPayments() {
       `*, charges (id, amount, period_month, period_year, fee_types (id, name, category))`
     )
     .in("apartment_id", apartmentIds)
-    .order("payment_date", { ascending: false });
+    .order("payment_date", { ascending: false })
+    .limit(100);
 
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };

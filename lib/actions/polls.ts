@@ -23,7 +23,8 @@ export async function getActivePolls() {
     .select(`*, poll_options (*), poll_votes (*)`)
     .eq("building_id", profile.building_id)
     .in("status", ["active", "closed"])
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   if (error) return { error: error.message, data: [] };
 

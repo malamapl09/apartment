@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import SpaceCard from "@/components/admin/space-card";
+import type { PublicSpace } from "@/types";
 
 export default async function SpacesPage({
   params,
@@ -43,7 +44,7 @@ export default async function SpacesPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {spaces.map((space: any) => (
+          {(spaces as PublicSpace[]).map((space) => (
             <SpaceCard key={space.id} space={space} locale={locale} />
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ComponentProps } from "react";
 import {
   getFeeTypes,
@@ -15,7 +15,13 @@ import type { ChargeWithDetails, FeeType } from "@/types";
 
 type FeesDashboardPayments = ComponentProps<typeof FeesDashboard>["payments"];
 
-export default async function AdminFeesPage() {
+export default async function AdminFeesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("admin.fees");
 
   const [

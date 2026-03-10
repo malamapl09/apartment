@@ -2,7 +2,24 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { z } from "zod";
 import type { MaintenanceCategory, MaintenancePriority } from "@/types";
+
+const createMaintenanceRequestSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  category: z.enum(["plumbing", "electrical", "hvac", "structural", "pest_control", "general"], {
+    error: "Invalid category",
+  }),
+  priority: z.enum(["low", "medium", "high", "urgent"], {
+    error: "Invalid priority",
+  }),
+  photos: z.array(z.string().url()).optional(),
+});
+
+const addCommentSchema = z.object({
+  body: z.string().min(1, "Comment cannot be empty").max(2000, "Comment must be under 2000 characters"),
+});
 
 export async function createMaintenanceRequest(data: {
   title: string;
@@ -11,6 +28,11 @@ export async function createMaintenanceRequest(data: {
   priority: MaintenancePriority;
   photos?: string[];
 }) {
+  const parsed = createMaintenanceRequestSchema.safeParse(data);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
   const supabase = await createClient();
 
   const {
@@ -75,7 +97,7 @@ export async function getMyMaintenanceRequests(filter?: "open" | "resolved" | "a
     query = query.in("status", ["resolved", "closed"]);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(100);
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };
 }
@@ -114,6 +136,11 @@ export async function getMaintenanceRequest(id: string) {
 }
 
 export async function addComment(requestId: string, body: string) {
+  const parsed = addCommentSchema.safeParse({ body });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
+  }
+
   const supabase = await createClient();
 
   const {

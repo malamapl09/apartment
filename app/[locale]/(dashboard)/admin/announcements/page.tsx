@@ -1,6 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,10 +18,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getAnnouncements, deleteAnnouncement } from "@/lib/actions/announcements";
+import { getAnnouncements } from "@/lib/actions/announcements";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DeleteAnnouncementButton } from "./delete-button";
+import type { AnnouncementTarget } from "@/types";
+
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link";
+
+const targetVariantMap: Record<AnnouncementTarget, BadgeVariant> = {
+  all: "default",
+  owners: "secondary",
+  residents: "outline",
+};
+
+interface AnnouncementWithProfile {
+  id: string;
+  title: string;
+  target: AnnouncementTarget;
+  published_at: string;
+  expires_at: string | null;
+  profiles: { full_name: string } | null;
+}
 
 export default async function AnnouncementsPage({
   params,
@@ -83,7 +101,7 @@ export default async function AnnouncementsPage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {announcements.map((announcement) => {
+                {(announcements as AnnouncementWithProfile[]).map((announcement) => {
                   const targetLabel =
                     announcement.target === "all"
                       ? "Todos"
@@ -91,12 +109,7 @@ export default async function AnnouncementsPage({
                       ? "Propietarios"
                       : "Residentes";
 
-                  const targetVariant =
-                    announcement.target === "all"
-                      ? "default"
-                      : announcement.target === "owners"
-                      ? "secondary"
-                      : "outline";
+                  const targetVariant = targetVariantMap[announcement.target];
 
                   return (
                     <TableRow key={announcement.id}>
@@ -104,7 +117,7 @@ export default async function AnnouncementsPage({
                         {announcement.title}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={targetVariant as any}>
+                        <Badge variant={targetVariant}>
                           {targetLabel}
                         </Badge>
                       </TableCell>
@@ -125,7 +138,7 @@ export default async function AnnouncementsPage({
                           : "—"}
                       </TableCell>
                       <TableCell>
-                        {(announcement as any).profiles?.full_name || "—"}
+                        {announcement.profiles?.full_name || "—"}
                       </TableCell>
                       <TableCell className="text-right">
                         <DeleteAnnouncementButton

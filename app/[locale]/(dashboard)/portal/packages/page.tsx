@@ -1,11 +1,17 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Package } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getMyPackages } from "@/lib/actions/packages";
 import { MyPackagesList } from "@/components/portal/my-packages-list";
 
-export default async function PortalPackagesPage() {
+export default async function PortalPackagesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("portal.packages");
   const { data: packages, error } = await getMyPackages();
 

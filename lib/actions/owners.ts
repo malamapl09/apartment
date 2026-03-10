@@ -38,7 +38,7 @@ export async function getOwners(searchQuery?: string) {
     query = query.or(`full_name.ilike.%${sanitized}%,email.ilike.%${sanitized}%`);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query.limit(500);
 
   if (error) return { error: error.message, data: [] };
   return { data: data || [] };

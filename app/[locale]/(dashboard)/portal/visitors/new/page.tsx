@@ -1,10 +1,16 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { VisitorRegisterForm } from "@/components/portal/visitor-register-form";
 
-export default async function RegisterVisitorPage() {
+export default async function RegisterVisitorPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("portal.visitors");
 
   return (
