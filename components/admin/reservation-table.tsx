@@ -79,9 +79,9 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
             <TableRow>
               <TableHead>{t("reference")}</TableHead>
               <TableHead>{t("space")}</TableHead>
-              <TableHead>{t("resident")}</TableHead>
-              <TableHead>{t("dateTime")}</TableHead>
-              <TableHead>{t("amount")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("resident")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("dateTime")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("amount")}</TableHead>
               <TableHead>{t("status")}</TableHead>
               <TableHead className="w-[70px]">{t("actions")}</TableHead>
             </TableRow>
@@ -97,7 +97,7 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
                     <p className="font-medium">{reservation.public_spaces.name}</p>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <div>
                     <p className="font-medium">{reservation.profiles.full_name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -105,7 +105,7 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
                     </p>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <div>
                     <p className="font-medium">
                       {format(new Date(reservation.start_time), "PP")}
@@ -116,7 +116,7 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
                     </p>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <span className="font-semibold">
                     ${reservation.total_amount.toFixed(2)}
                   </span>

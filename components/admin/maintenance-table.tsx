@@ -107,14 +107,14 @@ export function MaintenanceTable({ requests, locale }: MaintenanceTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t("table.reference")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.reference")}</TableHead>
             <TableHead>{t("table.title")}</TableHead>
-            <TableHead>{t("table.apartment")}</TableHead>
-            <TableHead>{t("table.category")}</TableHead>
-            <TableHead>{t("table.priority")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.apartment")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.category")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.priority")}</TableHead>
             <TableHead>{t("table.status")}</TableHead>
-            <TableHead>{t("table.assignedTo")}</TableHead>
-            <TableHead>{t("table.date")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.assignedTo")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.date")}</TableHead>
             <TableHead className="w-[70px]">{t("table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
@@ -124,7 +124,7 @@ export function MaintenanceTable({ requests, locale }: MaintenanceTableProps) {
             const sCfg = statusConfig[request.status];
             return (
               <TableRow key={request.id}>
-                <TableCell className="font-mono text-sm">
+                <TableCell className="hidden sm:table-cell font-mono text-sm">
                   {request.reference_code}
                 </TableCell>
                 <TableCell>
@@ -139,7 +139,7 @@ export function MaintenanceTable({ requests, locale }: MaintenanceTableProps) {
                     )}
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   {request.apartments ? (
                     <span className="text-sm font-medium">
                       {request.apartments.unit_number}
@@ -148,12 +148,12 @@ export function MaintenanceTable({ requests, locale }: MaintenanceTableProps) {
                     <span className="text-xs text-muted-foreground">—</span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <span className="text-sm capitalize">
                     {t(`category.${request.category}`)}
                   </span>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <Badge
                     variant={pCfg.variant}
                     className={cn("capitalize", pCfg.className)}
@@ -169,7 +169,7 @@ export function MaintenanceTable({ requests, locale }: MaintenanceTableProps) {
                     {t(`status.${request.status}`)}
                   </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   {request.assigned_to ? (
                     <span className="text-sm">{request.assigned_to}</span>
                   ) : (
@@ -178,7 +178,7 @@ export function MaintenanceTable({ requests, locale }: MaintenanceTableProps) {
                     </span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <span className="text-sm text-muted-foreground">
                     {format(new Date(request.created_at), "PP")}
                   </span>

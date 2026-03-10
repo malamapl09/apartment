@@ -98,11 +98,11 @@ export function DocumentTable({ documents, onDelete }: DocumentTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>{t("table.title")}</TableHead>
-            <TableHead>{t("table.category")}</TableHead>
-            <TableHead>{t("table.target")}</TableHead>
-            <TableHead>{t("table.version")}</TableHead>
-            <TableHead>{t("table.uploadedBy")}</TableHead>
-            <TableHead>{t("table.date")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.category")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.target")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.version")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.uploadedBy")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.date")}</TableHead>
             <TableHead className="text-right">{t("table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
@@ -119,21 +119,21 @@ export function DocumentTable({ documents, onDelete }: DocumentTableProps) {
                   )}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">
                 <Badge variant={categoryVariantMap[doc.category]}>
                   {getCategoryLabel(doc.category)}
                 </Badge>
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">
                 <Badge variant={targetVariantMap[doc.target]}>
                   {getTargetLabel(doc.target)}
                 </Badge>
               </TableCell>
-              <TableCell>v{doc.version}</TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">v{doc.version}</TableCell>
+              <TableCell className="hidden sm:table-cell">
                 {doc.profiles?.full_name ?? "—"}
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">
                 {format(new Date(doc.created_at), "dd MMM yyyy")}
               </TableCell>
               <TableCell className="text-right">

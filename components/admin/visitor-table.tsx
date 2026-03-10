@@ -102,10 +102,10 @@ export function VisitorTable({ visitors }: VisitorTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>{t("table.visitorName")}</TableHead>
-              <TableHead>{t("table.apartment")}</TableHead>
-              <TableHead>{t("table.accessCode")}</TableHead>
-              <TableHead>{t("table.validFrom")}</TableHead>
-              <TableHead>{t("table.validUntil")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("table.apartment")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("table.accessCode")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("table.validFrom")}</TableHead>
+              <TableHead className="hidden sm:table-cell">{t("table.validUntil")}</TableHead>
               <TableHead>{t("table.status")}</TableHead>
               <TableHead className="text-right">{t("table.actions")}</TableHead>
             </TableRow>
@@ -128,10 +128,10 @@ export function VisitorTable({ visitors }: VisitorTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>{t("table.visitorName")}</TableHead>
-            <TableHead>{t("table.apartment")}</TableHead>
-            <TableHead>{t("table.accessCode")}</TableHead>
-            <TableHead>{t("table.validFrom")}</TableHead>
-            <TableHead>{t("table.validUntil")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.apartment")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.accessCode")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.validFrom")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.validUntil")}</TableHead>
             <TableHead>{t("table.status")}</TableHead>
             <TableHead className="text-right">{t("table.actions")}</TableHead>
           </TableRow>
@@ -144,16 +144,16 @@ export function VisitorTable({ visitors }: VisitorTableProps) {
                 <TableCell className="font-medium">
                   {visitor.visitor_name}
                 </TableCell>
-                <TableCell>{visitor.apartments?.unit_number ?? "—"}</TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">{visitor.apartments?.unit_number ?? "—"}</TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <span className="font-mono text-sm font-semibold tracking-wider">
                     {visitor.access_code}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                   {formatDate(visitor.valid_from)}
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
+                <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
                   {formatDate(visitor.valid_until)}
                 </TableCell>
                 <TableCell>

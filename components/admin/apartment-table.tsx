@@ -42,10 +42,10 @@ export function ApartmentTable({ apartments }: ApartmentTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Unit</TableHead>
-            <TableHead>Floor</TableHead>
-            <TableHead>Area (m²)</TableHead>
-            <TableHead>Bedrooms</TableHead>
-            <TableHead>Bathrooms</TableHead>
+            <TableHead className="hidden sm:table-cell">Floor</TableHead>
+            <TableHead className="hidden sm:table-cell">Area (m²)</TableHead>
+            <TableHead className="hidden sm:table-cell">Bedrooms</TableHead>
+            <TableHead className="hidden sm:table-cell">Bathrooms</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Owners</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -64,10 +64,10 @@ export function ApartmentTable({ apartments }: ApartmentTableProps) {
                 <TableCell className="font-medium">
                   {apartment.unit_number}
                 </TableCell>
-                <TableCell>{apartment.floor}</TableCell>
-                <TableCell>{apartment.area_sqm}</TableCell>
-                <TableCell>{apartment.bedrooms}</TableCell>
-                <TableCell>{apartment.bathrooms}</TableCell>
+                <TableCell className="hidden sm:table-cell">{apartment.floor}</TableCell>
+                <TableCell className="hidden sm:table-cell">{apartment.area_sqm}</TableCell>
+                <TableCell className="hidden sm:table-cell">{apartment.bedrooms}</TableCell>
+                <TableCell className="hidden sm:table-cell">{apartment.bathrooms}</TableCell>
                 <TableCell>{getStatusBadge(apartment.status)}</TableCell>
                 <TableCell>
                   {apartment.apartment_owners && apartment.apartment_owners.length > 0 ? (
