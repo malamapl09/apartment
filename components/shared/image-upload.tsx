@@ -90,8 +90,7 @@ export default function ImageUpload({
           filesToUpload.length > 1 ? "s" : ""
         }`
       );
-    } catch (error) {
-      console.error("Upload error:", error);
+    } catch {
       toast.error("Failed to upload images");
     } finally {
       setUploading(false);

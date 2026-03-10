@@ -24,7 +24,8 @@ export function useUser() {
         .single();
 
       if (error) {
-        console.error("Failed to fetch user profile:", error);
+        setLoading(false);
+        return;
       }
 
       setProfile(data);

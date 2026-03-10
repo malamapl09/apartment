@@ -55,6 +55,52 @@ export async function forgotPassword(formData: FormData) {
   return { success: true };
 }
 
+const updateProfileSchema = z.object({
+  full_name: z.string().min(2),
+  phone: z.string().optional(),
+  national_id: z.string().optional(),
+  emergency_contact_name: z.string().optional(),
+  emergency_contact_phone: z.string().optional(),
+  preferred_locale: z.enum(["en", "es"]),
+});
+
+export async function updateMyProfile(
+  values: z.infer<typeof updateProfileSchema>
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  const parsed = updateProfileSchema.safeParse(values);
+  if (!parsed.success) {
+    return { error: "Invalid data" };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: parsed.data.full_name,
+      phone: parsed.data.phone || null,
+      national_id: parsed.data.national_id || null,
+      emergency_contact_name: parsed.data.emergency_contact_name || null,
+      emergency_contact_phone: parsed.data.emergency_contact_phone || null,
+      preferred_locale: parsed.data.preferred_locale,
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
+
 export async function setPassword(formData: FormData) {
   const supabase = await createClient();
   const password = formData.get("password") as string;

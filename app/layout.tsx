@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { PWARegister } from "@/components/shared/pwa-register";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,22 +29,12 @@ export const metadata: Metadata = {
   },
 };
 
+export { geistSans, geistMono };
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html suppressHydrationWarning>
-      <head>
-        <meta name="theme-color" content="#0f172a" />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-        <PWARegister />
-      </body>
-    </html>
-  );
+  return children;
 }

@@ -920,7 +920,13 @@
       "cancel": "Cancelar",
       "creating": "Creando...",
       "yesNoDescription": "Esta encuesta tendrá automáticamente 'Sí' y 'No' como opciones",
-      "backToPolls": "Volver a encuestas"
+      "backToPolls": "Volver a encuestas",
+      "validation": {
+        "titleRequired": "El título es requerido",
+        "endDateRequired": "La fecha de cierre es requerida",
+        "endDateFuture": "La fecha de cierre debe ser en el futuro",
+        "atLeastTwoOptions": "Se requieren al menos 2 opciones"
+      }
     },
     "reports": {
       "title": "Reportes y Exportación",

@@ -540,6 +540,12 @@
         "incorrect_password": "Current password is incorrect",
         "password_change_failed": "Failed to change password",
         "update_failed": "Failed to update profile"
+      },
+      "validation": {
+        "nameMinLength": "Name must be at least 2 characters",
+        "currentPasswordRequired": "Current password is required",
+        "passwordMinLength": "Password must be at least 8 characters",
+        "passwordsMustMatch": "Passwords don't match"
       }
     },
     "polls": {

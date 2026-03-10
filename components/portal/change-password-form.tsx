@@ -19,14 +19,11 @@ import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-const formSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+type FormValues = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
 
 export default function ChangePasswordForm() {
   const t = useTranslations("portal.profile");
@@ -35,7 +32,16 @@ export default function ChangePasswordForm() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const formSchema = z.object({
+    currentPassword: z.string().min(1, t("validation.currentPasswordRequired")),
+    newPassword: z.string().min(8, t("validation.passwordMinLength")),
+    confirmPassword: z.string(),
+  }).refine((data) => data.newPassword === data.confirmPassword, {
+    message: t("validation.passwordsMustMatch"),
+    path: ["confirmPassword"],
+  });
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       currentPassword: "",
@@ -44,7 +50,7 @@ export default function ChangePasswordForm() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
 
     try {
@@ -79,8 +85,7 @@ export default function ChangePasswordForm() {
 
       toast.success(t("success.password_changed"));
       form.reset();
-    } catch (error) {
-      console.error("Error changing password:", error);
+    } catch {
       toast.error(t("error.password_change_failed"));
     } finally {
       setIsLoading(false);

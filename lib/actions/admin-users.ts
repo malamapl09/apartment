@@ -42,6 +42,18 @@ export async function inviteOwner(formData: FormData) {
 
   const { email, full_name, phone, apartment_id } = result.data;
 
+  // Verify the apartment belongs to the admin's building
+  const { data: apartment } = await supabase
+    .from("apartments")
+    .select("id")
+    .eq("id", apartment_id)
+    .eq("building_id", profile.building_id)
+    .single();
+
+  if (!apartment) {
+    return { error: "Apartment not found in your building" };
+  }
+
   // Create the user via admin client with invite
   const { data: newUser, error: createError } = await adminClient.auth.admin.inviteUserByEmail(email, {
     data: {
@@ -72,6 +84,8 @@ export async function inviteOwner(formData: FormData) {
     });
 
   if (profileError) {
+    // Cleanup: delete orphaned auth user since profile insert failed
+    await adminClient.auth.admin.deleteUser(newUser.user.id);
     return { error: profileError.message };
   }
 
@@ -86,6 +100,9 @@ export async function inviteOwner(formData: FormData) {
     });
 
   if (linkError) {
+    // Cleanup: delete orphaned auth user and profile since apartment link failed
+    await adminClient.from("profiles").delete().eq("id", newUser.user.id);
+    await adminClient.auth.admin.deleteUser(newUser.user.id);
     return { error: linkError.message };
   }
 

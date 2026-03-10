@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Bell, Check, CheckCheck, Calendar, AlertCircle, MessageSquare, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -17,6 +18,10 @@ import { es } from "date-fns/locale";
 import { enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
+
+interface NotificationData {
+  action_url?: string;
+}
 
 // Map notification types to icons
 const getNotificationIcon = (type: string) => {
@@ -39,6 +44,7 @@ const dateLocales: Record<string, Locale> = { es, en: enUS };
 export function NotificationList() {
   const t = useTranslations("common.notifications");
   const currentLocale = useLocale();
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -65,8 +71,8 @@ export function NotificationList() {
     try {
       const { data = [] } = await getNotifications();
       setNotifications(data);
-    } catch (error) {
-      console.error("Failed to load notifications:", error);
+    } catch {
+      // silently ignore — notifications are non-critical background data
     } finally {
       setLoading(false);
     }
@@ -76,8 +82,8 @@ export function NotificationList() {
     try {
       const { count = 0 } = await getUnreadCount();
       setUnreadCount(count);
-    } catch (error) {
-      console.error("Failed to load unread count:", error);
+    } catch {
+      // silently ignore
     }
   };
 
@@ -88,8 +94,8 @@ export function NotificationList() {
         prev.map(n => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error("Failed to mark as read:", error);
+    } catch {
+      // silently ignore
     }
   };
 
@@ -98,8 +104,8 @@ export function NotificationList() {
       await markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
-    } catch (error) {
-      console.error("Failed to mark all as read:", error);
+    } catch {
+      // silently ignore
     }
   };
 
@@ -164,8 +170,9 @@ export function NotificationList() {
                       if (!notification.read_at) {
                         handleMarkAsRead(notification.id);
                       }
-                      if ((notification.data as any)?.action_url) {
-                        window.location.href = (notification.data as any).action_url;
+                      const url = (notification.data as NotificationData)?.action_url;
+                      if (url) {
+                        router.push(url);
                       }
                     }}
                     className={cn(

@@ -106,7 +106,7 @@ export default function BookingFlow({
     setIsSubmitting(true);
 
     try {
-      const dateStr = selectedDate.toISOString().split("T")[0];
+      const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
       const result = await createReservation({
         space_id: space.id,
         start_time: `${dateStr}T${startTime}:00`,
@@ -122,8 +122,7 @@ export default function BookingFlow({
         setReservationCode(result.data.reference_code);
         toast.success(t("success.reservation_created"));
       }
-    } catch (error) {
-      console.error("Error creating reservation:", error);
+    } catch {
       toast.error(t("error.unknown"));
     } finally {
       setIsSubmitting(false);

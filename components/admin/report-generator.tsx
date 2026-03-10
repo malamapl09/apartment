@@ -31,6 +31,7 @@ import {
   getChargesCSV,
   getPaymentsCSV,
 } from "@/lib/actions/reports";
+import { formatCurrency } from "@/lib/utils";
 
 const MONTHS = [
   { value: "1", labelKey: "january" },
@@ -319,7 +320,7 @@ export function ReportGenerator() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold">
-                  ${financialData.summary.totalCharged.toLocaleString()}
+                  {formatCurrency(financialData.summary.totalCharged)}
                 </p>
               </CardContent>
             </Card>
@@ -329,7 +330,7 @@ export function ReportGenerator() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold text-green-600">
-                  ${financialData.summary.totalCollected.toLocaleString()}
+                  {formatCurrency(financialData.summary.totalCollected)}
                 </p>
               </CardContent>
             </Card>
@@ -339,7 +340,7 @@ export function ReportGenerator() {
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-bold text-red-600">
-                  ${financialData.summary.outstanding.toLocaleString()}
+                  {formatCurrency(financialData.summary.outstanding)}
                 </p>
               </CardContent>
             </Card>
@@ -407,7 +408,7 @@ export function ReportGenerator() {
                               {data.count}
                             </td>
                             <td className="py-2 text-right">
-                              ${data.amount.toLocaleString()}
+                              {formatCurrency(data.amount)}
                             </td>
                           </tr>
                         )
@@ -455,13 +456,13 @@ export function ReportGenerator() {
                         <td className="py-2 pr-4">{charge.apartment}</td>
                         <td className="py-2 pr-4">{charge.feeType}</td>
                         <td className="py-2 pr-4 text-right">
-                          ${charge.amount.toLocaleString()}
+                          {formatCurrency(charge.amount)}
                         </td>
                         <td className="py-2 pr-4 text-right text-green-600">
-                          ${charge.paid.toLocaleString()}
+                          {formatCurrency(charge.paid)}
                         </td>
                         <td className="py-2 pr-4 text-right text-red-600">
-                          ${(charge.amount - charge.paid).toLocaleString()}
+                          {formatCurrency(charge.amount - charge.paid)}
                         </td>
                         <td className="py-2 capitalize">{charge.status}</td>
                       </tr>

@@ -127,7 +127,6 @@ export default function PaymentUpload({
         onSuccess();
       }
     } catch (err) {
-      console.error("Upload error:", err);
       setError(err instanceof Error ? err.message : t("errors.upload_failed"));
       toast.error(t("errors.upload_failed"));
     } finally {

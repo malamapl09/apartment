@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 export async function getReservations(filters?: {
   status?: string;
@@ -58,9 +59,8 @@ export async function getPendingPayments() {
 }
 
 export async function verifyPayment(reservationId: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("reservations")
@@ -70,6 +70,7 @@ export async function verifyPayment(reservationId: string) {
       payment_verified_at: new Date().toISOString(),
     })
     .eq("id", reservationId)
+    .eq("building_id", profile.building_id)
     .eq("status", "payment_submitted");
 
   if (error) return { error: error.message };
@@ -80,9 +81,8 @@ export async function verifyPayment(reservationId: string) {
 }
 
 export async function rejectPayment(reservationId: string, reason: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("reservations")
@@ -92,6 +92,7 @@ export async function rejectPayment(reservationId: string, reason: string) {
       payment_rejected_reason: reason,
     })
     .eq("id", reservationId)
+    .eq("building_id", profile.building_id)
     .eq("status", "payment_submitted");
 
   if (error) return { error: error.message };
@@ -102,9 +103,8 @@ export async function rejectPayment(reservationId: string, reason: string) {
 }
 
 export async function adminCancelReservation(reservationId: string, reason: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("reservations")
@@ -114,6 +114,7 @@ export async function adminCancelReservation(reservationId: string, reason: stri
       cancelled_by: user.id,
     })
     .eq("id", reservationId)
+    .eq("building_id", profile.building_id)
     .in("status", ["pending_payment", "payment_submitted", "confirmed"]);
 
   if (error) return { error: error.message };

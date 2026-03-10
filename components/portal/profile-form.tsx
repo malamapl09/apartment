@@ -26,16 +26,16 @@ import {
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { updateMyProfile } from "@/lib/actions/auth";
 
-const formSchema = z.object({
-  full_name: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().optional(),
-  national_id: z.string().optional(),
-  emergency_contact_name: z.string().optional(),
-  emergency_contact_phone: z.string().optional(),
-  preferred_locale: z.enum(["en", "es"]),
-});
+type FormValues = {
+  full_name: string;
+  phone?: string;
+  national_id?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  preferred_locale: "en" | "es";
+};
 
 interface ProfileFormProps {
   profile: any;
@@ -47,7 +47,16 @@ export default function ProfileForm({ profile, locale }: ProfileFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const formSchema = z.object({
+    full_name: z.string().min(2, t("validation.nameMinLength")),
+    phone: z.string().optional(),
+    national_id: z.string().optional(),
+    emergency_contact_name: z.string().optional(),
+    emergency_contact_phone: z.string().optional(),
+    preferred_locale: z.enum(["en", "es"]),
+  });
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       full_name: profile?.full_name || "",
@@ -59,25 +68,13 @@ export default function ProfileForm({ profile, locale }: ProfileFormProps) {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     setIsLoading(true);
 
     try {
-      const supabase = createClient();
+      const result = await updateMyProfile(values);
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: values.full_name,
-          phone: values.phone || null,
-          national_id: values.national_id || null,
-          emergency_contact_name: values.emergency_contact_name || null,
-          emergency_contact_phone: values.emergency_contact_phone || null,
-          preferred_locale: values.preferred_locale,
-        })
-        .eq("id", profile.id);
-
-      if (error) throw error;
+      if (result.error) throw new Error(result.error);
 
       toast.success(t("success.profile_updated"));
 
@@ -88,8 +85,7 @@ export default function ProfileForm({ profile, locale }: ProfileFormProps) {
       } else {
         router.refresh();
       }
-    } catch (error) {
-      console.error("Error updating profile:", error);
+    } catch {
       toast.error(t("error.update_failed"));
     } finally {
       setIsLoading(false);

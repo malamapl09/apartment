@@ -174,7 +174,7 @@ export async function getPortalSummary() {
   const { data: ownerLink } = await supabase
     .from("apartment_owners")
     .select("apartment_id")
-    .eq("owner_id", user.id)
+    .eq("profile_id", user.id)
     .limit(1)
     .single();
 

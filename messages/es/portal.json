@@ -540,6 +540,12 @@
         "incorrect_password": "La contrase\u00f1a actual es incorrecta",
         "password_change_failed": "Error al cambiar la contrase\u00f1a",
         "update_failed": "Error al actualizar el perfil"
+      },
+      "validation": {
+        "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+        "currentPasswordRequired": "La contraseña actual es requerida",
+        "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+        "passwordsMustMatch": "Las contraseñas no coinciden"
       }
     },
     "polls": {

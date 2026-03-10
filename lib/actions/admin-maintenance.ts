@@ -57,7 +57,7 @@ export async function updateMaintenanceStatus(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("building_id, role")
     .eq("id", user.id)
     .single();
   if (!profile || !["admin", "super_admin"].includes(profile.role)) {
@@ -83,12 +83,16 @@ export async function updateMaintenanceStatus(
     .from("maintenance_requests")
     .select("requested_by, reference_code, title")
     .eq("id", id)
+    .eq("building_id", profile.building_id)
     .single();
+
+  if (!request) return { error: "Maintenance request not found" };
 
   const { error } = await supabase
     .from("maintenance_requests")
     .update(updates)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 
@@ -120,12 +124,21 @@ export async function addInternalNote(requestId: string, body: string) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("building_id, role")
     .eq("id", user.id)
     .single();
   if (!profile || !["admin", "super_admin"].includes(profile.role)) {
     return { error: "Unauthorized" };
   }
+
+  // Verify the maintenance request belongs to the admin's building
+  const { data: request } = await supabase
+    .from("maintenance_requests")
+    .select("id")
+    .eq("id", requestId)
+    .eq("building_id", profile.building_id)
+    .single();
+  if (!request) return { error: "Maintenance request not found" };
 
   const { error } = await supabase.from("maintenance_comments").insert({
     request_id: requestId,

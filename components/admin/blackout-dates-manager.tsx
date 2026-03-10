@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { BlackoutDate } from "@/types";
 import { addBlackout, removeBlackout } from "@/lib/actions/blackout-dates";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ export default function BlackoutDatesManager({
   locale,
 }: BlackoutDatesManagerProps) {
   const t = useTranslations("admin.spaces.blackouts_manager");
+  const router = useRouter();
   const [blackouts, setBlackouts] = useState<BlackoutDate[]>(initialBlackouts);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [reason, setReason] = useState("");
@@ -67,7 +69,7 @@ export default function BlackoutDatesManager({
         toast.success(t("addSuccess"));
         setSelectedDate(undefined);
         setReason("");
-        window.location.reload();
+        router.refresh();
       } else if ('error' in result) {
         toast.error(result.error || t("addError"));
       }

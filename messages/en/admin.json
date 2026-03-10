@@ -920,7 +920,13 @@
       "cancel": "Cancel",
       "creating": "Creating...",
       "yesNoDescription": "This poll will automatically have 'Yes' and 'No' as options",
-      "backToPolls": "Back to polls"
+      "backToPolls": "Back to polls",
+      "validation": {
+        "titleRequired": "Title is required",
+        "endDateRequired": "End date is required",
+        "endDateFuture": "End date must be in the future",
+        "atLeastTwoOptions": "At least 2 options are required"
+      }
     },
     "reports": {
       "title": "Reports & Export",

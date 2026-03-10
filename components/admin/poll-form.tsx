@@ -32,33 +32,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plus, Trash2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
-const pollFormSchema = z
-  .object({
-    title: z.string().min(1, "Title is required").max(200),
-    description: z.string().max(1000).optional(),
-    poll_type: z.enum(["single_choice", "multiple_choice", "yes_no"]),
-    target: z.enum(["all", "owners", "residents"]),
-    ends_at: z.string().min(1, "End date is required").refine(
-      (v) => new Date(v) > new Date(),
-      { message: "End date must be in the future" }
-    ),
-    is_anonymous: z.boolean(),
-    options: z.array(z.string()),
-  })
-  .superRefine((data, ctx) => {
-    if (data.poll_type !== "yes_no") {
-      const filled = data.options.filter((o) => o.trim() !== "");
-      if (filled.length < 2) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "At least 2 options are required",
-          path: ["options"],
-        });
-      }
-    }
-  });
-
-type PollFormValues = z.infer<typeof pollFormSchema>;
+type PollFormValues = {
+  title: string;
+  description?: string;
+  poll_type: "single_choice" | "multiple_choice" | "yes_no";
+  target: "all" | "owners" | "residents";
+  ends_at: string;
+  is_anonymous: boolean;
+  options: string[];
+};
 
 interface PollFormProps {
   onSuccess?: () => void;
@@ -69,6 +51,32 @@ export function PollForm({ onSuccess }: PollFormProps) {
   const tCommon = useTranslations("labels");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const pollFormSchema = z
+    .object({
+      title: z.string().min(1, t("validation.titleRequired")).max(200),
+      description: z.string().max(1000).optional(),
+      poll_type: z.enum(["single_choice", "multiple_choice", "yes_no"]),
+      target: z.enum(["all", "owners", "residents"]),
+      ends_at: z.string().min(1, t("validation.endDateRequired")).refine(
+        (v) => new Date(v) > new Date(),
+        { message: t("validation.endDateFuture") }
+      ),
+      is_anonymous: z.boolean(),
+      options: z.array(z.string()),
+    })
+    .superRefine((data, ctx) => {
+      if (data.poll_type !== "yes_no") {
+        const filled = data.options.filter((o) => o.trim() !== "");
+        if (filled.length < 2) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t("validation.atLeastTwoOptions"),
+            path: ["options"],
+          });
+        }
+      }
+    });
 
   const form = useForm<PollFormValues>({
     resolver: zodResolver(pollFormSchema),

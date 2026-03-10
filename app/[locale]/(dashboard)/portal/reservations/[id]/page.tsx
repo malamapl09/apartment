@@ -270,7 +270,6 @@ export default async function ReservationDetailPage({
           <PaymentUpload
             reservationId={reservation.id}
             buildingId={reservation.space.building.id}
-            onSuccess={() => window.location.reload()}
           />
         </div>
       )}

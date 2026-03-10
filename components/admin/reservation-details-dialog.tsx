@@ -22,6 +22,7 @@ import {
   FileText,
 } from "lucide-react";
 import { format } from "date-fns";
+import { formatCurrency } from "@/lib/utils";
 
 interface Reservation {
   id: string;
@@ -122,7 +123,7 @@ export function ReservationDetailsDialog({
                 <DollarSign className="h-4 w-4 mt-0.5 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">
-                    ${reservation.total_amount.toFixed(2)}
+                    {formatCurrency(reservation.total_amount)}
                   </p>
                   <p className="text-xs text-muted-foreground">{t("reservation.amount")}</p>
                 </div>

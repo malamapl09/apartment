@@ -79,9 +79,8 @@ export function InviteOwnerForm({ apartments }: InviteOwnerFormProps) {
       } else {
         toast.error(result.error || t("errorToast"));
       }
-    } catch (error) {
+    } catch {
       toast.error(t("unexpectedError"));
-      console.error(error);
     } finally {
       setIsLoading(false);
     }

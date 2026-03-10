@@ -88,8 +88,7 @@ export function AnnouncementForm() {
       toast.success(t("successToast"));
       router.push("/admin/announcements");
       router.refresh();
-    } catch (error) {
-      console.error("Error creating announcement:", error);
+    } catch {
       toast.error(t("errorToast"));
     } finally {
       setIsSubmitting(false);

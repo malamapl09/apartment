@@ -1,29 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import type { FeeCategory, FeeType, PaymentMethod } from "@/types";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
-
-async function getAdminProfile() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" as const, supabase, user: null, profile: null };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" as const, supabase, user: null, profile: null };
-  }
-
-  return { error: null, supabase, user, profile };
-}
+import { getAdminProfile } from "@/lib/actions/helpers";
 
 export async function createFeeType(data: {
   name: string;
@@ -67,8 +47,8 @@ export async function getFeeTypes() {
 }
 
 export async function updateFeeType(id: string, data: Partial<FeeType>) {
-  const { error: authError, supabase } = await getAdminProfile();
-  if (authError) return { error: authError };
+  const { error: authError, supabase, profile } = await getAdminProfile();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   // Pick only updatable fields — omit read-only server fields
   const updateData: Record<string, unknown> = {};
@@ -82,7 +62,8 @@ export async function updateFeeType(id: string, data: Partial<FeeType>) {
   const { error } = await supabase
     .from("fee_types")
     .update(updateData)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("building_id", profile.building_id);
 
   if (error) return { error: error.message };
 
@@ -206,11 +187,12 @@ export async function recordPayment(data: {
   const { error: authError, supabase, user, profile } = await getAdminProfile();
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
-  // Get charge info
+  // Get charge info — scoped to admin's building
   const { data: charge } = await supabase
     .from("charges")
     .select("*, payments (*)")
     .eq("id", data.charge_id)
+    .eq("building_id", profile.building_id)
     .single();
 
   if (!charge) return { error: "Charge not found" };

@@ -33,7 +33,9 @@ export async function getOwners(searchQuery?: string) {
     .order("full_name");
 
   if (searchQuery) {
-    query = query.or(`full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+    // Escape PostgREST LIKE wildcards to prevent filter injection
+    const sanitized = searchQuery.replace(/[%_]/g, "\\$&");
+    query = query.or(`full_name.ilike.%${sanitized}%,email.ilike.%${sanitized}%`);
   }
 
   const { data, error } = await query;

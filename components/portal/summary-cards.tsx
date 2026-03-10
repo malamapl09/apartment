@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Wrench, UserCheck, Bell } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 type SummaryData = {
   pendingCharges: number;
@@ -26,7 +27,7 @@ export default function PortalSummaryCards({
     {
       title: t("pendingCharges"),
       value: data.pendingCharges,
-      subtitle: data.pendingAmount > 0 ? `$${data.pendingAmount.toLocaleString()}` : undefined,
+      subtitle: data.pendingAmount > 0 ? formatCurrency(data.pendingAmount) : undefined,
       icon: DollarSign,
       href: `/${locale}/portal/fees`,
       color: "text-orange-600",

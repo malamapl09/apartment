@@ -97,13 +97,12 @@ export function ApartmentForm({ initialData, apartmentId }: ApartmentFormProps) 
         router.push(`/${locale}/admin/apartments`);
       }
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error(
         isEditMode
           ? t("updateError")
           : t("createError")
       );
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
