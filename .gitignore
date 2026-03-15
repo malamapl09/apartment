@@ -44,6 +44,7 @@ yarn-error.log*
 
 # misc assets
 *.png
+!public/icons/*.png
 *.docx
 
 # typescript
