@@ -25,13 +25,12 @@ export default async function NewReservationPage({
 
   // Fetch space with building info
   const { data: space, error: spaceError } = await supabase
-    .from("spaces")
+    .from("public_spaces")
     .select(`
       *,
-      building:buildings (
+      buildings (
         id,
-        name,
-        currency
+        name
       )
     `)
     .eq("id", spaceId)
@@ -62,20 +61,34 @@ export default async function NewReservationPage({
     .order("date");
 
   // Fetch building bank info (for payment instructions)
-  const { data: bankInfo } = await supabase
+  const { data: building } = await supabase
     .from("buildings")
-    .select("bank_account_name, bank_account_number, bank_name, bank_routing_number")
-    .eq("id", space.building?.id)
+    .select("bank_account_info")
+    .eq("id", space.buildings?.id)
     .single();
 
-  const formattedBankInfo = bankInfo
+  const bankAccountInfo = building?.bank_account_info as {
+    bank_name?: string;
+    account_number?: string;
+    account_type?: string;
+    holder_name?: string;
+  } | null;
+
+  const formattedBankInfo = bankAccountInfo
     ? {
-        account_name: bankInfo.bank_account_name,
-        account_number: bankInfo.bank_account_number,
-        bank_name: bankInfo.bank_name,
-        routing_number: bankInfo.bank_routing_number,
+        account_name: bankAccountInfo.holder_name || "",
+        account_number: bankAccountInfo.account_number || "",
+        bank_name: bankAccountInfo.bank_name || "",
       }
     : undefined;
+
+  // Map to the shape BookingFlow expects (with building.currency)
+  const spaceWithBuilding = {
+    ...space,
+    building: space.buildings
+      ? { id: space.buildings.id, name: space.buildings.name, currency: "USD" }
+      : undefined,
+  };
 
   return (
     <div className="space-y-6">
@@ -87,7 +100,7 @@ export default async function NewReservationPage({
       </div>
 
       <BookingFlow
-        space={space}
+        space={spaceWithBuilding}
         schedules={schedules || []}
         blackouts={blackouts || []}
         bankInfo={formattedBankInfo}

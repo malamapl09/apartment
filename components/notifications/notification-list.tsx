@@ -48,7 +48,7 @@ const getNotificationIcon = (type: string) => {
 const dateLocales: Record<string, Locale> = { es, en: enUS };
 
 export function NotificationList() {
-  const t = useTranslations("common.notifications");
+  const t = useTranslations("notifications");
   const currentLocale = useLocale();
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);

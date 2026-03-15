@@ -30,15 +30,8 @@ export default async function SpacesPage({
 
   // Fetch active spaces
   const { data: spaces } = await supabase
-    .from("spaces")
-    .select(`
-      *,
-      building:buildings (
-        id,
-        name,
-        currency
-      )
-    `)
+    .from("public_spaces")
+    .select("*")
     .eq("is_active", true)
     .order("name");
 
@@ -51,76 +44,81 @@ export default async function SpacesPage({
 
       {spaces && spaces.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {spaces.map((space) => (
-            <Card key={space.id} className="flex flex-col overflow-hidden">
-              {/* Photo Area */}
-              <div className="aspect-video bg-muted relative">
-                {space.photo_url ? (
-                  <img
-                    src={space.photo_url}
-                    alt={space.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="h-12 w-12 text-muted-foreground" />
-                  </div>
-                )}
-                {space.is_free && (
-                  <Badge className="absolute top-2 right-2" variant="secondary">
-                    {t("free")}
-                  </Badge>
-                )}
-              </div>
+          {spaces.map((space) => {
+            const isFree = space.hourly_rate === 0 && space.deposit_amount === 0;
+            const firstPhoto = space.photos?.[0];
 
-              <CardHeader>
-                <CardTitle>{space.name}</CardTitle>
-                <CardDescription className="line-clamp-2">
-                  {space.description}
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="flex-1 space-y-4">
-                <div className="grid gap-2 text-sm">
-                  {/* Capacity */}
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>
-                      {t("capacity")}: {space.capacity} {t("people")}
-                    </span>
-                  </div>
-
-                  {/* Hourly Rate */}
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span>
-                      {space.is_free
-                        ? t("free_of_charge")
-                        : `${formatCurrency(space.hourly_rate, space.building?.currency || "USD")} ${t("per_hour")}`}
-                    </span>
-                  </div>
-
-                  {/* Max Duration */}
-                  {space.max_duration_hours && (
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span>
-                        {t("max_duration")}: {space.max_duration_hours}h
-                      </span>
+            return (
+              <Card key={space.id} className="flex flex-col overflow-hidden">
+                {/* Photo Area */}
+                <div className="aspect-video bg-muted relative">
+                  {firstPhoto ? (
+                    <img
+                      src={firstPhoto}
+                      alt={space.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="h-12 w-12 text-muted-foreground" />
                     </div>
                   )}
+                  {isFree && (
+                    <Badge className="absolute top-2 right-2" variant="secondary">
+                      {t("free")}
+                    </Badge>
+                  )}
                 </div>
-              </CardContent>
 
-              <CardFooter>
-                <Button asChild className="w-full">
-                  <Link href={`/${locale}/portal/spaces/${space.id}`}>
-                    {t("view_details")} <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                <CardHeader>
+                  <CardTitle>{space.name}</CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {space.description}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="flex-1 space-y-4">
+                  <div className="grid gap-2 text-sm">
+                    {/* Capacity */}
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        {t("capacity")}: {space.capacity} {t("people")}
+                      </span>
+                    </div>
+
+                    {/* Hourly Rate */}
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        {isFree
+                          ? t("free_of_charge")
+                          : `${formatCurrency(space.hourly_rate, "USD")} ${t("per_hour")}`}
+                      </span>
+                    </div>
+
+                    {/* Max Duration */}
+                    {space.max_duration_hours && (
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span>
+                          {t("max_duration")}: {space.max_duration_hours}h
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+
+                <CardFooter>
+                  <Button asChild className="w-full">
+                    <Link href={`/${locale}/portal/spaces/${space.id}`}>
+                      {t("view_details")} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       ) : (
         <Card>

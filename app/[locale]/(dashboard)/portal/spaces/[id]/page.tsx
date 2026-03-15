@@ -33,13 +33,12 @@ export default async function SpaceDetailPage({
 
   // Fetch space
   const { data: space, error } = await supabase
-    .from("spaces")
+    .from("public_spaces")
     .select(`
       *,
-      building:buildings (
+      buildings (
         id,
-        name,
-        currency
+        name
       )
     `)
     .eq("id", id)
@@ -48,6 +47,9 @@ export default async function SpaceDetailPage({
   if (error || !space) {
     notFound();
   }
+
+  const isFree = space.hourly_rate === 0 && space.deposit_amount === 0;
+  const firstPhoto = space.photos?.[0];
 
   // Fetch availability schedules
   const { data: schedules } = await supabase
@@ -90,9 +92,9 @@ export default async function SpaceDetailPage({
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{space.name}</h1>
-          <p className="text-muted-foreground mt-2">{space.building?.name}</p>
+          <p className="text-muted-foreground mt-2">{space.buildings?.name}</p>
         </div>
-        {space.is_free && (
+        {isFree && (
           <Badge variant="secondary" className="text-lg px-4 py-2">
             {t("free")}
           </Badge>
@@ -101,9 +103,9 @@ export default async function SpaceDetailPage({
 
       {/* Photo Gallery */}
       <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-        {space.photo_url ? (
+        {firstPhoto ? (
           <img
-            src={space.photo_url}
+            src={firstPhoto}
             alt={space.name}
             className="w-full h-full object-cover"
           />
@@ -115,17 +117,19 @@ export default async function SpaceDetailPage({
       </div>
 
       {/* Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5" />
-            {t("about")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground whitespace-pre-wrap">{space.description}</p>
-        </CardContent>
-      </Card>
+      {space.description && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5" />
+              {t("about")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground whitespace-pre-wrap">{space.description}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Details Grid */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -153,13 +157,13 @@ export default async function SpaceDetailPage({
                 <span className="text-sm font-medium">{t("hourly_rate")}</span>
               </div>
               <span className="text-sm font-semibold">
-                {space.is_free
+                {isFree
                   ? t("free_of_charge")
-                  : formatCurrency(space.hourly_rate, space.building?.currency || "USD")}
+                  : formatCurrency(space.hourly_rate, "USD")}
               </span>
             </div>
 
-            {!space.is_free && space.deposit_amount > 0 && (
+            {!isFree && space.deposit_amount > 0 && (
               <>
                 <Separator />
                 <div className="flex items-center justify-between">
@@ -168,7 +172,7 @@ export default async function SpaceDetailPage({
                     <span className="text-sm font-medium">{t("deposit")}</span>
                   </div>
                   <span className="text-sm font-semibold">
-                    {formatCurrency(space.deposit_amount, space.building?.currency || "USD")}
+                    {formatCurrency(space.deposit_amount, "USD")}
                   </span>
                 </div>
               </>
@@ -187,7 +191,7 @@ export default async function SpaceDetailPage({
               </>
             )}
 
-            {space.gap_between_bookings_minutes > 0 && (
+            {space.gap_minutes > 0 && (
               <>
                 <Separator />
                 <div className="flex items-center justify-between">
@@ -195,24 +199,12 @@ export default async function SpaceDetailPage({
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm font-medium">{t("gap_between")}</span>
                   </div>
-                  <span className="text-sm">{space.gap_between_bookings_minutes} {t("minutes")}</span>
+                  <span className="text-sm">{space.gap_minutes} {t("minutes")}</span>
                 </div>
               </>
             )}
           </CardContent>
         </Card>
-
-        {/* Rules */}
-        {space.rules && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("rules")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{space.rules}</p>
-            </CardContent>
-          </Card>
-        )}
       </div>
 
       {/* Availability Schedule */}
