@@ -10,11 +10,12 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { Calendar, Clock, DollarSign, CheckCircle, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { Calendar, Clock, DollarSign, CheckCircle, AlertCircle, ArrowLeft, ArrowRight, Activity } from "lucide-react";
 import { toast } from "sonner";
 import type { PublicSpace, AvailabilitySchedule, BlackoutDate } from "@/types";
 import ReservationCalendar from "./reservation-calendar";
 import TimeSlotPicker from "./time-slot-picker";
+import ActivityForm from "./activity-form";
 import { createReservation } from "@/lib/actions/reservations";
 import { formatDate, formatCurrency } from "@/lib/utils/date";
 
@@ -57,6 +58,7 @@ export default function BookingFlow({
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reservationCode, setReservationCode] = useState("");
+  const [activityFormOpen, setActivityFormOpen] = useState(false);
 
   // Get schedule for selected date
   const selectedSchedule = selectedDate
@@ -255,11 +257,24 @@ export default function BookingFlow({
             initialDate={selectedDate}
           />
           {selectedDate && selectedSchedule && (
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between">
+              <Button variant="outline" onClick={() => setActivityFormOpen(true)}>
+                <Activity className="mr-2 h-4 w-4" />
+                {t("log_activity")}
+              </Button>
               <Button onClick={() => setStep("time")} size="lg">
                 {t("next")} <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
+          )}
+
+          {selectedDate && (
+            <ActivityForm
+              spaceId={space.id}
+              selectedDate={selectedDate}
+              open={activityFormOpen}
+              onOpenChange={setActivityFormOpen}
+            />
           )}
         </div>
       )}

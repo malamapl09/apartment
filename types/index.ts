@@ -10,6 +10,8 @@ export type ReservationStatus =
   | "completed"
   | "rejected";
 
+export type SpaceActivityStatus = "active" | "cancelled";
+
 export type AnnouncementTarget = "all" | "owners" | "residents";
 
 export interface Building {
@@ -134,6 +136,25 @@ export interface Reservation {
   version: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface SpaceActivity {
+  id: string;
+  building_id: string;
+  space_id: string;
+  user_id: string;
+  title: string;
+  description: string | null;
+  start_time: string;
+  end_time: string;
+  status: SpaceActivityStatus;
+  cancelled_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SpaceActivityWithUser extends SpaceActivity {
+  profiles: Pick<Profile, "id" | "full_name">;
 }
 
 export interface Announcement {

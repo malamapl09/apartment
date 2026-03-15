@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useTranslations, useLocale } from "next-intl";
 import type { AvailabilitySchedule, BlackoutDate } from "@/types";
 import { useRealtimeAvailability } from "@/lib/hooks/use-realtime-availability";
+import { useRealtimeActivities } from "@/lib/hooks/use-realtime-activities";
 
 interface ReservationCalendarProps {
   spaceId: string;
@@ -49,6 +50,7 @@ export default function ReservationCalendar({
   const [month, setMonth] = useState<Date>(initialDate || new Date());
 
   const { reservations } = useRealtimeAvailability(spaceId);
+  const { activities } = useRealtimeActivities(spaceId);
 
   const blackoutDatesSet = useMemo(
     () => new Set(blackouts.map((b) => b.date)),
@@ -144,6 +146,21 @@ export default function ReservationCalendar({
       }))
       .sort((a, b) => a.start.localeCompare(b.start));
   }, [selectedDate, reservations]);
+
+  const selectedDateActivities = useMemo(() => {
+    if (!selectedDate || !activities) return [];
+    const dateStr = toDateStr(selectedDate);
+
+    return activities
+      .filter((act) => toDateStr(new Date(act.start_time)) === dateStr)
+      .map((act) => ({
+        id: act.id,
+        start: extractTime(act.start_time),
+        end: extractTime(act.end_time),
+        title: act.title,
+      }))
+      .sort((a, b) => a.start.localeCompare(b.start));
+  }, [selectedDate, activities]);
 
   const selectedSchedule = useMemo(
     () => selectedDate
@@ -261,9 +278,11 @@ export default function ReservationCalendar({
             <DailyTimeline
               schedule={selectedSchedule}
               reservations={selectedDateReservations}
+              activities={selectedDateActivities}
               labels={{
                 available: t("timeline.available"),
                 occupied: t("timeline.occupied"),
+                activity: t("timeline.activity"),
                 noReservations: t("no_reservations_this_day"),
               }}
             />
@@ -279,14 +298,16 @@ export default function ReservationCalendar({
 interface DailyTimelineProps {
   schedule: AvailabilitySchedule;
   reservations: { start: string; end: string }[];
+  activities?: { id: string; start: string; end: string; title: string }[];
   labels: {
     available: string;
     occupied: string;
+    activity: string;
     noReservations: string;
   };
 }
 
-function DailyTimeline({ schedule, reservations, labels }: DailyTimelineProps) {
+function DailyTimeline({ schedule, reservations, activities = [], labels }: DailyTimelineProps) {
   const scheduleStart = timeToMinutes(schedule.start_time);
   const scheduleEnd = timeToMinutes(schedule.end_time);
   const totalMinutes = scheduleEnd - scheduleStart;
@@ -316,7 +337,31 @@ function DailyTimeline({ schedule, reservations, labels }: DailyTimelineProps) {
         <div className="relative">
           {/* Background = available */}
           <div className="h-10 rounded-lg bg-green-100 dark:bg-green-950 border relative overflow-hidden">
-            {/* Occupied blocks */}
+            {/* Activity blocks (blue, non-blocking) */}
+            {activities.map((act) => {
+              const startMins = timeToMinutes(act.start);
+              const endMins = timeToMinutes(act.end);
+              const left = toPercent(Math.max(startMins, scheduleStart));
+              const right = toPercent(Math.min(endMins, scheduleEnd));
+              const width = right - left;
+
+              return (
+                <Tooltip key={act.id}>
+                  <TooltipTrigger asChild>
+                    <div
+                      className="absolute top-0 bottom-0 bg-blue-400/50 dark:bg-blue-500/40 border-x border-blue-500/30 cursor-default"
+                      style={{ left: `${left}%`, width: `${width}%` }}
+                      role="img"
+                      aria-label={`${labels.activity}: ${act.title} ${act.start} – ${act.end}`}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    {act.title}: {act.start} – {act.end} ({labels.activity})
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+            {/* Occupied blocks (red, blocking) */}
             {reservations.map((res) => {
               const startMins = timeToMinutes(res.start);
               const endMins = timeToMinutes(res.end);
@@ -325,7 +370,7 @@ function DailyTimeline({ schedule, reservations, labels }: DailyTimelineProps) {
               const width = right - left;
 
               return (
-                <Tooltip key={`${res.start}-${res.end}`}>
+                <Tooltip key={`res-${res.start}-${res.end}`}>
                   <TooltipTrigger asChild>
                     <div
                       className="absolute top-0 bottom-0 bg-red-400/70 dark:bg-red-500/50 border-x border-red-500/30 cursor-default"
@@ -367,6 +412,10 @@ function DailyTimeline({ schedule, reservations, labels }: DailyTimelineProps) {
           <span className="inline-block h-3 w-5 rounded bg-red-400/70 dark:bg-red-500/50 border border-red-500/30" />
           {labels.occupied}
         </div>
+        <div className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-5 rounded bg-blue-400/50 dark:bg-blue-500/40 border border-blue-500/30" />
+          {labels.activity}
+        </div>
       </div>
 
       {/* Reservation list */}
@@ -374,7 +423,7 @@ function DailyTimeline({ schedule, reservations, labels }: DailyTimelineProps) {
         <div className="space-y-2">
           {reservations.map((res) => (
             <div
-              key={`${res.start}-${res.end}`}
+              key={`res-${res.start}-${res.end}`}
               className="flex items-center justify-between p-3 rounded-lg border bg-muted/50"
             >
               <span className="text-sm font-medium">
@@ -388,6 +437,26 @@ function DailyTimeline({ schedule, reservations, labels }: DailyTimelineProps) {
         <p className="text-sm text-muted-foreground text-center py-2">
           {labels.noReservations}
         </p>
+      )}
+
+      {/* Activity list */}
+      {activities.length > 0 && (
+        <div className="space-y-2">
+          {activities.map((act) => (
+            <div
+              key={act.id}
+              className="flex items-center justify-between p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30"
+            >
+              <div>
+                <span className="text-sm font-medium">{act.start} – {act.end}</span>
+                <span className="text-sm text-muted-foreground ml-2">— {act.title}</span>
+              </div>
+              <Badge variant="outline" className="border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300">
+                {labels.activity}
+              </Badge>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

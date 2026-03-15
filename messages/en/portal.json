@@ -92,7 +92,11 @@
       "no_schedule": "No availability schedule configured",
       "blackout_dates": "Blackout Dates",
       "blackout_description": "Dates when this space is not available",
-      "reserve_this_space": "Reserve This Space"
+      "reserve_this_space": "Reserve This Space",
+      "upcoming_activities": "Upcoming Activities",
+      "upcoming_activities_description": "Scheduled activities at this space (informational only — they don't block reservations)",
+      "no_activities": "No upcoming activities",
+      "activity_badge": "Activity"
     },
     "reservations": {
       "title": "My Reservations",
@@ -277,8 +281,10 @@
       },
       "timeline": {
         "available": "Available",
-        "occupied": "Occupied"
-      }
+        "occupied": "Occupied",
+        "activity": "Activity"
+      },
+      "log_activity": "Log an Activity"
     },
     "reservationStatus": {
       "pending_payment": "Pending Payment",
@@ -583,6 +589,26 @@
       "no": "No",
       "viewPoll": "View poll",
       "backToPolls": "Back to polls"
+    },
+    "activities": {
+      "title": "Log an Activity",
+      "description": "Let others know what you'll be doing at this space. Activities are informational only — they don't block reservations.",
+      "activity_title": "Activity Title",
+      "title_placeholder": "e.g., Personal trainer session",
+      "activity_description": "Description (optional)",
+      "description_placeholder": "e.g., Trainer: Juan",
+      "start_time": "Start Time",
+      "end_time": "End Time",
+      "info": "Activities are for information only. They do not reserve or block the space.",
+      "creating": "Creating...",
+      "submit": "Log Activity",
+      "success": "Activity logged successfully!",
+      "cancel": "Cancel Activity",
+      "cancel_confirm": "Are you sure you want to cancel this activity?",
+      "cancel_success": "Activity cancelled",
+      "validation": {
+        "fill_required": "Please fill in all required fields"
+      }
     },
     "emailPreferences": {
       "title": "Email Notifications",

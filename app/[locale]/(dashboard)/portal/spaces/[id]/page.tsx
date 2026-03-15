@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Users, DollarSign, Clock, Shield, Calendar, Info, ArrowRight, Image as ImageIcon } from "lucide-react";
+import { Users, DollarSign, Clock, Shield, Calendar, Info, ArrowRight, Image as ImageIcon, Activity } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/date";
 
 export default async function SpaceDetailPage({
@@ -62,6 +62,16 @@ export default async function SpaceDetailPage({
     .eq("space_id", id)
     .gte("date", new Date().toISOString().split("T")[0])
     .order("date");
+
+  // Fetch upcoming activities
+  const { data: upcomingActivities } = await supabase
+    .from("space_activities")
+    .select("*, profiles!user_id(id, full_name)")
+    .eq("space_id", id)
+    .eq("status", "active")
+    .gte("end_time", new Date().toISOString())
+    .order("start_time")
+    .limit(20);
 
   const dayNames = [
     t("days.sunday"),
@@ -264,6 +274,51 @@ export default async function SpaceDetailPage({
           </CardContent>
         </Card>
       )}
+
+      {/* Upcoming Activities */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-5 w-5" />
+            {t("upcoming_activities")}
+          </CardTitle>
+          <CardDescription>{t("upcoming_activities_description")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {upcomingActivities && upcomingActivities.length > 0 ? (
+            <div className="space-y-3">
+              {upcomingActivities.map((activity) => {
+                const start = new Date(activity.start_time);
+                const end = new Date(activity.end_time);
+                const timeStr = `${start.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })} – ${end.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`;
+                const dateStr = start.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
+
+                return (
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30"
+                  >
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {dateStr} · {timeStr}
+                        {activity.profiles && ` · ${activity.profiles.full_name}`}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300">
+                      {t("activity_badge")}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              {t("no_activities")}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* CTA */}
       {space.is_active && (

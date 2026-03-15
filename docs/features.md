@@ -662,7 +662,41 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - Owners can cancel their own reservations with an optional reason.
 - The cancellation policy (configured per space) determines whether a refund applies.
 
-### 5.4 Maintenance Requests
+### 5.4 Space Activities
+
+| Property | Value |
+|---|---|
+| **Database Table** | `space_activities` |
+| **Components** | `components/portal/activity-form.tsx`, integrated into `components/portal/reservation-calendar.tsx` (DailyTimeline) and `components/portal/booking-flow.tsx` |
+| **Server Actions** | `lib/actions/space-activities.ts` -- `createSpaceActivity(data)`, `cancelSpaceActivity(activityId)` |
+| **Admin Actions** | `lib/actions/admin-space-activities.ts` -- `adminCancelSpaceActivity(activityId)` |
+| **Realtime Hook** | `lib/hooks/use-realtime-activities.ts` -- `useRealtimeActivities(spaceId)` |
+
+**Purpose**: A lightweight, non-blocking activity log for common spaces. Residents can signal "I'll be at the gym with my trainer from 10-11am" without making a full reservation that blocks others. Activities are **informational only** -- they do NOT block reservations or prevent others from using the space.
+
+**Fields**:
+
+- Title (required, max 200 chars) -- e.g., "Personal trainer session"
+- Description (optional, max 500 chars) -- e.g., "Trainer: Juan"
+- Start time, End time (required)
+- Status: `active` or `cancelled`
+
+**Where activities appear**:
+
+1. **DailyTimeline**: Blue blocks alongside red reservation blocks on the reservation calendar. Positioned using the same logic but with blue coloring and a tooltip showing the activity title.
+2. **Space detail page** (`/portal/spaces/[id]`): "Upcoming Activities" card showing future activities with time, title, and who logged it.
+3. **Booking flow**: "Log an Activity" button appears in the date step after selecting a date, opening a dialog form.
+
+**Realtime**: Activities update in real-time via Supabase Realtime (postgres_changes on the `space_activities` table).
+
+**RLS Policies**:
+
+- All building members can view activities (SELECT)
+- Users can create their own activities (INSERT)
+- Users can update their own active activities (UPDATE)
+- Admins can update any activity in their building (UPDATE)
+
+### 5.5 Maintenance Requests
 
 | Property | Value |
 |---|---|
@@ -690,7 +724,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - A comment thread (`maintenance-comments.tsx`) allows back-and-forth communication between the owner and building management.
 - Internal notes added by admins are not visible to the owner.
 
-### 5.5 Visitors
+### 5.6 Visitors
 
 | Property | Value |
 |---|---|
@@ -705,7 +739,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - **Date range**: Each visitor registration has a `valid_from` and `valid_until` date, defining the window during which the access code is active.
 - **Cancellation**: Owners can cancel a visitor registration, which invalidates the access code.
 
-### 5.6 Fees and Payments
+### 5.7 Fees and Payments
 
 | Property | Value |
 |---|---|
@@ -725,7 +759,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - **Charges list**: Itemized list of all charges with fee type, amount, due date, and status.
 - **Payment history**: Complete record of all payments made by the owner.
 
-### 5.7 Documents
+### 5.8 Documents
 
 | Property | Value |
 |---|---|
@@ -739,7 +773,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - Download documents directly.
 - The document list respects the target audience: owners see documents targeted to `all` and `owners`; residents see documents targeted to `all` and `residents`.
 
-### 5.8 Polls
+### 5.9 Polls
 
 | Property | Value |
 |---|---|
@@ -755,7 +789,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - For closed polls, only results are displayed.
 - When anonymous voting is enabled, the results page does not show who voted for what.
 
-### 5.9 Packages
+### 5.10 Packages
 
 | Property | Value |
 |---|---|
@@ -769,7 +803,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - Each package shows: tracking number, carrier, description, date received, and current status.
 - Status indicators: `pending` (waiting at front desk), `notified` (owner has been notified), `picked_up` (collected).
 
-### 5.10 Profile
+### 5.11 Profile
 
 | Property | Value |
 |---|---|
@@ -1038,6 +1072,8 @@ Signs out the current user and redirects to `/login`.
 | `lib/actions/polls.ts` | Voting and poll result queries |
 | `lib/actions/reports.ts` | Report generation |
 | `lib/actions/reservations.ts` | Reservation booking, payment upload, cancellation |
+| `lib/actions/space-activities.ts` | Space activity creation and cancellation (portal) |
+| `lib/actions/admin-space-activities.ts` | Admin space activity cancellation |
 | `lib/actions/schedules.ts` | Space availability schedule management |
 | `lib/actions/search.ts` | Global search for command palette |
 | `lib/actions/setup.ts` | Initial setup wizard |
