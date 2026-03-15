@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
   <rect width="192" height="192" rx="24" fill="#0f172a"/>
   <!-- Building icon -->
-  <g transform="translate(96, 70)" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+  <g transform="translate(96, 96)" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
     <!-- Main building -->
     <rect x="-40" y="-36" width="36" height="72" rx="2"/>
     <!-- Tall building -->
@@ -27,6 +27,4 @@
     <!-- Door right -->
     <rect x="2" y="22" width="12" height="14" fill="white" stroke="none" rx="1"/>
   </g>
-  <!-- RH text -->
-  <text x="96" y="158" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" letter-spacing="2">RH</text>
 </svg>
