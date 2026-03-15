@@ -518,7 +518,7 @@ Configurable amenity spaces with scheduling rules, pricing, and quiet-hour enfor
 | photos | text[] | | Array of storage URLs |
 | hourly_rate | numeric(10,2) | DEFAULT 0 | Reservation cost per hour |
 | deposit_amount | numeric(10,2) | DEFAULT 0 | Refundable deposit |
-| requires_approval | boolean | DEFAULT false | Admin must approve reservations |
+| allow_reservations | boolean | DEFAULT true | When false, space only allows non-blocking activities |
 | min_advance_hours | integer | DEFAULT 24 | Minimum booking lead time |
 | max_advance_days | integer | DEFAULT 30 | Maximum booking horizon |
 | max_duration_hours | integer | DEFAULT 8 | Maximum reservation length |

@@ -44,6 +44,9 @@ export async function createReservation(data: {
     .single();
   if (!space) return { error: "Space not found" };
   if (!space.is_active) return { error: "Space is not available" };
+  if (space.allow_reservations === false) {
+    return { error: "This space does not accept reservations" };
+  }
 
   // Fetch schedules
   const { data: schedules } = await supabase

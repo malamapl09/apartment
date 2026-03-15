@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Separator } from "@/components/ui/separator";
 import { Users, DollarSign, Clock, Shield, Calendar, Info, ArrowRight, Image as ImageIcon, Activity } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/date";
+import ActivityCancelButton from "@/components/portal/activity-cancel-button";
 
 export default async function SpaceDetailPage({
   params,
@@ -292,6 +293,7 @@ export default async function SpaceDetailPage({
                 const end = new Date(activity.end_time);
                 const timeStr = `${start.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })} – ${end.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}`;
                 const dateStr = start.toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
+                const isOwner = activity.user_id === user.id;
 
                 return (
                   <div
@@ -305,9 +307,16 @@ export default async function SpaceDetailPage({
                         {activity.profiles && ` · ${activity.profiles.full_name}`}
                       </p>
                     </div>
-                    <Badge variant="outline" className="border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300">
-                      {t("activity_badge")}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300">
+                        {t("activity_badge")}
+                      </Badge>
+                      <ActivityCancelButton
+                        activityId={activity.id}
+                        recurrenceGroupId={activity.recurrence_group_id ?? null}
+                        isOwner={isOwner}
+                      />
+                    </div>
                   </div>
                 );
               })}
@@ -321,7 +330,7 @@ export default async function SpaceDetailPage({
       </Card>
 
       {/* CTA */}
-      {space.is_active && (
+      {space.is_active && space.allow_reservations !== false && (
         <div className="flex justify-center">
           <Button asChild size="lg" className="min-w-64">
             <Link href={`/${locale}/portal/reservations/new/${space.id}`}>
@@ -329,6 +338,17 @@ export default async function SpaceDetailPage({
               {t("reserve_this_space")} <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
+        </div>
+      )}
+
+      {space.is_active && space.allow_reservations === false && (
+        <div className="flex flex-col items-center gap-2 py-4">
+          <Badge variant="secondary" className="text-sm px-4 py-1.5">
+            {t("activities_only")}
+          </Badge>
+          <p className="text-sm text-muted-foreground text-center max-w-md">
+            {t("activities_only_description")}
+          </p>
         </div>
       )}
     </div>

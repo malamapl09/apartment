@@ -1071,6 +1071,7 @@ export type Database = {
       }
       public_spaces: {
         Row: {
+          allow_reservations: boolean | null
           building_id: string
           cancellation_hours: number | null
           capacity: number | null
@@ -1089,10 +1090,10 @@ export type Database = {
           photos: string[] | null
           quiet_hours_end: string | null
           quiet_hours_start: string | null
-          requires_approval: boolean | null
           updated_at: string | null
         }
         Insert: {
+          allow_reservations?: boolean | null
           building_id: string
           cancellation_hours?: number | null
           capacity?: number | null
@@ -1111,10 +1112,10 @@ export type Database = {
           photos?: string[] | null
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
-          requires_approval?: boolean | null
           updated_at?: string | null
         }
         Update: {
+          allow_reservations?: boolean | null
           building_id?: string
           cancellation_hours?: number | null
           capacity?: number | null
@@ -1133,7 +1134,6 @@ export type Database = {
           photos?: string[] | null
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
-          requires_approval?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1244,6 +1244,92 @@ export type Database = {
           },
           {
             foreignKeyName: "reservations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      space_activities: {
+        Row: {
+          building_id: string
+          cancelled_by: string | null
+          created_at: string | null
+          description: string | null
+          end_time: string
+          id: string
+          is_recurring: boolean | null
+          recurrence_end_date: string | null
+          recurrence_group_id: string | null
+          recurrence_pattern: string | null
+          space_id: string
+          start_time: string
+          status: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          building_id: string
+          cancelled_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_time: string
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_end_date?: string | null
+          recurrence_group_id?: string | null
+          recurrence_pattern?: string | null
+          space_id: string
+          start_time: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          building_id?: string
+          cancelled_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: string
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_end_date?: string | null
+          recurrence_group_id?: string | null
+          recurrence_pattern?: string | null
+          space_id?: string
+          start_time?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "space_activities_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_activities_cancelled_by_fkey"
+            columns: ["cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_activities_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "public_spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "space_activities_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1388,6 +1474,7 @@ export type Database = {
       generate_visitor_access_code: { Args: never; Returns: string }
       get_my_building_id: { Args: never; Returns: string }
       get_my_role: { Args: never; Returns: string }
+      has_any_buildings: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
@@ -1520,4 +1607,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

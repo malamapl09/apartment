@@ -27,8 +27,8 @@ export default function SpaceForm({
   const t = useTranslations("admin.spaces.form");
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [requiresApproval, setRequiresApproval] = useState(
-    initialData?.requires_approval ?? false
+  const [allowReservations, setAllowReservations] = useState(
+    initialData?.allow_reservations ?? true
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,7 +36,7 @@ export default function SpaceForm({
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
-    formData.set("requires_approval", requiresApproval.toString());
+    formData.set("allow_reservations", allowReservations.toString());
 
     try {
       const result = await onSubmit(formData);
@@ -270,23 +270,23 @@ export default function SpaceForm({
         </CardContent>
       </Card>
 
-      {/* Approval Settings */}
+      {/* Reservation Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("approvalSettings")}</CardTitle>
+          <CardTitle>{t("reservationSettings")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="requires_approval">{t("requiresApprovalLabel")}</Label>
+              <Label htmlFor="allow_reservations">{t("allowReservationsLabel")}</Label>
               <p className="text-sm text-muted-foreground">
-                {t("requiresApprovalDescription")}
+                {t("allowReservationsDescription")}
               </p>
             </div>
             <Switch
-              id="requires_approval"
-              checked={requiresApproval}
-              onCheckedChange={setRequiresApproval}
+              id="allow_reservations"
+              checked={allowReservations}
+              onCheckedChange={setAllowReservations}
             />
           </div>
         </CardContent>

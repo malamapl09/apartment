@@ -329,7 +329,7 @@ If any step fails, cleanup runs in reverse order (apartment link removed, profil
 | Capacity | Maximum number of people allowed |
 | Hourly rate | Cost per hour of usage (0 for free spaces) |
 | Deposit | Refundable deposit amount |
-| Approval required | Whether admin must approve reservations |
+| Allow reservations | Whether the space accepts blocking reservations (when `false`, only non-blocking activities are allowed) |
 | Advance booking limit | How far in advance reservations can be made |
 | Max duration | Maximum booking duration in hours |
 | Monthly limit per owner | Maximum bookings per owner per month |
@@ -621,7 +621,8 @@ The portal is the resident-facing interface where apartment owners and residents
 
 - Grid of all active common spaces.
 - Each space card shows: photos, name, capacity, hourly rate, amenities list.
-- A "Reserve" button on each card leads to the booking flow.
+- Spaces with `allow_reservations = false` display an "Activities Only" badge instead of a reserve button.
+- A "Reserve" button on each card leads to the booking flow (only for reservable spaces).
 
 ### 5.3 Reservations
 
@@ -640,7 +641,7 @@ The portal is the resident-facing interface where apartment owners and residents
 
 **Validation Rules**:
 
-- Space must be active.
+- Space must be active and have `allow_reservations = true`.
 - Selected date must not be a blackout date.
 - Selected time must fall within the space's schedule for that day of the week.
 - Selected time must not overlap with existing reservations (including the gap buffer).
@@ -668,7 +669,7 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 |---|---|
 | **Database Table** | `space_activities` |
 | **Components** | `components/portal/activity-form.tsx`, integrated into `components/portal/reservation-calendar.tsx` (DailyTimeline) and `components/portal/booking-flow.tsx` |
-| **Server Actions** | `lib/actions/space-activities.ts` -- `createSpaceActivity(data)`, `cancelSpaceActivity(activityId)` |
+| **Server Actions** | `lib/actions/space-activities.ts` -- `createSpaceActivity(data)`, `cancelSpaceActivity(activityId)`, `cancelRecurringActivities(recurrenceGroupId)` |
 | **Admin Actions** | `lib/actions/admin-space-activities.ts` -- `adminCancelSpaceActivity(activityId)` |
 | **Realtime Hook** | `lib/hooks/use-realtime-activities.ts` -- `useRealtimeActivities(spaceId)` |
 
@@ -680,6 +681,15 @@ If the total is zero, the reservation status is set to `confirmed` immediately. 
 - Description (optional, max 500 chars) -- e.g., "Trainer: Juan"
 - Start time, End time (required)
 - Status: `active` or `cancelled`
+- Recurring: `is_recurring` (boolean), `recurrence_pattern` (`daily` | `weekly` | `monthly`), `recurrence_end_date` (date), `recurrence_group_id` (uuid, shared across occurrences)
+
+**Recurring Activities**:
+
+- When creating a recurring activity, all individual occurrences are materialized as separate rows sharing a `recurrence_group_id`.
+- Maximum 52 occurrences per creation (1 year of weekly).
+- Monthly recurrence clamps to the last day of the target month (e.g., Jan 31 → Feb 28).
+- Users can cancel a single occurrence or all future occurrences in a series via `cancelRecurringActivities()`.
+- The activity form exposes a "Recurring activity" toggle with frequency and end date fields (mirrors the visitor recurrence UI).
 
 **Where activities appear**:
 

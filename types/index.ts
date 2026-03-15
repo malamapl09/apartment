@@ -86,7 +86,7 @@ export interface PublicSpace {
   photos: string[];
   hourly_rate: number;
   deposit_amount: number;
-  requires_approval: boolean;
+  allow_reservations: boolean;
   min_advance_hours: number;
   max_advance_days: number;
   max_duration_hours: number;
@@ -149,6 +149,10 @@ export interface SpaceActivity {
   end_time: string;
   status: SpaceActivityStatus;
   cancelled_by: string | null;
+  is_recurring: boolean;
+  recurrence_pattern: RecurrencePattern | null;
+  recurrence_end_date: string | null;
+  recurrence_group_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -5,6 +5,7 @@ import { PublicSpace } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, DollarSign } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SpaceCardProps {
   space: PublicSpace;
@@ -12,6 +13,7 @@ interface SpaceCardProps {
 }
 
 export default function SpaceCard({ space, locale }: SpaceCardProps) {
+  const t = useTranslations("admin.spaces");
   const hasPhotos = space.photos && space.photos.length > 0;
   const firstPhoto = hasPhotos ? space.photos[0] : null;
 
@@ -41,7 +43,7 @@ export default function SpaceCard({ space, locale }: SpaceCardProps) {
                   : "bg-gray-500 hover:bg-gray-600"
               }
             >
-              {space.is_active ? "Active" : "Inactive"}
+              {space.is_active ? t("active") : t("inactive")}
             </Badge>
           </div>
         </div>
@@ -60,7 +62,7 @@ export default function SpaceCard({ space, locale }: SpaceCardProps) {
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5">
               <Users className="h-4 w-4 text-muted-foreground" />
-              <span>{space.capacity} people</span>
+              <span>{space.capacity} {t("capacity").toLowerCase()}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -70,9 +72,9 @@ export default function SpaceCard({ space, locale }: SpaceCardProps) {
         </CardContent>
 
         <CardFooter className="p-4 pt-0 text-xs text-muted-foreground">
-          {space.requires_approval && (
+          {space.allow_reservations === false && (
             <Badge variant="outline" className="text-xs">
-              Requires Approval
+              {t("activitiesOnly")}
             </Badge>
           )}
         </CardFooter>

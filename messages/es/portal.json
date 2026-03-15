@@ -93,6 +93,8 @@
       "blackout_dates": "Fechas Bloqueadas",
       "blackout_description": "Fechas en las que este espacio no est\u00e1 disponible",
       "reserve_this_space": "Reservar Este Espacio",
+      "activities_only": "Solo Actividades",
+      "activities_only_description": "Este espacio está disponible solo para actividades. Las reservaciones no están disponibles.",
       "upcoming_activities": "Actividades Próximas",
       "upcoming_activities_description": "Actividades programadas en este espacio (solo informativas — no bloquean reservaciones)",
       "no_activities": "No hay actividades próximas",
@@ -606,6 +608,18 @@
       "cancel": "Cancelar Actividad",
       "cancel_confirm": "¿Estás seguro de que deseas cancelar esta actividad?",
       "cancel_success": "Actividad cancelada",
+      "isRecurring": "Actividad recurrente",
+      "recurrencePattern": "Frecuencia",
+      "recurrence": {
+        "daily": "Diario",
+        "weekly": "Semanal",
+        "monthly": "Mensual"
+      },
+      "recurrenceEndDate": "Repetir hasta",
+      "recurringSuccess": "¡Actividades recurrentes creadas!",
+      "cancelSeries": "Cancelar Todas las Futuras",
+      "cancelSeriesConfirm": "¿Cancelar todas las actividades futuras de esta serie?",
+      "cancelSeriesSuccess": "Actividades futuras canceladas",
       "validation": {
         "fill_required": "Por favor completa todos los campos requeridos"
       }

@@ -42,6 +42,10 @@ export default async function NewReservationPage({
     notFound();
   }
 
+  if (space.allow_reservations === false) {
+    redirect(`/${locale}/portal/spaces/${spaceId}`);
+  }
+
   // Fetch availability schedules
   const { data: schedules } = await supabase
     .from("availability_schedules")
