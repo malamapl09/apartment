@@ -633,7 +633,7 @@ The portal is the resident-facing interface where apartment owners and residents
 
 **Booking Flow**:
 
-1. **Select date**: The owner picks a date on the reservation calendar. The calendar shows available dates based on the space's schedule and blackout dates.
+1. **Select date**: The owner picks a date on the reservation calendar. The calendar shows available dates based on the space's schedule and blackout dates. Each day displays a colored occupancy dot indicator: green (some bookings, < 50% occupied), amber (mostly booked, 50-90%), or red (fully booked, 90%+). Hovering a dot shows a tooltip with the occupancy level. Below the calendar, a **daily timeline bar** visualizes the selected day's schedule with green (available) and red (occupied) blocks, hour markers, and tooltips showing exact reservation times. Occupancy data updates in real-time via Supabase Realtime.
 2. **Choose time slot**: Available time slots for the selected date are displayed via the `time-slot-picker.tsx` component. Slots already booked by others are greyed out.
 3. **Confirm booking**: A summary of the booking details is shown (space, date, time, duration, cost breakdown).
 4. **Upload payment proof**: If the space has an hourly rate greater than zero, the owner must upload proof of payment (bank transfer receipt, etc.). If the space is free (hourly rate = 0), the reservation is auto-confirmed.

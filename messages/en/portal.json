@@ -268,7 +268,17 @@
       "hours": "hours",
       "max_duration": "Max duration",
       "confirm_time": "Confirm Time",
-      "occupied_times": "Occupied Times"
+      "occupied_times": "Occupied Times",
+      "daily_timeline": "Daily Availability",
+      "occupancy": {
+        "light": "Some bookings",
+        "busy": "Mostly booked",
+        "full": "Fully booked"
+      },
+      "timeline": {
+        "available": "Available",
+        "occupied": "Occupied"
+      }
     },
     "reservationStatus": {
       "pending_payment": "Pending Payment",

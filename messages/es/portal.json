@@ -268,7 +268,17 @@
       "hours": "horas",
       "max_duration": "Duraci\u00f3n m\u00e1xima",
       "confirm_time": "Confirmar Hora",
-      "occupied_times": "Horarios Ocupados"
+      "occupied_times": "Horarios Ocupados",
+      "daily_timeline": "Disponibilidad del Día",
+      "occupancy": {
+        "light": "Algunas reservas",
+        "busy": "Casi lleno",
+        "full": "Completamente ocupado"
+      },
+      "timeline": {
+        "available": "Disponible",
+        "occupied": "Ocupado"
+      }
     },
     "reservationStatus": {
       "pending_payment": "Pago Pendiente",
