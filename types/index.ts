@@ -92,8 +92,9 @@ export interface PublicSpace {
   max_duration_hours: number;
   max_monthly_per_owner: number;
   gap_minutes: number;
-  quiet_hours_start: string | null;
-  quiet_hours_end: string | null;
+  max_hours_per_day_per_user: number | null;
+  max_hours_per_week_per_user: number | null;
+  max_hours_per_month_per_user: number | null;
   cancellation_hours: number;
   is_active: boolean;
   created_at: string;
@@ -113,6 +114,47 @@ export interface BlackoutDate {
   space_id: string;
   date: string;
   reason: string | null;
+  start_time: string | null;
+  end_time: string | null;
+}
+
+export interface RecurringBlackout {
+  id: string;
+  space_id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  reason: string | null;
+  created_at: string;
+}
+
+export type InfractionSeverity = "minor" | "major" | "severe";
+
+export interface Infraction {
+  id: string;
+  building_id: string;
+  profile_id: string;
+  space_id: string | null;
+  occurred_at: string;
+  severity: InfractionSeverity;
+  description: string;
+  created_by: string;
+  created_at: string;
+}
+
+export interface UserRestriction {
+  id: string;
+  building_id: string;
+  profile_id: string;
+  space_id: string | null;
+  infraction_id: string | null;
+  reason: string;
+  starts_at: string;
+  ends_at: string | null;
+  revoked_at: string | null;
+  revoked_by: string | null;
+  created_by: string;
+  created_at: string;
 }
 
 export interface Reservation {

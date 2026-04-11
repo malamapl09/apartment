@@ -1,9 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
-import { validateBooking } from "@/lib/reservations/validate-booking";
+import {
+  validateBooking,
+  type BookingErrorKey,
+} from "@/lib/reservations/validate-booking";
 import { getAuthProfile } from "@/lib/actions/helpers";
 
 const createReservationSchema = z.object({
@@ -48,54 +52,98 @@ export async function createReservation(data: {
     return { error: "This space does not accept reservations" };
   }
 
-  // Fetch schedules
-  const { data: schedules } = await supabase
-    .from("availability_schedules")
-    .select("*")
-    .eq("space_id", data.space_id);
+  // Fetch building timezone for TZ-aware hour counting
+  const { data: building } = await supabase
+    .from("buildings")
+    .select("timezone, payment_deadline_hours")
+    .eq("id", profile.building_id)
+    .single();
+  const buildingTimezone = building?.timezone || "UTC";
 
-  // Fetch blackouts
-  const { data: blackouts } = await supabase
-    .from("blackout_dates")
-    .select("*")
-    .eq("space_id", data.space_id);
-
-  // Count monthly reservations for this user
+  // Start monthly count early (wait on it later)
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
   const endOfMonth = new Date(startOfMonth);
   endOfMonth.setMonth(endOfMonth.getMonth() + 1);
 
-  const { count: monthlyCount } = await supabase
-    .from("reservations")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .eq("space_id", data.space_id)
-    .in("status", ["pending_payment", "payment_submitted", "confirmed"])
-    .gte("start_time", startOfMonth.toISOString())
-    .lt("start_time", endOfMonth.toISOString());
+  const [
+    schedulesRes,
+    blackoutsRes,
+    recurringBlackoutsRes,
+    monthlyCountRes,
+    restrictionRes,
+    bookedHoursRes,
+    isAvailableRes,
+  ] = await Promise.all([
+    supabase
+      .from("availability_schedules")
+      .select("*")
+      .eq("space_id", data.space_id),
+    supabase
+      .from("blackout_dates")
+      .select("*")
+      .eq("space_id", data.space_id),
+    supabase
+      .from("recurring_blackouts")
+      .select("*")
+      .eq("space_id", data.space_id),
+    supabase
+      .from("reservations")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("space_id", data.space_id)
+      .in("status", ["pending_payment", "payment_submitted", "confirmed"])
+      .gte("start_time", startOfMonth.toISOString())
+      .lt("start_time", endOfMonth.toISOString()),
+    supabase.rpc("has_active_restriction", {
+      p_profile_id: user.id,
+      p_space_id: data.space_id,
+      p_at: data.start_time,
+    }),
+    supabase.rpc("get_user_space_booked_hours", {
+      p_user_id: user.id,
+      p_space_id: data.space_id,
+      p_booking_start: data.start_time,
+      p_timezone: buildingTimezone,
+    }),
+    supabase.rpc("check_space_availability", {
+      p_space_id: data.space_id,
+      p_start: data.start_time,
+      p_end: data.end_time,
+    }),
+  ]);
 
-  // Check for time conflicts using DB function
-  const { data: isAvailable } = await supabase.rpc("check_space_availability", {
-    p_space_id: data.space_id,
-    p_start: data.start_time,
-    p_end: data.end_time,
-  });
+  const bookedHoursRow = Array.isArray(bookedHoursRes.data)
+    ? bookedHoursRes.data[0]
+    : bookedHoursRes.data;
 
-  // Validate booking
   const validation = validateBooking({
     space,
     startTime: new Date(data.start_time),
     endTime: new Date(data.end_time),
-    schedules: schedules || [],
-    blackouts: blackouts || [],
-    existingReservationsThisMonth: monthlyCount || 0,
-    hasConflict: isAvailable === false,
+    schedules: schedulesRes.data || [],
+    blackouts: (blackoutsRes.data || []) as import("@/types").BlackoutDate[],
+    recurringBlackouts:
+      (recurringBlackoutsRes.data || []) as import("@/types").RecurringBlackout[],
+    existingReservationsThisMonth: monthlyCountRes.count || 0,
+    hoursBookedToday: Number(bookedHoursRow?.hours_today ?? 0),
+    hoursBookedThisWeek: Number(bookedHoursRow?.hours_week ?? 0),
+    hoursBookedThisMonth: Number(bookedHoursRow?.hours_month ?? 0),
+    hasRestriction: restrictionRes.data === true,
+    hasConflict: isAvailableRes.data === false,
   });
 
   if (!validation.valid) {
-    return { error: validation.error };
+    const t = (await getTranslations("portal.reservations.errors")) as unknown as (
+      key: string,
+      values?: Record<string, string | number>,
+    ) => string;
+    const key = (validation.errorKey as BookingErrorKey).replace(
+      "reservation.",
+      "",
+    );
+    return { error: t(key, validation.errorParams) };
   }
 
   // Calculate payment amount
@@ -104,13 +152,6 @@ export async function createReservation(data: {
 
   // Generate reference code
   const { data: refCode } = await supabase.rpc("generate_reference_code");
-
-  // Calculate payment deadline
-  const { data: building } = await supabase
-    .from("buildings")
-    .select("payment_deadline_hours")
-    .eq("id", profile.building_id)
-    .single();
 
   const deadlineHours = building?.payment_deadline_hours || 48;
   const paymentDeadline = new Date();

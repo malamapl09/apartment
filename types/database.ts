@@ -237,21 +237,27 @@ export type Database = {
       blackout_dates: {
         Row: {
           date: string
+          end_time: string | null
           id: string
           reason: string | null
           space_id: string
+          start_time: string | null
         }
         Insert: {
           date: string
+          end_time?: string | null
           id?: string
           reason?: string | null
           space_id: string
+          start_time?: string | null
         }
         Update: {
           date?: string
+          end_time?: string | null
           id?: string
           reason?: string | null
           space_id?: string
+          start_time?: string | null
         }
         Relationships: [
           {
@@ -542,6 +548,71 @@ export type Database = {
             columns: ["building_id"]
             isOneToOne: false
             referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      infractions: {
+        Row: {
+          building_id: string
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          occurred_at: string
+          profile_id: string
+          severity: string
+          space_id: string | null
+        }
+        Insert: {
+          building_id: string
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          occurred_at?: string
+          profile_id: string
+          severity?: string
+          space_id?: string | null
+        }
+        Update: {
+          building_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          occurred_at?: string
+          profile_id?: string
+          severity?: string
+          space_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "infractions_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "infractions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "infractions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "infractions_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "public_spaces"
             referencedColumns: ["id"]
           },
         ]
@@ -1084,12 +1155,13 @@ export type Database = {
           is_active: boolean | null
           max_advance_days: number | null
           max_duration_hours: number | null
+          max_hours_per_day_per_user: number | null
+          max_hours_per_month_per_user: number | null
+          max_hours_per_week_per_user: number | null
           max_monthly_per_owner: number | null
           min_advance_hours: number | null
           name: string
           photos: string[] | null
-          quiet_hours_end: string | null
-          quiet_hours_start: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1106,12 +1178,13 @@ export type Database = {
           is_active?: boolean | null
           max_advance_days?: number | null
           max_duration_hours?: number | null
+          max_hours_per_day_per_user?: number | null
+          max_hours_per_month_per_user?: number | null
+          max_hours_per_week_per_user?: number | null
           max_monthly_per_owner?: number | null
           min_advance_hours?: number | null
           name: string
           photos?: string[] | null
-          quiet_hours_end?: string | null
-          quiet_hours_start?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1128,12 +1201,13 @@ export type Database = {
           is_active?: boolean | null
           max_advance_days?: number | null
           max_duration_hours?: number | null
+          max_hours_per_day_per_user?: number | null
+          max_hours_per_month_per_user?: number | null
+          max_hours_per_week_per_user?: number | null
           max_monthly_per_owner?: number | null
           min_advance_hours?: number | null
           name?: string
           photos?: string[] | null
-          quiet_hours_end?: string | null
-          quiet_hours_start?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1142,6 +1216,44 @@ export type Database = {
             columns: ["building_id"]
             isOneToOne: false
             referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recurring_blackouts: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          reason: string | null
+          space_id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          reason?: string | null
+          space_id: string
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          reason?: string | null
+          space_id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_blackouts_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "public_spaces"
             referencedColumns: ["id"]
           },
         ]
@@ -1337,6 +1449,94 @@ export type Database = {
           },
         ]
       }
+      user_restrictions: {
+        Row: {
+          building_id: string
+          created_at: string
+          created_by: string
+          ends_at: string | null
+          id: string
+          infraction_id: string | null
+          profile_id: string
+          reason: string
+          revoked_at: string | null
+          revoked_by: string | null
+          space_id: string | null
+          starts_at: string
+        }
+        Insert: {
+          building_id: string
+          created_at?: string
+          created_by: string
+          ends_at?: string | null
+          id?: string
+          infraction_id?: string | null
+          profile_id: string
+          reason: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          space_id?: string | null
+          starts_at?: string
+        }
+        Update: {
+          building_id?: string
+          created_at?: string
+          created_by?: string
+          ends_at?: string | null
+          id?: string
+          infraction_id?: string | null
+          profile_id?: string
+          reason?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          space_id?: string | null
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_restrictions_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_restrictions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_restrictions_infraction_id_fkey"
+            columns: ["infraction_id"]
+            isOneToOne: false
+            referencedRelation: "infractions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_restrictions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_restrictions_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_restrictions_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "public_spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visitors: {
         Row: {
           access_code: string
@@ -1474,6 +1674,23 @@ export type Database = {
       generate_visitor_access_code: { Args: never; Returns: string }
       get_my_building_id: { Args: never; Returns: string }
       get_my_role: { Args: never; Returns: string }
+      get_user_space_booked_hours: {
+        Args: {
+          p_booking_start: string
+          p_space_id: string
+          p_timezone: string
+          p_user_id: string
+        }
+        Returns: {
+          hours_month: number
+          hours_today: number
+          hours_week: number
+        }[]
+      }
+      has_active_restriction: {
+        Args: { p_at?: string; p_profile_id: string; p_space_id: string }
+        Returns: boolean
+      }
       has_any_buildings: { Args: never; Returns: boolean }
     }
     Enums: {

@@ -237,36 +237,70 @@ export default function SpaceForm({
         </CardContent>
       </Card>
 
-      {/* Quiet Hours */}
+      {/* Usage Limits */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("quietHours")}</CardTitle>
+          <CardTitle>{t("usageLimits.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <p className="text-sm text-muted-foreground">
+            {t("usageLimits.noLimitHint")}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="quiet_hours_start">{t("quietHoursStartLabel")}</Label>
+              <Label htmlFor="max_hours_per_day_per_user">
+                {t("usageLimits.maxHoursPerDayLabel")}
+              </Label>
               <Input
-                id="quiet_hours_start"
-                name="quiet_hours_start"
-                type="time"
-                defaultValue={initialData?.quiet_hours_start || "22:00"}
+                id="max_hours_per_day_per_user"
+                name="max_hours_per_day_per_user"
+                type="number"
+                step="0.5"
+                min="0"
+                defaultValue={initialData?.max_hours_per_day_per_user ?? ""}
+                placeholder={t("usageLimits.noLimitPlaceholder")}
               />
+              <p className="text-xs text-muted-foreground">
+                {t("usageLimits.maxHoursPerDayDescription")}
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="quiet_hours_end">{t("quietHoursEndLabel")}</Label>
+              <Label htmlFor="max_hours_per_week_per_user">
+                {t("usageLimits.maxHoursPerWeekLabel")}
+              </Label>
               <Input
-                id="quiet_hours_end"
-                name="quiet_hours_end"
-                type="time"
-                defaultValue={initialData?.quiet_hours_end || "08:00"}
+                id="max_hours_per_week_per_user"
+                name="max_hours_per_week_per_user"
+                type="number"
+                step="0.5"
+                min="0"
+                defaultValue={initialData?.max_hours_per_week_per_user ?? ""}
+                placeholder={t("usageLimits.noLimitPlaceholder")}
               />
+              <p className="text-xs text-muted-foreground">
+                {t("usageLimits.maxHoursPerWeekDescription")}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="max_hours_per_month_per_user">
+                {t("usageLimits.maxHoursPerMonthLabel")}
+              </Label>
+              <Input
+                id="max_hours_per_month_per_user"
+                name="max_hours_per_month_per_user"
+                type="number"
+                step="0.5"
+                min="0"
+                defaultValue={initialData?.max_hours_per_month_per_user ?? ""}
+                placeholder={t("usageLimits.noLimitPlaceholder")}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("usageLimits.maxHoursPerMonthDescription")}
+              </p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            {t("quietHoursDescription")}
-          </p>
         </CardContent>
       </Card>
 

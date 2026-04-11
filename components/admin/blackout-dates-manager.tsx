@@ -7,6 +7,7 @@ import { addBlackout, removeBlackout } from "@/lib/actions/blackout-dates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -47,12 +48,19 @@ export default function BlackoutDatesManager({
   const [blackouts, setBlackouts] = useState<BlackoutDate[]>(initialBlackouts);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [reason, setReason] = useState("");
+  const [allDay, setAllDay] = useState(true);
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("17:00");
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleAddBlackout = async () => {
     if (!selectedDate) {
       toast.error(t("selectDateError"));
+      return;
+    }
+    if (!allDay && endTime <= startTime) {
+      toast.error(t("timeRangeError"));
       return;
     }
 
@@ -62,13 +70,16 @@ export default function BlackoutDatesManager({
       const result = await addBlackout(
         spaceId,
         format(selectedDate, "yyyy-MM-dd"),
-        reason || undefined
+        reason || undefined,
+        allDay ? null : startTime,
+        allDay ? null : endTime,
       );
 
       if ('success' in result && result.success) {
         toast.success(t("addSuccess"));
         setSelectedDate(undefined);
         setReason("");
+        setAllDay(true);
         router.refresh();
       } else if ('error' in result) {
         toast.error(result.error || t("addError"));
@@ -99,8 +110,10 @@ export default function BlackoutDatesManager({
     }
   };
 
-  // Get already blacklisted dates for calendar
-  const blackoutDates = blackouts.map((b) => new Date(b.date));
+  // Dates that are full-day blacked out — partial-day blackouts don't disable the calendar
+  const fullDayBlackoutDates = blackouts
+    .filter((b) => b.start_time === null && b.end_time === null)
+    .map((b) => new Date(b.date));
 
   return (
     <div className="space-y-6">
@@ -134,15 +147,49 @@ export default function BlackoutDatesManager({
                     onSelect={setSelectedDate}
                     disabled={(date) =>
                       date < new Date() ||
-                      blackoutDates.some(
-                        (bd) => bd.toDateString() === date.toDateString()
-                      )
+                      (allDay &&
+                        fullDayBlackoutDates.some(
+                          (bd) => bd.toDateString() === date.toDateString(),
+                        ))
                     }
                     initialFocus
                   />
                 </PopoverContent>
               </Popover>
             </div>
+
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="all_day">{t("allDay")}</Label>
+                <p className="text-xs text-muted-foreground">
+                  {t("allDayDescription")}
+                </p>
+              </div>
+              <Switch id="all_day" checked={allDay} onCheckedChange={setAllDay} />
+            </div>
+
+            {!allDay && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="start_time">{t("startTime")}</Label>
+                  <Input
+                    id="start_time"
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="end_time">{t("endTime")}</Label>
+                  <Input
+                    id="end_time"
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="reason">{t("reasonLabel")}</Label>
@@ -191,6 +238,11 @@ export default function BlackoutDatesManager({
                       <div className="flex-1">
                         <div className="font-medium">
                           {format(new Date(blackout.date), "PPP")}
+                          {blackout.start_time && blackout.end_time && (
+                            <span className="ml-2 text-sm text-muted-foreground">
+                              {blackout.start_time.slice(0, 5)}–{blackout.end_time.slice(0, 5)}
+                            </span>
+                          )}
                         </div>
                         {blackout.reason && (
                           <div className="text-sm text-muted-foreground mt-1">

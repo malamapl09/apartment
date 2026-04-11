@@ -2,6 +2,9 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import BookingFlow from "@/components/portal/booking-flow";
+import RestrictionBanner from "@/components/portal/restriction-banner";
+import { getMyActiveRestrictions } from "@/lib/actions/user-restrictions-portal";
+import type { UserRestriction } from "@/types";
 
 export default async function NewReservationPage({
   params,
@@ -60,6 +63,9 @@ export default async function NewReservationPage({
     .gte("date", new Date().toISOString().split("T")[0])
     .order("date");
 
+  // Fetch this user's active restrictions (for the banner)
+  const { data: restrictions } = await getMyActiveRestrictions();
+
   // Fetch building bank info (for payment instructions)
   const { data: building } = await supabase
     .from("buildings")
@@ -90,13 +96,24 @@ export default async function NewReservationPage({
       : undefined,
   };
 
+  const typedRestrictions = (restrictions ?? []) as (UserRestriction & {
+    public_spaces: { id: string; name: string } | null;
+  })[];
+
   return (
     <div className="space-y-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground mt-2">
-          {t("booking_for")} {space.name}
-        </p>
+      <div className="max-w-4xl mx-auto space-y-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground mt-2">
+            {t("booking_for")} {space.name}
+          </p>
+        </div>
+
+        <RestrictionBanner
+          restrictions={typedRestrictions}
+          currentSpaceId={spaceId}
+        />
       </div>
 
       <BookingFlow

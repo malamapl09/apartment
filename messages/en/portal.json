@@ -151,7 +151,32 @@
       "no_upcoming_description": "You don't have any upcoming reservations. Browse available spaces to make a new one.",
       "no_past": "No Past Reservations",
       "no_past_description": "You don't have any past reservations yet.",
-      "browse_spaces": "Browse Spaces"
+      "browse_spaces": "Browse Spaces",
+      "restrictionsBanner": {
+        "title": "Booking restricted",
+        "description": "You currently have active restrictions that may prevent bookings:",
+        "allSpaces": "All spaces",
+        "indefinite": "Indefinite",
+        "endsOn": "Until {date}"
+      },
+      "errors": {
+        "mustBeFuture": "Reservation must be in the future",
+        "endAfterStart": "End time must be after start time",
+        "minAdvance": "Must book at least {hours} hours in advance",
+        "maxAdvance": "Cannot book more than {days} days in advance",
+        "maxDuration": "Maximum duration is {hours} hours",
+        "maxMonthly": "You have reached the maximum of {count} reservations this month",
+        "notAvailableOnDay": "Space is not available on this day",
+        "outsideSchedule": "Space is only available from {start} to {end}",
+        "blackoutFullDay": "Space is not available on this date",
+        "blackoutPartialDay": "Space is blocked from {start} to {end} on this date",
+        "recurringBlackout": "Space is blocked from {start} to {end} on this day of the week",
+        "conflict": "Time slot conflicts with an existing reservation",
+        "restricted": "You are not permitted to book this space. Contact building management.",
+        "dailyCapReached": "Daily limit of {hours} hours reached for this space",
+        "weeklyCapReached": "Weekly limit of {hours} hours reached for this space",
+        "monthlyCapReached": "Monthly limit of {hours} hours reached for this space"
+      }
     },
     "reservation_detail": {
       "reference_code": "Reference Code",
@@ -308,9 +333,21 @@
       "requestTitlePlaceholder": "Brief description of the issue...",
       "requestDescription": "Description",
       "requestDescriptionPlaceholder": "Describe the issue in detail...",
-      "category": "Category",
+      "category": {
+        "plumbing": "Plumbing",
+        "electrical": "Electrical",
+        "hvac": "HVAC",
+        "structural": "Structural",
+        "pest_control": "Pest Control",
+        "general": "General"
+      },
       "selectCategory": "Select a category",
-      "priority": "Priority",
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
       "selectPriority": "Select priority",
       "photos": "Photos",
       "photosDescription": "Upload photos of the issue (optional)",
@@ -329,20 +366,6 @@
         "waiting_parts": "Waiting for Parts",
         "resolved": "Resolved",
         "closed": "Closed"
-      },
-      "priority": {
-        "low": "Low",
-        "medium": "Medium",
-        "high": "High",
-        "urgent": "Urgent"
-      },
-      "category": {
-        "plumbing": "Plumbing",
-        "electrical": "Electrical",
-        "hvac": "HVAC",
-        "structural": "Structural",
-        "pest_control": "Pest Control",
-        "general": "General"
       },
       "formDescription": "Fill in the details below to submit a maintenance request.",
       "titleRequired": "Title *",
@@ -433,32 +456,30 @@
       }
     },
     "polls": {
-      "title": "Polls & Voting",
-      "description": "Participate in building polls and view results",
-      "noPolls": "No Polls Available",
-      "noPollsDescription": "There are no active polls at this time",
+      "title": "Polls",
+      "description": "Vote on building matters and view results",
       "vote": "Vote",
-      "submitVote": "Submit Vote",
-      "voted": "You have voted",
-      "viewResults": "View Results",
-      "results": "Results",
-      "totalVotes": "Total Votes",
-      "votes": "votes",
+      "viewResults": "Results",
       "alreadyVoted": "You have already voted on this poll",
-      "pollClosed": "This poll is closed",
-      "voteSuccess": "Your vote has been recorded",
-      "selectOption": "Please select an option",
-      "endsAt": "Ends",
-      "anonymous": "Anonymous",
-      "status": {
-        "active": "Active",
-        "closed": "Closed"
-      },
-      "type": {
-        "single_choice": "Single Choice",
-        "multiple_choice": "Multiple Choice",
-        "yes_no": "Yes / No"
-      }
+      "submitVote": "Submit Vote",
+      "submitting": "Submitting...",
+      "selectOne": "Select one option",
+      "selectMultiple": "Select one or more options",
+      "pollEnds": "Ends",
+      "pollClosed": "Poll is closed",
+      "noActivePolls": "No Polls Available",
+      "noActivePollsDescription": "There are no active polls at this time",
+      "noClosedPollsDescription": "There are no closed polls yet",
+      "voteSuccess": "Your vote has been submitted",
+      "totalVotes": "votes",
+      "noVotesYet": "No votes yet",
+      "active": "Active",
+      "closed": "Closed",
+      "voted": "Voted",
+      "yes": "Yes",
+      "no": "No",
+      "viewPoll": "View poll",
+      "backToPolls": "Back to polls"
     },
     "documents": {
       "title": "Documents",
@@ -565,32 +586,6 @@
         "passwordMinLength": "Password must be at least 8 characters",
         "passwordsMustMatch": "Passwords don't match"
       }
-    },
-    "polls": {
-      "title": "Polls",
-      "description": "Vote on building matters and view results",
-      "vote": "Vote",
-      "viewResults": "Results",
-      "alreadyVoted": "You have already voted on this poll",
-      "submitVote": "Submit Vote",
-      "submitting": "Submitting...",
-      "selectOne": "Select one option",
-      "selectMultiple": "Select one or more options",
-      "pollEnds": "Ends",
-      "pollClosed": "Poll is closed",
-      "noActivePolls": "No Polls Available",
-      "noActivePollsDescription": "There are no active polls at this time",
-      "noClosedPollsDescription": "There are no closed polls yet",
-      "voteSuccess": "Your vote has been submitted",
-      "totalVotes": "votes",
-      "noVotesYet": "No votes yet",
-      "active": "Active",
-      "closed": "Closed",
-      "voted": "Voted",
-      "yes": "Yes",
-      "no": "No",
-      "viewPoll": "View poll",
-      "backToPolls": "Back to polls"
     },
     "activities": {
       "title": "Log an Activity",

@@ -5,6 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { getAdminProfile, getAuthProfile } from "@/lib/actions/helpers";
 
+const optionalPositive = z.preprocess(
+  (v) => (v === "" || v === null || v === undefined ? null : v),
+  z.coerce.number().positive().nullable(),
+);
+
 const spaceSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional().nullable(),
@@ -17,8 +22,9 @@ const spaceSchema = z.object({
   max_duration_hours: z.coerce.number().int().positive().default(8),
   max_monthly_per_owner: z.coerce.number().int().positive().default(4),
   gap_minutes: z.coerce.number().int().nonnegative().default(60),
-  quiet_hours_start: z.string().optional().nullable(),
-  quiet_hours_end: z.string().optional().nullable(),
+  max_hours_per_day_per_user: optionalPositive,
+  max_hours_per_week_per_user: optionalPositive,
+  max_hours_per_month_per_user: optionalPositive,
   cancellation_hours: z.coerce.number().int().nonnegative().default(24),
 });
 
@@ -79,8 +85,9 @@ export async function createSpace(formData: FormData) {
     max_duration_hours: formData.get("max_duration_hours") || 8,
     max_monthly_per_owner: formData.get("max_monthly_per_owner") || 4,
     gap_minutes: formData.get("gap_minutes") || 60,
-    quiet_hours_start: formData.get("quiet_hours_start") || null,
-    quiet_hours_end: formData.get("quiet_hours_end") || null,
+    max_hours_per_day_per_user: formData.get("max_hours_per_day_per_user"),
+    max_hours_per_week_per_user: formData.get("max_hours_per_week_per_user"),
+    max_hours_per_month_per_user: formData.get("max_hours_per_month_per_user"),
     cancellation_hours: formData.get("cancellation_hours") || 24,
   });
 
@@ -116,8 +123,9 @@ export async function updateSpace(id: string, formData: FormData) {
     max_duration_hours: formData.get("max_duration_hours") || 8,
     max_monthly_per_owner: formData.get("max_monthly_per_owner") || 4,
     gap_minutes: formData.get("gap_minutes") || 60,
-    quiet_hours_start: formData.get("quiet_hours_start") || null,
-    quiet_hours_end: formData.get("quiet_hours_end") || null,
+    max_hours_per_day_per_user: formData.get("max_hours_per_day_per_user"),
+    max_hours_per_week_per_user: formData.get("max_hours_per_week_per_user"),
+    max_hours_per_month_per_user: formData.get("max_hours_per_month_per_user"),
     cancellation_hours: formData.get("cancellation_hours") || 24,
   });
 

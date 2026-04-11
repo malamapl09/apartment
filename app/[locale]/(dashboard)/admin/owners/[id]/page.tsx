@@ -1,13 +1,18 @@
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { getOwner } from "@/lib/actions/owners";
+import { getRestrictionsForProfile } from "@/lib/actions/restrictions";
+import { getInfractionsForProfile } from "@/lib/actions/infractions";
+import { getSpaces } from "@/lib/actions/spaces";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import RestrictionsCard from "@/components/admin/restrictions-card";
+import InfractionsCard from "@/components/admin/infractions-card";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Mail, Phone, MapPin, Calendar } from "lucide-react";
-import type { ApartmentStatus } from "@/types";
+import type { ApartmentStatus, Infraction, UserRestriction } from "@/types";
 
 interface LinkedApartment {
   id: string;
@@ -28,7 +33,25 @@ export default async function OwnerDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("admin.owners");
 
-  const { data: owner } = await getOwner(id);
+  const [ownerResult, restrictionsResult, infractionsResult, spacesResult] =
+    await Promise.all([
+      getOwner(id),
+      getRestrictionsForProfile(id),
+      getInfractionsForProfile(id),
+      getSpaces(),
+    ]);
+
+  const { data: owner } = ownerResult;
+  const restrictions = (restrictionsResult.data ?? []) as (UserRestriction & {
+    public_spaces: { id: string; name: string } | null;
+  })[];
+  const infractions = (infractionsResult.data ?? []) as (Infraction & {
+    public_spaces: { id: string; name: string } | null;
+  })[];
+  const spaces = (spacesResult.data ?? []).map((s) => ({
+    id: s.id,
+    name: s.name,
+  }));
 
   if (!owner) {
     notFound();
@@ -164,6 +187,18 @@ export default async function OwnerDetailPage({
           </div>
         </CardContent>
       </Card>
+
+      <RestrictionsCard
+        profileId={id}
+        restrictions={restrictions}
+        spaces={spaces}
+      />
+
+      <InfractionsCard
+        profileId={id}
+        infractions={infractions}
+        spaces={spaces}
+      />
     </div>
   );
 }

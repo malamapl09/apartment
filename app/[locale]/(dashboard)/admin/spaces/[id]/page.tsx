@@ -3,9 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import { getSpace, updateSpace, toggleSpaceActive } from "@/lib/actions/spaces";
 import { getSchedule } from "@/lib/actions/schedules";
 import { getBlackouts } from "@/lib/actions/blackout-dates";
+import { getRecurringBlackoutsForSpace } from "@/lib/actions/recurring-blackouts";
 import SpaceForm from "@/components/admin/space-form";
 import AvailabilityEditor from "@/components/admin/availability-editor";
 import BlackoutDatesManager from "@/components/admin/blackout-dates-manager";
+import RecurringBlackoutsManager from "@/components/admin/recurring-blackouts-manager";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -21,15 +23,17 @@ export default async function SpaceDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("admin.spaces");
 
-  const [spaceResult, scheduleResult, blackoutsResult] = await Promise.all([
+  const [spaceResult, scheduleResult, blackoutsResult, recurringResult] = await Promise.all([
     getSpace(id),
     getSchedule(id),
     getBlackouts(id),
+    getRecurringBlackoutsForSpace(id),
   ]);
 
   const { data: space } = spaceResult;
   const { data: schedule } = scheduleResult;
   const { data: blackouts } = blackoutsResult;
+  const { data: recurringBlackouts } = recurringResult;
 
   if (!space) {
     notFound();
@@ -77,10 +81,11 @@ export default async function SpaceDetailPage({
       </div>
 
       <Tabs defaultValue="details" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="details">{t("details")}</TabsTrigger>
           <TabsTrigger value="schedule">{t("schedule")}</TabsTrigger>
           <TabsTrigger value="blackouts">{t("blackouts")}</TabsTrigger>
+          <TabsTrigger value="recurring-blackouts">{t("recurringBlackouts.tab")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-6">
@@ -123,6 +128,20 @@ export default async function SpaceDetailPage({
                 spaceId={id}
                 initialBlackouts={blackouts || []}
                 locale={locale}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="recurring-blackouts" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("recurringBlackouts.title")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RecurringBlackoutsManager
+                spaceId={id}
+                initialRecurringBlackouts={recurringBlackouts || []}
               />
             </CardContent>
           </Card>
