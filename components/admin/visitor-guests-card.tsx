@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -27,6 +27,9 @@ interface Props {
   visitor: VisitorWithCompanions;
 }
 
+type RowKey = "primary" | string;
+type GuestsT = ReturnType<typeof useTranslations<"admin.visitors.guests">>;
+
 const formatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString(undefined, {
     hour: "2-digit",
@@ -36,18 +39,19 @@ const formatTime = (iso: string) =>
 export default function VisitorGuestsCard({ visitor }: Props) {
   const t = useTranslations("admin.visitors.guests");
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isBulkPending, startBulkTransition] = useTransition();
+  const [pendingRow, setPendingRow] = useState<RowKey | null>(null);
 
   const companions = [...(visitor.visitor_companions ?? [])].sort(
     (a, b) => a.position - b.position,
   );
   const totalGuests = 1 + companions.length;
 
-  const handleAction = (
+  const runBulk = (
     action: () => Promise<{ success?: boolean; error?: string }>,
     successMsg: string,
   ) => {
-    startTransition(async () => {
+    startBulkTransition(async () => {
       const result = await action();
       if (result.error) {
         toast.error(result.error);
@@ -58,12 +62,32 @@ export default function VisitorGuestsCard({ visitor }: Props) {
     });
   };
 
+  const runRow = async (
+    key: RowKey,
+    action: () => Promise<{ success?: boolean; error?: string }>,
+    successMsg: string,
+  ) => {
+    setPendingRow(key);
+    try {
+      const result = await action();
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(successMsg);
+        router.refresh();
+      }
+    } finally {
+      setPendingRow(null);
+    }
+  };
+
   const anyExpected =
     visitor.checked_in_at === null ||
     companions.some((c) => c.checked_in_at === null);
-  const anyInside = companions.some(
-    (c) => c.checked_in_at !== null && c.checked_out_at === null,
-  ) || (visitor.checked_in_at !== null && visitor.checked_out_at === null);
+  const anyInside =
+    companions.some(
+      (c) => c.checked_in_at !== null && c.checked_out_at === null,
+    ) || (visitor.checked_in_at !== null && visitor.checked_out_at === null);
 
   return (
     <Card>
@@ -77,14 +101,14 @@ export default function VisitorGuestsCard({ visitor }: Props) {
               size="sm"
               variant="outline"
               onClick={() =>
-                handleAction(
+                runBulk(
                   () => checkInVisitorGroup(visitor.id),
                   t("checkAllInSuccess"),
                 )
               }
-              disabled={isPending}
+              disabled={isBulkPending}
             >
-              {isPending ? (
+              {isBulkPending ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <CheckCheck className="h-4 w-4 mr-2" />
@@ -97,14 +121,14 @@ export default function VisitorGuestsCard({ visitor }: Props) {
               size="sm"
               variant="outline"
               onClick={() =>
-                handleAction(
+                runBulk(
                   () => checkOutVisitorGroup(visitor.id),
                   t("checkAllOutSuccess"),
                 )
               }
-              disabled={isPending}
+              disabled={isBulkPending}
             >
-              {isPending ? (
+              {isBulkPending ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <LogOut className="h-4 w-4 mr-2" />
@@ -121,19 +145,22 @@ export default function VisitorGuestsCard({ visitor }: Props) {
             isPrimary
             checkedInAt={visitor.checked_in_at}
             checkedOutAt={visitor.checked_out_at}
+            isRowPending={pendingRow === "primary"}
+            disabled={pendingRow !== null || isBulkPending}
             onCheckIn={() =>
-              handleAction(
+              runRow(
+                "primary",
                 () => checkInVisitorMember(visitor.id, null),
                 t("checkInSuccess"),
               )
             }
             onCheckOut={() =>
-              handleAction(
+              runRow(
+                "primary",
                 () => checkOutVisitorMember(visitor.id, null),
                 t("checkOutSuccess"),
               )
             }
-            isPending={isPending}
             t={t}
           />
           {companions.map((c) => (
@@ -142,19 +169,22 @@ export default function VisitorGuestsCard({ visitor }: Props) {
               label={c.name}
               checkedInAt={c.checked_in_at}
               checkedOutAt={c.checked_out_at}
+              isRowPending={pendingRow === c.id}
+              disabled={pendingRow !== null || isBulkPending}
               onCheckIn={() =>
-                handleAction(
+                runRow(
+                  c.id,
                   () => checkInVisitorMember(visitor.id, c.id),
                   t("checkInSuccess"),
                 )
               }
               onCheckOut={() =>
-                handleAction(
+                runRow(
+                  c.id,
                   () => checkOutVisitorMember(visitor.id, c.id),
                   t("checkOutSuccess"),
                 )
               }
-              isPending={isPending}
               t={t}
             />
           ))}
@@ -169,10 +199,11 @@ interface GuestRowProps {
   isPrimary?: boolean;
   checkedInAt: string | null;
   checkedOutAt: string | null;
+  isRowPending: boolean;
+  disabled: boolean;
   onCheckIn: () => void;
   onCheckOut: () => void;
-  isPending: boolean;
-  t: (key: string) => string;
+  t: GuestsT;
 }
 
 function GuestRow({
@@ -180,9 +211,10 @@ function GuestRow({
   isPrimary,
   checkedInAt,
   checkedOutAt,
+  isRowPending,
+  disabled,
   onCheckIn,
   onCheckOut,
-  isPending,
   t,
 }: GuestRowProps) {
   return (
@@ -215,8 +247,12 @@ function GuestRow({
       </div>
 
       {checkedInAt === null && (
-        <Button size="sm" onClick={onCheckIn} disabled={isPending}>
-          <LogIn className="h-4 w-4 mr-1" />
+        <Button size="sm" onClick={onCheckIn} disabled={disabled}>
+          {isRowPending ? (
+            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+          ) : (
+            <LogIn className="h-4 w-4 mr-1" />
+          )}
           {t("checkIn")}
         </Button>
       )}
@@ -225,9 +261,13 @@ function GuestRow({
           size="sm"
           variant="outline"
           onClick={onCheckOut}
-          disabled={isPending}
+          disabled={disabled}
         >
-          <LogOut className="h-4 w-4 mr-1" />
+          {isRowPending ? (
+            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+          ) : (
+            <LogOut className="h-4 w-4 mr-1" />
+          )}
           {t("checkOut")}
         </Button>
       )}

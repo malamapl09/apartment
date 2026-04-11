@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 import { createNotification } from "@/lib/notifications/create";
-import { isFirstArrival } from "@/lib/visitors/helpers";
 
 export async function getAllVisitors(filters?: {
   status?: string;
@@ -108,17 +107,17 @@ async function ensureAdmin() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" as const, supabase, user: null };
+  if (!user) return { error: "Unauthorized" as const, supabase, user: null, profile: null };
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("building_id, role")
     .eq("id", user.id)
     .single();
   if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" as const, supabase, user: null };
+    return { error: "Unauthorized" as const, supabase, user: null, profile: null };
   }
-  return { error: null, supabase, user };
+  return { error: null, supabase, user, profile };
 }
 
 export async function checkInVisitorMember(
@@ -128,24 +127,16 @@ export async function checkInVisitorMember(
   const { error: authError, supabase, user } = await ensureAdmin();
   if (authError || !user) return { error: authError ?? "Unauthorized" };
 
-  // Read parent + companions to determine if this would be the first arrival.
-  const { data: parent } = await supabase
+  // Refuse to mutate cancelled, expired or already-completed visitors.
+  const { data: parent, error: parentError } = await supabase
     .from("visitors")
     .select("id, status, checked_in_at")
     .eq("id", visitorId)
     .single();
-  if (!parent) return { error: "Visitor not found" };
-
-  const { data: companions } = await supabase
-    .from("visitor_companions")
-    .select("id, checked_in_at")
-    .eq("visitor_id", visitorId);
-
-  const wasFirstArrival = isFirstArrival(
-    parent.status,
-    parent.checked_in_at,
-    companions ?? [],
-  );
+  if (parentError || !parent) return { error: "Visitor not found" };
+  if (!["expected", "checked_in"].includes(parent.status)) {
+    return { error: `Visitor is ${parent.status}` };
+  }
 
   const checkedInAt = new Date().toISOString();
 
@@ -169,9 +160,17 @@ export async function checkInVisitorMember(
     if (error) return { error: error.message };
   }
 
-  await supabase.rpc("recompute_visitor_status", { p_visitor_id: visitorId });
+  // recompute_visitor_status holds FOR UPDATE on the parent and atomically
+  // returns true exactly once — when this call wins the expected->checked_in
+  // transition. Two concurrent companion check-ins cannot both observe
+  // wasFirstArrival=true.
+  const { data: wasFirstArrival, error: rpcError } = await supabase.rpc(
+    "recompute_visitor_status",
+    { p_visitor_id: visitorId },
+  );
+  if (rpcError) return { error: rpcError.message };
 
-  if (wasFirstArrival) {
+  if (wasFirstArrival === true) {
     await fireFirstArrivalNotifications(supabase, visitorId, checkedInAt);
   }
 
@@ -186,6 +185,16 @@ export async function checkOutVisitorMember(
 ) {
   const { error: authError, supabase, user } = await ensureAdmin();
   if (authError || !user) return { error: authError ?? "Unauthorized" };
+
+  const { data: parent, error: parentError } = await supabase
+    .from("visitors")
+    .select("status")
+    .eq("id", visitorId)
+    .single();
+  if (parentError || !parent) return { error: "Visitor not found" };
+  if (!["expected", "checked_in"].includes(parent.status)) {
+    return { error: `Visitor is ${parent.status}` };
+  }
 
   const checkedOutAt = new Date().toISOString();
 
@@ -208,7 +217,10 @@ export async function checkOutVisitorMember(
     if (error) return { error: error.message };
   }
 
-  await supabase.rpc("recompute_visitor_status", { p_visitor_id: visitorId });
+  const { error: rpcError } = await supabase.rpc("recompute_visitor_status", {
+    p_visitor_id: visitorId,
+  });
+  if (rpcError) return { error: rpcError.message };
 
   revalidatePath("/admin/visitors");
   revalidatePath(`/admin/visitors/${visitorId}`);
@@ -219,44 +231,21 @@ export async function checkInVisitorGroup(visitorId: string) {
   const { error: authError, supabase, user } = await ensureAdmin();
   if (authError || !user) return { error: authError ?? "Unauthorized" };
 
-  const { data: parent } = await supabase
-    .from("visitors")
-    .select("id, status, checked_in_at")
-    .eq("id", visitorId)
-    .single();
-  if (!parent) return { error: "Visitor not found" };
-
-  const { data: companions } = await supabase
-    .from("visitor_companions")
-    .select("id, checked_in_at")
-    .eq("visitor_id", visitorId);
-
-  const wasFirstArrival = isFirstArrival(
-    parent.status,
-    parent.checked_in_at,
-    companions ?? [],
+  // Atomic on the DB side: stamps parent + every still-expected companion
+  // and recomputes status, all under one Postgres transaction. Returns the
+  // first-arrival flag (true exactly once across concurrent callers).
+  const { data: wasFirstArrival, error } = await supabase.rpc(
+    "check_in_visitor_group",
+    { p_visitor_id: visitorId, p_user_id: user.id },
   );
+  if (error) return { error: error.message };
 
-  const checkedInAt = new Date().toISOString();
-
-  if (parent.checked_in_at === null) {
-    await supabase
-      .from("visitors")
-      .update({ checked_in_at: checkedInAt, checked_in_by: user.id })
-      .eq("id", visitorId)
-      .is("checked_in_at", null);
-  }
-
-  await supabase
-    .from("visitor_companions")
-    .update({ checked_in_at: checkedInAt, checked_in_by: user.id })
-    .eq("visitor_id", visitorId)
-    .is("checked_in_at", null);
-
-  await supabase.rpc("recompute_visitor_status", { p_visitor_id: visitorId });
-
-  if (wasFirstArrival) {
-    await fireFirstArrivalNotifications(supabase, visitorId, checkedInAt);
+  if (wasFirstArrival === true) {
+    await fireFirstArrivalNotifications(
+      supabase,
+      visitorId,
+      new Date().toISOString(),
+    );
   }
 
   revalidatePath("/admin/visitors");
@@ -268,31 +257,19 @@ export async function checkOutVisitorGroup(visitorId: string) {
   const { error: authError, supabase, user } = await ensureAdmin();
   if (authError || !user) return { error: authError ?? "Unauthorized" };
 
-  const checkedOutAt = new Date().toISOString();
-
-  await supabase
-    .from("visitors")
-    .update({ checked_out_at: checkedOutAt, checked_out_by: user.id })
-    .eq("id", visitorId)
-    .not("checked_in_at", "is", null)
-    .is("checked_out_at", null);
-
-  await supabase
-    .from("visitor_companions")
-    .update({ checked_out_at: checkedOutAt, checked_out_by: user.id })
-    .eq("visitor_id", visitorId)
-    .not("checked_in_at", "is", null)
-    .is("checked_out_at", null);
-
-  await supabase.rpc("recompute_visitor_status", { p_visitor_id: visitorId });
+  const { error } = await supabase.rpc("check_out_visitor_group", {
+    p_visitor_id: visitorId,
+    p_user_id: user.id,
+  });
+  if (error) return { error: error.message };
 
   revalidatePath("/admin/visitors");
   revalidatePath(`/admin/visitors/${visitorId}`);
   return { success: true };
 }
 
-// Backwards-compatible aliases — older code may still call checkInVisitor /
-// checkOutVisitor (they assume "primary visitor" semantics).
+// Backwards-compatible aliases — older callers (e.g. visitor-table.tsx)
+// invoke the primary-only check-in/out from the list view.
 export async function checkInVisitor(id: string) {
   return checkInVisitorMember(id, null);
 }
@@ -302,8 +279,8 @@ export async function checkOutVisitor(id: string) {
 }
 
 export async function getVisitorWithCompanions(visitorId: string) {
-  const { error: authError, supabase } = await ensureAdmin();
-  if (authError) return { error: authError ?? "Unauthorized" };
+  const { error: authError, supabase, profile } = await ensureAdmin();
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
     .from("visitors")
@@ -314,6 +291,7 @@ export async function getVisitorWithCompanions(visitorId: string) {
        visitor_companions(id, position, name, id_number, phone, checked_in_at, checked_out_at)`,
     )
     .eq("id", visitorId)
+    .eq("building_id", profile.building_id)
     .single();
 
   if (error) return { error: error.message };
