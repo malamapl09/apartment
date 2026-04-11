@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,12 +28,18 @@ import { VisitorAccessCode } from "@/components/shared/visitor-access-code";
 import { registerVisitor } from "@/lib/actions/visitors";
 import { Link } from "@/i18n/navigation";
 
+type Companion = { name: string; id_number: string; phone: string };
+
+const MAX_COMPANIONS = 20;
+const emptyCompanion = (): Companion => ({ name: "", id_number: "", phone: "" });
+
 export function VisitorRegisterForm() {
   const t = useTranslations("portal.visitors");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [successData, setSuccessData] = useState<{
     access_code: string;
+    companion_count: number;
   } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -50,6 +56,29 @@ export function VisitorRegisterForm() {
     recurrence_end_date: "",
     notes: "",
   });
+  const [companions, setCompanions] = useState<Companion[]>([]);
+
+  const updateCompanion = (
+    index: number,
+    field: keyof Companion,
+    value: string,
+  ) => {
+    setCompanions((prev) =>
+      prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)),
+    );
+  };
+
+  const addCompanion = () => {
+    if (companions.length >= MAX_COMPANIONS) {
+      toast.error(t("companions.maxReached", { max: MAX_COMPANIONS }));
+      return;
+    }
+    setCompanions((prev) => [...prev, emptyCompanion()]);
+  };
+
+  const removeCompanion = (index: number) => {
+    setCompanions((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -65,6 +94,14 @@ export function VisitorRegisterForm() {
       toast.error(t("dateRangeError"));
       return;
     }
+
+    const cleanedCompanions = companions
+      .map((c) => ({
+        name: c.name.trim(),
+        id_number: c.id_number.trim() || undefined,
+        phone: c.phone.trim() || undefined,
+      }))
+      .filter((c) => c.name.length > 0);
 
     setIsLoading(true);
     try {
@@ -85,6 +122,7 @@ export function VisitorRegisterForm() {
           ? formData.recurrence_end_date || undefined
           : undefined,
         notes: formData.notes || undefined,
+        companions: cleanedCompanions.length > 0 ? cleanedCompanions : undefined,
       });
 
       if (result.error) {
@@ -92,7 +130,10 @@ export function VisitorRegisterForm() {
         return;
       }
 
-      setSuccessData({ access_code: result.data?.access_code ?? "" });
+      setSuccessData({
+        access_code: result.data?.access_code ?? "",
+        companion_count: cleanedCompanions.length,
+      });
     } catch {
       toast.error(t("registerError"));
     } finally {
@@ -101,6 +142,7 @@ export function VisitorRegisterForm() {
   };
 
   if (successData) {
+    const totalGuests = 1 + successData.companion_count;
     return (
       <Card>
         <CardHeader>
@@ -109,6 +151,11 @@ export function VisitorRegisterForm() {
         </CardHeader>
         <CardContent className="space-y-6">
           <VisitorAccessCode code={successData.access_code} />
+          {successData.companion_count > 0 && (
+            <p className="text-sm text-center text-muted-foreground">
+              {t("companions.sharedBy", { count: totalGuests })}
+            </p>
+          )}
           <div className="flex gap-3">
             <Button asChild variant="outline" className="flex-1">
               <Link href="/portal/visitors">{t("myVisitors")}</Link>
@@ -131,6 +178,7 @@ export function VisitorRegisterForm() {
                   recurrence_end_date: "",
                   notes: "",
                 });
+                setCompanions([]);
               }}
             >
               {t("registerVisitor")}
@@ -226,6 +274,113 @@ export function VisitorRegisterForm() {
                 onChange={handleChange}
               />
             </div>
+          </div>
+
+          {/* Additional guests */}
+          <div className="space-y-3 rounded-lg border p-4">
+            <div>
+              <h3 className="text-sm font-semibold">
+                {t("companions.title")}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {t("companions.description")}
+              </p>
+            </div>
+
+            {companions.length > 0 && (
+              <div className="space-y-3">
+                {companions.map((companion, index) => (
+                  <div
+                    key={index}
+                    className="rounded-md border p-3 space-y-3 bg-muted/30"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        #{index + 2}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => removeCompanion(index)}
+                        aria-label={t("companions.remove")}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <div className="space-y-1 sm:col-span-1">
+                        <Label
+                          htmlFor={`companion_name_${index}`}
+                          className="text-xs"
+                        >
+                          {t("companions.nameLabel")}{" "}
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id={`companion_name_${index}`}
+                          value={companion.name}
+                          onChange={(e) =>
+                            updateCompanion(index, "name", e.target.value)
+                          }
+                          placeholder={t("visitorNamePlaceholder")}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label
+                          htmlFor={`companion_id_${index}`}
+                          className="text-xs"
+                        >
+                          {t("companions.idLabel")}
+                        </Label>
+                        <Input
+                          id={`companion_id_${index}`}
+                          value={companion.id_number}
+                          onChange={(e) =>
+                            updateCompanion(index, "id_number", e.target.value)
+                          }
+                          placeholder={t("visitorIdPlaceholder")}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label
+                          htmlFor={`companion_phone_${index}`}
+                          className="text-xs"
+                        >
+                          {t("companions.phoneLabel")}
+                        </Label>
+                        <Input
+                          id={`companion_phone_${index}`}
+                          type="tel"
+                          value={companion.phone}
+                          onChange={(e) =>
+                            updateCompanion(index, "phone", e.target.value)
+                          }
+                          placeholder={t("visitorPhonePlaceholder")}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addCompanion}
+              disabled={companions.length >= MAX_COMPANIONS}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t("companions.add")}
+            </Button>
+            {companions.length >= MAX_COMPANIONS && (
+              <p className="text-xs text-muted-foreground">
+                {t("companions.max", { max: MAX_COMPANIONS })}
+              </p>
+            )}
           </div>
 
           {/* Valid Period */}

@@ -1537,6 +1537,70 @@ export type Database = {
           },
         ]
       }
+      visitor_companions: {
+        Row: {
+          checked_in_at: string | null
+          checked_in_by: string | null
+          checked_out_at: string | null
+          checked_out_by: string | null
+          created_at: string
+          id: string
+          id_number: string | null
+          name: string
+          phone: string | null
+          position: number
+          visitor_id: string
+        }
+        Insert: {
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          checked_out_at?: string | null
+          checked_out_by?: string | null
+          created_at?: string
+          id?: string
+          id_number?: string | null
+          name: string
+          phone?: string | null
+          position: number
+          visitor_id: string
+        }
+        Update: {
+          checked_in_at?: string | null
+          checked_in_by?: string | null
+          checked_out_at?: string | null
+          checked_out_by?: string | null
+          created_at?: string
+          id?: string
+          id_number?: string | null
+          name?: string
+          phone?: string | null
+          position?: number
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitor_companions_checked_in_by_fkey"
+            columns: ["checked_in_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitor_companions_checked_out_by_fkey"
+            columns: ["checked_out_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitor_companions_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visitors: {
         Row: {
           access_code: string
@@ -1683,6 +1747,16 @@ export type Database = {
         }
         Returns: string
       }
+      create_visitor_with_companions: {
+        Args: {
+          p_apartment_id: string
+          p_building_id: string
+          p_companions: Json
+          p_primary: Json
+          p_registered_by: string
+        }
+        Returns: string
+      }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       generate_maintenance_reference_code: { Args: never; Returns: string }
       generate_reference_code: { Args: never; Returns: string }
@@ -1707,6 +1781,10 @@ export type Database = {
         Returns: boolean
       }
       has_any_buildings: { Args: never; Returns: boolean }
+      recompute_visitor_status: {
+        Args: { p_visitor_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

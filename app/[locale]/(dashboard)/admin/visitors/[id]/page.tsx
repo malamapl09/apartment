@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import {
   Card,
   CardContent,
@@ -8,23 +7,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-  AlertCircle,
   User,
   Building,
-  Calendar,
   Car,
-  RefreshCw,
-  LogIn,
-  LogOut,
   ArrowLeft,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { checkInVisitor, checkOutVisitor } from "@/lib/actions/admin-visitors";
-import type { VisitorStatus, VisitorWithDetails } from "@/types";
+import { getVisitorWithCompanions } from "@/lib/actions/admin-visitors";
+import VisitorGuestsCard from "@/components/admin/visitor-guests-card";
+import type { VisitorStatus, VisitorWithCompanions } from "@/types";
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -67,23 +61,16 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
   const { id } = await params;
   const t = await getTranslations("admin.visitors");
 
-  const supabase = await createClient();
-
-  const { data: visitor, error } = await supabase
-    .from("visitors")
-    .select(`*, profiles (id, full_name), apartments (id, unit_number)`)
-    .eq("id", id)
-    .single();
-
-  if (error || !visitor) {
+  const result = await getVisitorWithCompanions(id);
+  if ("error" in result || !result.data) {
     notFound();
   }
 
-  const v = visitor as VisitorWithDetails;
+  const v = result.data as VisitorWithCompanions;
+  const companions = v.visitor_companions ?? [];
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      {/* Back link */}
       <Button variant="ghost" asChild className="-ml-2">
         <Link href="/admin/visitors">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -91,18 +78,23 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
         </Link>
       </Button>
 
-      {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
             {t("visitorDetail")}
           </h1>
-          <p className="text-muted-foreground">{v.visitor_name}</p>
+          <p className="text-muted-foreground">
+            {v.visitor_name}
+            {companions.length > 0 && (
+              <span className="ml-2 text-sm">
+                {t("guests.partyOf", { count: 1 + companions.length })}
+              </span>
+            )}
+          </p>
         </div>
         <StatusBadge status={v.status} />
       </div>
 
-      {/* Access Code - Large Display */}
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="flex flex-col items-center gap-2 py-8">
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
@@ -114,8 +106,9 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
         </CardContent>
       </Card>
 
+      <VisitorGuestsCard visitor={v} />
+
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Visitor Info */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -155,7 +148,6 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
 
-        {/* Apartment & Registered By */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -196,7 +188,6 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
 
-        {/* Vehicle Info */}
         {(v.vehicle_plate || v.vehicle_description) && (
           <Card>
             <CardHeader>
@@ -221,73 +212,6 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
             </CardContent>
           </Card>
         )}
-
-        {/* Check-in / Check-out */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Calendar className="h-4 w-4" />
-              Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            {v.checked_in_at ? (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("checkedInAt")}</span>
-                <span className="font-medium">{formatDate(v.checked_in_at)}</span>
-              </div>
-            ) : (
-              <p className="text-muted-foreground">Not yet checked in</p>
-            )}
-            {v.checked_out_at && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  {t("checkedOutAt")}
-                </span>
-                <span className="font-medium">
-                  {formatDate(v.checked_out_at)}
-                </span>
-              </div>
-            )}
-
-            <Separator />
-
-            {/* Actions */}
-            <div className="flex gap-2 pt-2">
-              {v.status === "expected" && (
-                <form
-                  action={async () => {
-                    "use server";
-                    await checkInVisitor(id);
-                  }}
-                >
-                  <Button type="submit" size="sm" className="gap-2">
-                    <LogIn className="h-4 w-4" />
-                    {t("checkIn")}
-                  </Button>
-                </form>
-              )}
-              {v.status === "checked_in" && (
-                <form
-                  action={async () => {
-                    "use server";
-                    await checkOutVisitor(id);
-                  }}
-                >
-                  <Button
-                    type="submit"
-                    size="sm"
-                    variant="outline"
-                    className="gap-2"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {t("checkOut")}
-                  </Button>
-                </form>
-              )}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

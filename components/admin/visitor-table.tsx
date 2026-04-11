@@ -17,10 +17,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { checkInVisitor, checkOutVisitor } from "@/lib/actions/admin-visitors";
+import { formatGroupLabel } from "@/lib/visitors/helpers";
 import type { VisitorWithDetails, VisitorStatus } from "@/types";
 
+type VisitorRow = VisitorWithDetails & {
+  visitor_companions?: { id: string }[] | null;
+};
+
 interface VisitorTableProps {
-  visitors: VisitorWithDetails[];
+  visitors: VisitorRow[];
 }
 
 function StatusBadge({ status }: { status: VisitorStatus }) {
@@ -142,7 +147,10 @@ export function VisitorTable({ visitors }: VisitorTableProps) {
             return (
               <TableRow key={visitor.id}>
                 <TableCell className="font-medium">
-                  {visitor.visitor_name}
+                  {formatGroupLabel(
+                    visitor.visitor_name,
+                    visitor.visitor_companions?.length ?? 0,
+                  )}
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">{visitor.apartments?.unit_number ?? "—"}</TableCell>
                 <TableCell className="hidden sm:table-cell">

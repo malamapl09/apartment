@@ -439,7 +439,19 @@
       },
       "notesLabel": "Notes",
       "notesPlaceholder": "Any additional notes...",
-      "dateRangeError": "Valid until must be after valid from"
+      "dateRangeError": "Valid until must be after valid from",
+      "companions": {
+        "title": "Additional guests",
+        "description": "Add everyone coming so the lobby can check each person in separately. They'll all share the same access code.",
+        "add": "Add another guest",
+        "remove": "Remove",
+        "nameLabel": "Name",
+        "idLabel": "ID number",
+        "phoneLabel": "Phone",
+        "max": "Maximum {max} guests per visit",
+        "maxReached": "Maximum {max} guests reached",
+        "sharedBy": "Shared by {count} guests"
+      }
     },
     "packages": {
       "title": "My Packages",

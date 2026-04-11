@@ -439,7 +439,19 @@
       },
       "notesLabel": "Notas",
       "notesPlaceholder": "Notas adicionales...",
-      "dateRangeError": "La fecha de fin debe ser posterior a la fecha de inicio"
+      "dateRangeError": "La fecha de fin debe ser posterior a la fecha de inicio",
+      "companions": {
+        "title": "Invitados adicionales",
+        "description": "Agrega a todos los que vendrán para que la recepción pueda registrar a cada persona por separado. Todos compartirán el mismo código de acceso.",
+        "add": "Agregar otro invitado",
+        "remove": "Quitar",
+        "nameLabel": "Nombre",
+        "idLabel": "Cédula",
+        "phoneLabel": "Teléfono",
+        "max": "Máximo {max} invitados por visita",
+        "maxReached": "Máximo {max} invitados alcanzado",
+        "sharedBy": "Compartido por {count} invitados"
+      }
     },
     "packages": {
       "title": "Mis Paquetes",

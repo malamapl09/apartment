@@ -340,6 +340,24 @@ export interface VisitorWithDetails extends Visitor {
   apartments: Pick<Apartment, "id" | "unit_number">;
 }
 
+export interface VisitorCompanion {
+  id: string;
+  visitor_id: string;
+  position: number;
+  name: string;
+  id_number: string | null;
+  phone: string | null;
+  checked_in_at: string | null;
+  checked_in_by: string | null;
+  checked_out_at: string | null;
+  checked_out_by: string | null;
+  created_at: string;
+}
+
+export interface VisitorWithCompanions extends VisitorWithDetails {
+  visitor_companions: VisitorCompanion[];
+}
+
 // Expense/Fee Tracking
 export type FeeCategory = "maintenance_fee" | "common_area" | "parking" | "special_assessment" | "other";
 export type ChargeStatus = "pending" | "paid" | "overdue" | "partial";

@@ -714,6 +714,22 @@
         "checked_out": "Retirado",
         "expired": "Expirado",
         "cancelled": "Cancelado"
+      },
+      "guests": {
+        "title": "Invitados",
+        "primary": "Principal",
+        "partyOf": "Grupo de {count}",
+        "notArrived": "No ha llegado",
+        "checkedIn": "Entró",
+        "checkedOut": "Salió",
+        "checkAllIn": "Registrar entrada de todos",
+        "checkAllInSuccess": "Todos los invitados registraron entrada",
+        "checkAllOut": "Registrar salida de todos",
+        "checkAllOutSuccess": "Todos los invitados registraron salida",
+        "checkIn": "Entrada",
+        "checkInSuccess": "Invitado registrado",
+        "checkOut": "Salida",
+        "checkOutSuccess": "Invitado salió"
       }
     },
     "packages": {

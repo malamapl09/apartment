@@ -714,6 +714,22 @@
         "checked_out": "Checked Out",
         "expired": "Expired",
         "cancelled": "Cancelled"
+      },
+      "guests": {
+        "title": "Guests",
+        "primary": "Primary",
+        "partyOf": "Party of {count}",
+        "notArrived": "Not yet arrived",
+        "checkedIn": "Checked in",
+        "checkedOut": "Checked out",
+        "checkAllIn": "Check all in",
+        "checkAllInSuccess": "All guests checked in",
+        "checkAllOut": "Check all out",
+        "checkAllOutSuccess": "All guests checked out",
+        "checkIn": "Check in",
+        "checkInSuccess": "Guest checked in",
+        "checkOut": "Check out",
+        "checkOutSuccess": "Guest checked out"
       }
     },
     "packages": {
