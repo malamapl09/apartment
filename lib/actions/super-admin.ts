@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import type { Building, Profile } from "@/types";
+import { ALL_MODULES, type Building, type Profile } from "@/types";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -200,20 +200,7 @@ const updateBuildingSchema = z.object({
   address: z.string().max(500).optional().default(""),
   total_units: z.coerce.number().int().min(1).max(9999),
   timezone: z.string().min(1),
-  enabled_modules: z
-    .array(
-      z.enum([
-        "reservations",
-        "visitors",
-        "maintenance",
-        "packages",
-        "polls",
-        "documents",
-        "announcements",
-        "fees",
-      ]),
-    )
-    .default([]),
+  enabled_modules: z.array(z.enum(ALL_MODULES)).default([]),
 });
 
 export async function updateBuilding(buildingId: string, formData: FormData) {

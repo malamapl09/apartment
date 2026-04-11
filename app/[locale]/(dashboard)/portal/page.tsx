@@ -9,6 +9,8 @@ import { Calendar, Home, Bell, ArrowRight } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
 import { getPortalSummary } from "@/lib/actions/analytics";
+import { getAuthProfile } from "@/lib/actions/helpers";
+import { isModuleEnabled } from "@/lib/modules";
 import PortalSummaryCards from "@/components/portal/summary-cards";
 
 export default async function PortalDashboardPage({
@@ -20,16 +22,14 @@ export default async function PortalDashboardPage({
   setRequestLocale(locale);
   const t = await getTranslations("portal");
 
-  const supabase = await createClient();
-
-  // Get current user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const { user, profile: authProfile } = await getAuthProfile();
+  if (!user || !authProfile) {
     redirect(`/${locale}/login`);
   }
+  const enabledModules = authProfile.enabled_modules;
+  const hasReservations = isModuleEnabled(enabledModules, "reservations");
+
+  const supabase = await createClient();
 
   // Fetch user profile with apartment info
   const { data: profile } = await supabase
@@ -50,22 +50,26 @@ export default async function PortalDashboardPage({
     .eq("id", user.id)
     .single();
 
-  // Fetch upcoming reservations (top 5)
-  const { data: upcomingReservations } = await supabase
-    .from("reservations")
-    .select(`
-      *,
-      space:spaces (
-        name,
-        photo_url
-      )
-    `)
-    .eq("user_id", user.id)
-    .in("status", ["confirmed", "payment_submitted", "pending_payment"])
-    .gte("date", new Date().toISOString().split("T")[0])
-    .order("date", { ascending: true })
-    .order("start_time", { ascending: true })
-    .limit(5);
+  // Fetch upcoming reservations (top 5) — only if the module is enabled
+  const upcomingReservations = hasReservations
+    ? (
+        await supabase
+          .from("reservations")
+          .select(`
+            *,
+            space:spaces (
+              name,
+              photo_url
+            )
+          `)
+          .eq("user_id", user.id)
+          .in("status", ["confirmed", "payment_submitted", "pending_payment"])
+          .gte("date", new Date().toISOString().split("T")[0])
+          .order("date", { ascending: true })
+          .order("start_time", { ascending: true })
+          .limit(5)
+      ).data
+    : null;
 
   // Fetch recent announcements (top 3)
   const { data: announcements } = await supabase
@@ -104,33 +108,36 @@ export default async function PortalDashboardPage({
         <PortalSummaryCards data={summary} locale={locale} />
       )}
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("quick_actions")}</CardTitle>
-          <CardDescription>{t("quick_actions_description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Button asChild size="lg" className="h-auto flex-col items-start p-6">
-              <Link href={`/${locale}/portal/spaces`}>
-                <Calendar className="h-6 w-6 mb-2" />
-                <span className="text-lg font-semibold">{t("reserve_space")}</span>
-                <span className="text-sm font-normal opacity-90">{t("reserve_space_description")}</span>
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-auto flex-col items-start p-6">
-              <Link href={`/${locale}/portal/reservations`}>
-                <Calendar className="h-6 w-6 mb-2" />
-                <span className="text-lg font-semibold">{t("my_reservations")}</span>
-                <span className="text-sm font-normal opacity-90">{t("my_reservations_description")}</span>
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Quick Actions — only show reservations CTAs when the module is on */}
+      {hasReservations && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("quick_actions")}</CardTitle>
+            <CardDescription>{t("quick_actions_description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Button asChild size="lg" className="h-auto flex-col items-start p-6">
+                <Link href={`/${locale}/portal/spaces`}>
+                  <Calendar className="h-6 w-6 mb-2" />
+                  <span className="text-lg font-semibold">{t("reserve_space")}</span>
+                  <span className="text-sm font-normal opacity-90">{t("reserve_space_description")}</span>
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-auto flex-col items-start p-6">
+                <Link href={`/${locale}/portal/reservations`}>
+                  <Calendar className="h-6 w-6 mb-2" />
+                  <span className="text-lg font-semibold">{t("my_reservations")}</span>
+                  <span className="text-sm font-normal opacity-90">{t("my_reservations_description")}</span>
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Upcoming Reservations */}
+      {/* Upcoming Reservations — only when the module is enabled */}
+      {hasReservations && (
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -189,6 +196,7 @@ export default async function PortalDashboardPage({
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Announcements */}
       {announcements && announcements.length > 0 && (

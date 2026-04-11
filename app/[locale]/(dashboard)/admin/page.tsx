@@ -1,6 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/actions/helpers";
+import { isModuleEnabled } from "@/lib/modules";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -25,9 +27,16 @@ export default async function AdminDashboard({
   setRequestLocale(locale);
   const t = await getTranslations("admin.dashboard");
 
+  const { profile } = await getAuthProfile();
+  const enabledModules = profile?.enabled_modules ?? [];
+  const hasReservations = isModuleEnabled(enabledModules, "reservations");
+  const hasFees = isModuleEnabled(enabledModules, "fees");
+  const hasMaintenance = isModuleEnabled(enabledModules, "maintenance");
+  const hasVisitors = isModuleEnabled(enabledModules, "visitors");
+
   const supabase = await createClient();
 
-  // Fetch counts
+  // Fetch counts (always-on modules)
   const { count: apartmentCount } = await supabase
     .from("apartments")
     .select("*", { count: "exact", head: true });
@@ -37,24 +46,32 @@ export default async function AdminDashboard({
     .select("*", { count: "exact", head: true })
     .eq("role", "owner");
 
-  const { count: upcomingReservationsCount } = await supabase
-    .from("reservations")
-    .select("*", { count: "exact", head: true })
-    .in("status", ["confirmed", "payment_submitted"])
-    .gt("start_time", new Date().toISOString());
+  // Reservations stats only when the module is enabled
+  let upcomingReservationsCount: number | null = null;
+  let pendingPaymentsCount: number | null = null;
+  if (hasReservations) {
+    const [upcoming, pending] = await Promise.all([
+      supabase
+        .from("reservations")
+        .select("*", { count: "exact", head: true })
+        .in("status", ["confirmed", "payment_submitted"])
+        .gt("start_time", new Date().toISOString()),
+      supabase
+        .from("reservations")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "payment_submitted"),
+    ]);
+    upcomingReservationsCount = upcoming.count ?? 0;
+    pendingPaymentsCount = pending.count ?? 0;
+  }
 
-  const { count: pendingPaymentsCount } = await supabase
-    .from("reservations")
-    .select("*", { count: "exact", head: true })
-    .eq("status", "payment_submitted");
-
-  // Fetch analytics data
+  // Fetch analytics data only for enabled modules
   const currentYear = new Date().getFullYear();
   const [collectionRates, maintenanceTrends, visitorStats, occupancyStats] =
     await Promise.all([
-      getCollectionRatesByMonth(currentYear),
-      getMaintenanceTrends(6),
-      getVisitorStats(6),
+      hasFees ? getCollectionRatesByMonth(currentYear) : Promise.resolve({ data: [] }),
+      hasMaintenance ? getMaintenanceTrends(6) : Promise.resolve({ data: [] }),
+      hasVisitors ? getVisitorStats(6) : Promise.resolve({ data: [] }),
       getOccupancyStats(),
     ]);
 
@@ -73,20 +90,24 @@ export default async function AdminDashboard({
       href: `/${locale}/admin/owners`,
       color: "text-green-600",
     },
-    {
-      title: t("stats.upcomingReservations"),
-      value: upcomingReservationsCount || 0,
-      icon: Calendar,
-      href: `/${locale}/admin/reservations`,
-      color: "text-purple-600",
-    },
-    {
-      title: t("stats.pendingPayments"),
-      value: pendingPaymentsCount || 0,
-      icon: CreditCard,
-      href: `/${locale}/admin/payments`,
-      color: "text-orange-600",
-    },
+    ...(hasReservations
+      ? [
+          {
+            title: t("stats.upcomingReservations"),
+            value: upcomingReservationsCount ?? 0,
+            icon: Calendar,
+            href: `/${locale}/admin/reservations`,
+            color: "text-purple-600",
+          },
+          {
+            title: t("stats.pendingPayments"),
+            value: pendingPaymentsCount ?? 0,
+            icon: CreditCard,
+            href: `/${locale}/admin/reservations/pending`,
+            color: "text-orange-600",
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -125,12 +146,14 @@ export default async function AdminDashboard({
         })}
       </div>
 
-      {/* Analytics Charts */}
+      {/* Analytics Charts — only render charts for enabled modules */}
       <div className="grid gap-4 md:grid-cols-2">
-        <CollectionRateChart data={collectionRates.data || []} />
+        {hasFees && <CollectionRateChart data={collectionRates.data || []} />}
         <OccupancyChart data={occupancyStats.data} />
-        <MaintenanceTrendChart data={maintenanceTrends.data || []} />
-        <VisitorStatsChart data={visitorStats.data || []} />
+        {hasMaintenance && (
+          <MaintenanceTrendChart data={maintenanceTrends.data || []} />
+        )}
+        {hasVisitors && <VisitorStatsChart data={visitorStats.data || []} />}
       </div>
 
       {/* Quick Actions */}
@@ -151,12 +174,14 @@ export default async function AdminDashboard({
               {t("quickActions.inviteOwner")}
             </Button>
           </Link>
-          <Link href={`/${locale}/admin/reservations`}>
-            <Button variant="outline" className="w-full">
-              <Calendar className="mr-2 h-4 w-4" />
-              {t("quickActions.manageReservations")}
-            </Button>
-          </Link>
+          {hasReservations && (
+            <Link href={`/${locale}/admin/reservations`}>
+              <Button variant="outline" className="w-full">
+                <Calendar className="mr-2 h-4 w-4" />
+                {t("quickActions.manageReservations")}
+              </Button>
+            </Link>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,38 +1,19 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/actions/helpers";
 import { ALL_MODULES, type ModuleKey } from "@/types";
 
 export { ALL_MODULES };
 export type { ModuleKey };
 
 /**
- * Server-component guard. Reads the current user's building's enabled_modules
- * and 404s if the requested module is off. Call at the very top of any
- * page.tsx that belongs to a gateable module — e.g.
- *   await assertCurrentUserHasModule("visitors");
- *
- * Costs one tiny SELECT on profiles+buildings; pages are already doing their
- * own queries so the marginal overhead is negligible.
+ * Server-component guard. 404s if the requested module is off. Calls the
+ * cached getAuthProfile() so if the layout has already fetched the profile
+ * in the same request, this is free (React.cache dedupes).
  */
 export async function assertCurrentUserHasModule(module: ModuleKey): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) notFound();
-
-  const { data: row } = await supabase
-    .from("profiles")
-    .select("buildings!building_id(enabled_modules)")
-    .eq("id", user.id)
-    .single();
-
-  const buildingsRel = (row as { buildings?: unknown } | null)?.buildings;
-  const buildingRow = Array.isArray(buildingsRel) ? buildingsRel[0] : buildingsRel;
-  const enabled =
-    (buildingRow as { enabled_modules?: string[] } | null)?.enabled_modules ?? [];
-
-  if (!isModuleEnabled(enabled, module)) notFound();
+  const { profile } = await getAuthProfile();
+  if (!profile) notFound();
+  if (!isModuleEnabled(profile.enabled_modules, module)) notFound();
 }
 
 export function isModuleEnabled(
