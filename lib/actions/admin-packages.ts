@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import { z } from "zod";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 import { createNotification } from "@/lib/notifications/create";
@@ -26,21 +27,8 @@ export async function logPackage(data: {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("packages");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: pkg, error } = await supabase
     .from("packages")
@@ -111,21 +99,9 @@ export async function getPackages(filters?: {
   page?: number;
   per_page?: number;
 }) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("packages");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [], total: 0 };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [], total: 0 };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [], total: 0 };
 
   const page = Math.max(1, Math.floor(filters?.page ?? 1));
   const perPage = filters?.per_page ?? 25;
@@ -151,21 +127,8 @@ export async function getPackages(filters?: {
 }
 
 export async function markPickedUp(id: string) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("packages");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("packages")
@@ -184,21 +147,9 @@ export async function markPickedUp(id: string) {
 }
 
 export async function getPackageStats() {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("packages");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: null };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: null };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: null };
 
   const { data: packages } = await supabase
     .from("packages")

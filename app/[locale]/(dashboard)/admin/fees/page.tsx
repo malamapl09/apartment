@@ -12,6 +12,7 @@ import { RealtimeRefreshWrapper } from "@/components/admin/realtime-refresh-wrap
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import type { ChargeWithDetails, FeeType } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 type FeesDashboardPayments = ComponentProps<typeof FeesDashboard>["payments"];
 
@@ -22,6 +23,7 @@ export default async function AdminFeesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("fees");
   const t = await getTranslations("admin.fees");
 
   const [

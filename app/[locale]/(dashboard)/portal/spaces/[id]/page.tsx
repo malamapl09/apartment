@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Users, DollarSign, Clock, Shield, Calendar, Info, ArrowRight, Image as ImageIcon, Activity } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/date";
 import ActivityCancelButton from "@/components/portal/activity-cancel-button";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function SpaceDetailPage({
   params,
@@ -18,6 +19,7 @@ export default async function SpaceDetailPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("portal.space_detail");
 
   const supabase = await createClient();

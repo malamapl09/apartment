@@ -4,6 +4,7 @@ import { DocumentBrowser } from "@/components/portal/document-browser";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import type { DocumentWithUploader } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function PortalDocumentsPage({
   params,
@@ -12,6 +13,7 @@ export default async function PortalDocumentsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("documents");
   const t = await getTranslations("portal.documents");
 
   const { data: documents, error } = await getDocuments();

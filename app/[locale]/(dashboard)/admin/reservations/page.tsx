@@ -6,6 +6,7 @@ import { PaginationControls } from "@/components/shared/pagination-controls";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 const PER_PAGE = 25;
 
@@ -23,6 +24,7 @@ interface PageProps {
 export default async function AdminReservationsPage({ params, searchParams }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("admin.reservations");
 
   const resolvedSearchParams = await searchParams;

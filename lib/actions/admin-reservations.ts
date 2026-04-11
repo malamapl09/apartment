@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 import { createNotification } from "@/lib/notifications/create";
 
 export async function getReservations(filters?: {
@@ -76,7 +76,7 @@ export async function getPendingPayments(params?: {
 }
 
 export async function verifyPayment(reservationId: string) {
-  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: reservation } = await supabase
@@ -115,7 +115,7 @@ export async function verifyPayment(reservationId: string) {
 }
 
 export async function rejectPayment(reservationId: string, reason: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: reservation } = await supabase
@@ -154,7 +154,7 @@ export async function rejectPayment(reservationId: string, reason: string) {
 }
 
 export async function adminCancelReservation(reservationId: string, reason: string) {
-  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: reservation } = await supabase

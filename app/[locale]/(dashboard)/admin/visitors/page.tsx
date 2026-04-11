@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users, AlertCircle, Search } from "lucide-react";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 import type { VisitorWithDetails } from "@/types";
 
 const PER_PAGE = 25;
@@ -28,6 +29,7 @@ interface PageProps {
 }
 
 export default async function AdminVisitorsPage({ searchParams }: PageProps) {
+  await assertCurrentUserHasModule("visitors");
   const t = await getTranslations("admin.visitors");
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);

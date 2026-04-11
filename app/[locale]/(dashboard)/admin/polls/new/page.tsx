@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -19,6 +20,7 @@ interface PageProps {
 export default async function AdminNewPollPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("polls");
   const t = await getTranslations("admin.polls");
 
   async function handleSuccess() {

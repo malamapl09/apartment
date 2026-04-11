@@ -5,6 +5,7 @@ import BookingFlow from "@/components/portal/booking-flow";
 import RestrictionBanner from "@/components/portal/restriction-banner";
 import { getMyActiveRestrictions } from "@/lib/actions/user-restrictions-portal";
 import type { UserRestriction } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function NewReservationPage({
   params,
@@ -13,6 +14,7 @@ export default async function NewReservationPage({
 }) {
   const { locale, spaceId } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("portal.booking");
 
   const supabase = await createClient();

@@ -1,14 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getAuthProfileForModule } from "@/lib/actions/helpers";
 
 export async function getMyCharges(filter?: "pending" | "paid" | "all") {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("fees");
+  if (authError || !user) return { error: authError ?? "Unauthorized", data: [] };
 
   // Get apartment IDs for this user via apartment_owners
   const { data: ownership } = await supabase
@@ -40,12 +36,8 @@ export async function getMyCharges(filter?: "pending" | "paid" | "all") {
 }
 
 export async function getMyPayments() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("fees");
+  if (authError || !user) return { error: authError ?? "Unauthorized", data: [] };
 
   const { data: ownership } = await supabase
     .from("apartment_owners")
@@ -72,12 +64,8 @@ export async function getMyPayments() {
 }
 
 export async function getMyBalance() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", balance: 0 };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("fees");
+  if (authError || !user) return { error: authError ?? "Unauthorized", balance: 0 };
 
   const { data: ownership } = await supabase
     .from("apartment_owners")

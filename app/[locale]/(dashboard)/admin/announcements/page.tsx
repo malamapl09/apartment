@@ -24,6 +24,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DeleteAnnouncementButton } from "./delete-button";
 import type { AnnouncementTarget } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost" | "link";
 
@@ -54,6 +55,7 @@ export default async function AnnouncementsPage({
   const { locale } = await params;
   const resolvedSearchParams = await searchParams;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("announcements");
   const t = await getTranslations("admin.announcements");
   const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);
 

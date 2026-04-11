@@ -24,6 +24,7 @@ import { formatDate, formatTime, formatDateTime, formatCurrency } from "@/lib/ut
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
 import PaymentUpload from "@/components/portal/payment-upload";
 import { generateICS } from "@/lib/utils/ics-generator";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function ReservationDetailPage({
   params,
@@ -32,6 +33,7 @@ export default async function ReservationDetailPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("portal.reservation_detail");
 
   const supabase = await createClient();

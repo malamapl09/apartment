@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
-import { getAdminProfile, getAuthProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 
 const optionalPositive = z.preprocess(
   (v) => (v === "" || v === null || v === undefined ? null : v),
@@ -29,13 +29,8 @@ const spaceSchema = z.object({
 });
 
 export async function getSpaces() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
-
-  const { data: profile } = await supabase
-    .from("profiles").select("building_id").eq("id", user.id).single();
-  if (!profile) return { error: "Profile not found", data: [] };
+  const { error: authError, supabase, profile } = await getAuthProfileForModule("reservations");
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   const { data, error } = await supabase
     .from("public_spaces")
@@ -48,7 +43,7 @@ export async function getSpaces() {
 }
 
 export async function getSpace(id: string) {
-  const { error: authError, supabase, profile } = await getAuthProfile();
+  const { error: authError, supabase, profile } = await getAuthProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
@@ -63,15 +58,8 @@ export async function getSpace(id: string) {
 }
 
 export async function createSpace(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles").select("building_id, role").eq("id", user.id).single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const result = spaceSchema.safeParse({
     name: formData.get("name"),
@@ -108,7 +96,7 @@ export async function createSpace(formData: FormData) {
 }
 
 export async function updateSpace(id: string, formData: FormData) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const result = spaceSchema.safeParse({
@@ -147,7 +135,7 @@ export async function updateSpace(id: string, formData: FormData) {
 }
 
 export async function toggleSpaceActive(id: string, isActive: boolean) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
@@ -163,7 +151,7 @@ export async function toggleSpaceActive(id: string, isActive: boolean) {
 }
 
 export async function updateSpacePhotos(id: string, photos: string[]) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase

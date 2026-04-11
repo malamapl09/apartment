@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Clock, DollarSign, ArrowRight, Image as ImageIcon } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/date";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function SpacesPage({
   params,
@@ -15,6 +16,7 @@ export default async function SpacesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("portal.spaces");
 
   const supabase = await createClient();

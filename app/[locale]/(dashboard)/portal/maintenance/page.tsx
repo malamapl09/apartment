@@ -22,6 +22,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { MaintenancePriority, MaintenanceStatus, MaintenanceRequest } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -51,6 +52,7 @@ const statusClassName: Record<MaintenanceStatus, string> = {
 export default async function PortalMaintenancePage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("maintenance");
   const t = await getTranslations("portal.maintenance");
 
   const [

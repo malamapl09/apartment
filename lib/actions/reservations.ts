@@ -8,7 +8,7 @@ import {
   validateBooking,
   type BookingErrorKey,
 } from "@/lib/reservations/validate-booking";
-import { getAuthProfile } from "@/lib/actions/helpers";
+import { getAuthProfileForModule } from "@/lib/actions/helpers";
 
 const createReservationSchema = z.object({
   space_id: z.string().uuid("Invalid space ID"),
@@ -232,7 +232,7 @@ export async function getMyReservations(filter?: "upcoming" | "past" | "all") {
 }
 
 export async function getReservation(id: string) {
-  const { error: authError, supabase, user, profile } = await getAuthProfile();
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("reservations");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase

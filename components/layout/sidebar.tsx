@@ -30,13 +30,14 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { UserRole } from "@/types";
+import type { ModuleKey, UserRole } from "@/types";
 
 interface NavItem {
   titleKey: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: UserRole[];
+  module?: ModuleKey;
   subItems?: { titleKey: string; href: string }[];
 }
 
@@ -64,12 +65,14 @@ const adminItems: NavItem[] = [
     href: "/admin/spaces",
     icon: MapPin,
     roles: ["super_admin", "admin"],
+    module: "reservations",
   },
   {
     titleKey: "reservations",
     href: "/admin/reservations",
     icon: CalendarDays,
     roles: ["super_admin", "admin"],
+    module: "reservations",
     subItems: [
       { titleKey: "pendingPayments", href: "/admin/reservations/pending" },
     ],
@@ -79,42 +82,49 @@ const adminItems: NavItem[] = [
     href: "/admin/announcements",
     icon: Megaphone,
     roles: ["super_admin", "admin"],
+    module: "announcements",
   },
   {
     titleKey: "maintenance",
     href: "/admin/maintenance",
     icon: Wrench,
     roles: ["super_admin", "admin"],
+    module: "maintenance",
   },
   {
     titleKey: "visitors",
     href: "/admin/visitors",
     icon: UserCheck,
     roles: ["super_admin", "admin"],
+    module: "visitors",
   },
   {
     titleKey: "packages",
     href: "/admin/packages",
     icon: Package,
     roles: ["super_admin", "admin"],
+    module: "packages",
   },
   {
     titleKey: "polls",
     href: "/admin/polls",
     icon: Vote,
     roles: ["super_admin", "admin"],
+    module: "polls",
   },
   {
     titleKey: "documents",
     href: "/admin/documents",
     icon: FileText,
     roles: ["super_admin", "admin"],
+    module: "documents",
   },
   {
     titleKey: "fees",
     href: "/admin/fees",
     icon: DollarSign,
     roles: ["super_admin", "admin"],
+    module: "fees",
   },
   {
     titleKey: "reports",
@@ -148,48 +158,56 @@ const portalItems: NavItem[] = [
     href: "/portal/spaces",
     icon: MapPin,
     roles: ["owner", "resident"],
+    module: "reservations",
   },
   {
     titleKey: "reservations",
     href: "/portal/reservations",
     icon: CalendarDays,
     roles: ["owner", "resident"],
+    module: "reservations",
   },
   {
     titleKey: "maintenance",
     href: "/portal/maintenance",
     icon: Wrench,
     roles: ["owner", "resident"],
+    module: "maintenance",
   },
   {
     titleKey: "visitors",
     href: "/portal/visitors",
     icon: UserCheck,
     roles: ["owner", "resident"],
+    module: "visitors",
   },
   {
     titleKey: "packages",
     href: "/portal/packages",
     icon: Package,
     roles: ["owner", "resident"],
+    module: "packages",
   },
   {
     titleKey: "polls",
     href: "/portal/polls",
     icon: Vote,
     roles: ["owner", "resident"],
+    module: "polls",
   },
   {
     titleKey: "documents",
     href: "/portal/documents",
     icon: FileText,
     roles: ["owner", "resident"],
+    module: "documents",
   },
   {
     titleKey: "fees",
     href: "/portal/fees",
     icon: DollarSign,
     roles: ["owner", "resident"],
+    module: "fees",
   },
   {
     titleKey: "profile",
@@ -201,18 +219,28 @@ const portalItems: NavItem[] = [
 
 interface SidebarProps {
   userRole: string;
+  enabledModules?: string[];
   isMobile?: boolean;
   onClose?: () => void;
 }
 
-export function Sidebar({ userRole, isMobile = false, onClose }: SidebarProps) {
+export function Sidebar({
+  userRole,
+  enabledModules = [],
+  isMobile = false,
+  onClose,
+}: SidebarProps) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const locale = useLocale();
   const [collapsed, setCollapsed] = useState(false);
 
   const isAdmin = userRole === "super_admin" || userRole === "admin";
-  const navItems = isAdmin ? adminItems : portalItems;
+  const navItems = (isAdmin ? adminItems : portalItems).filter((item) => {
+    // Items with no `module` are always-on (dashboard, apartments, owners, etc.)
+    if (!item.module) return true;
+    return enabledModules.includes(item.module);
+  });
 
   const isActive = (href: string) => {
     // Strip locale prefix for comparison
@@ -342,9 +370,11 @@ export function Sidebar({ userRole, isMobile = false, onClose }: SidebarProps) {
 
 export function MobileSidebar({
   userRole,
+  enabledModules = [],
   trigger,
 }: {
   userRole: string;
+  enabledModules?: string[];
   trigger: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -353,7 +383,12 @@ export function MobileSidebar({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent side="left" className="w-60 p-0">
-        <Sidebar userRole={userRole} isMobile onClose={() => setOpen(false)} />
+        <Sidebar
+          userRole={userRole}
+          enabledModules={enabledModules}
+          isMobile
+          onClose={() => setOpen(false)}
+        />
       </SheetContent>
     </Sheet>
   );

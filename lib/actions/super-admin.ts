@@ -200,6 +200,20 @@ const updateBuildingSchema = z.object({
   address: z.string().max(500).optional().default(""),
   total_units: z.coerce.number().int().min(1).max(9999),
   timezone: z.string().min(1),
+  enabled_modules: z
+    .array(
+      z.enum([
+        "reservations",
+        "visitors",
+        "maintenance",
+        "packages",
+        "polls",
+        "documents",
+        "announcements",
+        "fees",
+      ]),
+    )
+    .default([]),
 });
 
 export async function updateBuilding(buildingId: string, formData: FormData) {
@@ -208,13 +222,19 @@ export async function updateBuilding(buildingId: string, formData: FormData) {
   const { error } = await getSuperAdminProfile();
   if (error) return { error };
 
-  const raw = Object.fromEntries(formData.entries());
+  // FormData.entries() collapses repeated keys; pull modules separately.
+  const enabled_modules = formData.getAll("enabled_modules").map(String);
+  const raw = {
+    ...Object.fromEntries(formData.entries()),
+    enabled_modules,
+  };
   const parsed = updateBuildingSchema.safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const { name, address, total_units, timezone } = parsed.data;
+  const { name, address, total_units, timezone, enabled_modules: modules } =
+    parsed.data;
   const adminClient = createAdminClient();
 
   const { error: updateError } = await adminClient
@@ -224,6 +244,7 @@ export async function updateBuilding(buildingId: string, formData: FormData) {
       address: address || null,
       total_units,
       timezone,
+      enabled_modules: modules,
     })
     .eq("id", buildingId);
 
@@ -232,6 +253,7 @@ export async function updateBuilding(buildingId: string, formData: FormData) {
   }
 
   revalidatePath("/super-admin");
+  revalidatePath(`/super-admin/buildings/${buildingId}`);
 
   return { success: true };
 }

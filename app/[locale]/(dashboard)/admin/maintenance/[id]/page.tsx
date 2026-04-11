@@ -28,6 +28,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { MaintenancePriority, MaintenanceStatus } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 const priorityVariant: Record<
   MaintenancePriority,
@@ -54,6 +55,7 @@ interface PageProps {
 export default async function AdminMaintenanceDetailPage({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("maintenance");
   const t = await getTranslations("admin.maintenance");
 
   const supabase = await createClient();

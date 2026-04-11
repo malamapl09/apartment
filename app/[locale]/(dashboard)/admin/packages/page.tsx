@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Package, AlertCircle, Clock, Bell, CheckCircle } from "lucide-react";
 import type { PackageWithDetails } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 const PER_PAGE = 25;
 
@@ -31,6 +32,7 @@ interface PageProps {
 export default async function AdminPackagesPage({ params, searchParams }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("packages");
   const t = await getTranslations("admin.packages");
   const resolvedSearchParams = await searchParams;
   const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);

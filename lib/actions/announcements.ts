@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import { createBulkNotifications } from "@/lib/notifications/create";
 
 const announcementSchema = z.object({
@@ -15,20 +15,8 @@ const announcementSchema = z.object({
 });
 
 export async function createAnnouncement(formData: FormData) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("announcements");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const result = announcementSchema.safeParse({
     title: formData.get("title"),
@@ -101,18 +89,8 @@ export async function getAnnouncements(params?: {
   page?: number;
   per_page?: number;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [], total: 0 };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile) return { error: "Profile not found", data: [], total: 0 };
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("announcements");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized", data: [], total: 0 };
 
   const page = Math.max(1, Math.floor(params?.page ?? 1));
   const perPage = params?.per_page ?? 25;
@@ -131,7 +109,7 @@ export async function getAnnouncements(params?: {
 }
 
 export async function deleteAnnouncement(id: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("announcements");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase

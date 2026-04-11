@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import type { PollOption, PollVote, PollWithDetails } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -18,6 +19,7 @@ interface PageProps {
 export default async function PortalPollDetailPage({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("polls");
   const t = await getTranslations("portal.polls");
 
   const supabase = await createClient();

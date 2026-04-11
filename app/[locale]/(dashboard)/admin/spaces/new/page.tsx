@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createSpace } from "@/lib/actions/spaces";
 import SpaceForm from "@/components/admin/space-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function NewSpacePage({
   params,
@@ -11,6 +12,7 @@ export default async function NewSpacePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("admin.spaces");
 
   const handleCreate = async (formData: FormData): Promise<{ success: boolean; error?: string }> => {

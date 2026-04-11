@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import type { FeeCategory, FeeType, PaymentMethod } from "@/types";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 
 const createFeeTypeSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -28,7 +28,7 @@ export async function createFeeType(data: {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase.from("fee_types").insert({
@@ -48,7 +48,7 @@ export async function createFeeType(data: {
 }
 
 export async function getFeeTypes() {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   const { data, error } = await supabase
@@ -63,7 +63,7 @@ export async function getFeeTypes() {
 }
 
 export async function updateFeeType(id: string, data: Partial<FeeType>) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   // Pick only updatable fields — omit read-only server fields
@@ -92,7 +92,7 @@ export async function generateMonthlyCharges(
   month: number,
   year: number
 ) {
-  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized", count: 0 };
 
   // Get fee type details
@@ -216,7 +216,7 @@ export async function getCharges(filters?: {
   month?: number;
   year?: number;
 }) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   let query = supabase
@@ -243,7 +243,7 @@ export async function recordPayment(data: {
   reference_number?: string;
   notes?: string;
 }) {
-  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
 
   // Get charge info — scoped to admin's building
@@ -303,7 +303,7 @@ export async function getPayments(filters?: {
   month?: number;
   year?: number;
 }) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   // Use charges!inner join so we can filter by charge period at the DB level
@@ -331,7 +331,7 @@ export async function getPayments(filters?: {
 }
 
 export async function getFinancialSummary(month?: number, year?: number) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("fees");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: null };
 
   let chargesQuery = supabase

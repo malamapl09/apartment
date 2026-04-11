@@ -81,7 +81,21 @@
       "inactive": "Inactive",
       "notFound": "Building not found",
       "noUsers": "No users in this building",
-      "back": "Back to Buildings"
+      "back": "Back to Buildings",
+      "modulesTitle": "Enabled Modules",
+      "modulesDescription": "Hide modules this building doesn't need. Existing data is preserved when a module is turned off.",
+      "modulesWarning": "Disabling a module hides it from residents and admins. Existing data stays in the database and reappears when re-enabled.",
+      "noModules": "No modules enabled",
+      "modules": {
+        "reservations": "Reservations & Spaces",
+        "visitors": "Visitors",
+        "maintenance": "Maintenance",
+        "packages": "Packages",
+        "polls": "Polls",
+        "documents": "Documents",
+        "announcements": "Announcements",
+        "fees": "Fees"
+      }
     }
   }
 }

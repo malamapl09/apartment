@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import { z } from "zod";
 
 const createPollSchema = z.object({
@@ -35,21 +36,8 @@ export async function createPoll(data: {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("polls");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   // For yes_no polls, override options with Yes/No
   const optionLabels =
@@ -95,21 +83,9 @@ export async function createPoll(data: {
 }
 
 export async function publishPoll(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("polls");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("polls")
@@ -128,21 +104,9 @@ export async function publishPoll(id: string) {
 }
 
 export async function closePoll(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("polls");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("polls")
@@ -158,21 +122,9 @@ export async function closePoll(id: string) {
 }
 
 export async function getPolls() {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("polls");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [] };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   const { data, error } = await supabase
     .from("polls")
@@ -188,21 +140,9 @@ export async function getPolls() {
 }
 
 export async function getPollResults(id: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("polls");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: poll, error: pollError } = await supabase
     .from("polls")

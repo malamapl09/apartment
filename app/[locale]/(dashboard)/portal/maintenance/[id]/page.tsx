@@ -24,6 +24,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { MaintenancePriority, MaintenanceStatus } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 const priorityConfig: Record<
   MaintenancePriority,
@@ -53,6 +54,7 @@ interface PageProps {
 export default async function PortalMaintenanceDetailPage({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("maintenance");
   const t = await getTranslations("portal.maintenance");
 
   const { data: request, error } = await getMaintenanceRequest(id);

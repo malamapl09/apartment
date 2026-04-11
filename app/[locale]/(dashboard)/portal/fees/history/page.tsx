@@ -13,6 +13,7 @@ import { AlertCircle, ArrowLeft, Receipt } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { format } from "date-fns";
 import { formatCurrency, formatMonth } from "@/lib/utils/currency";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 type Payment = {
   id: string;
@@ -36,6 +37,7 @@ export default async function FeeHistoryPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("fees");
   const t = await getTranslations("portal.fees");
 
   const { data: payments, error } = await getMyPayments();

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import type { PollWithDetails, PollVote } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -25,6 +26,7 @@ type EnrichedPoll = PollWithDetails & { has_voted: boolean; user_votes: PollVote
 export default async function PortalPollsPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("polls");
   const t = await getTranslations("portal.polls");
 
   const { data: polls, error } = await getActivePolls();

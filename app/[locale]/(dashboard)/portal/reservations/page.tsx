@@ -10,6 +10,7 @@ import { Calendar, Clock, FileText, Upload, XCircle, ArrowRight } from "lucide-r
 import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
 import type { ReservationStatus } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface ReservationWithSpace {
   id: string;
@@ -34,6 +35,7 @@ export default async function MyReservationsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("portal.reservations");
 
   const supabase = await createClient();

@@ -18,6 +18,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { getVisitorWithCompanions } from "@/lib/actions/admin-visitors";
 import VisitorGuestsCard from "@/components/admin/visitor-guests-card";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 import type { VisitorStatus, VisitorWithCompanions } from "@/types";
 
 interface PageProps {
@@ -59,6 +60,7 @@ const formatDate = (dateStr: string) =>
 
 export default async function AdminVisitorDetailPage({ params }: PageProps) {
   const { id } = await params;
+  await assertCurrentUserHasModule("visitors");
   const t = await getTranslations("admin.visitors");
 
   const result = await getVisitorWithCompanions(id);

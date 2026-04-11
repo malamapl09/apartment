@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getAuthProfile } from "@/lib/actions/helpers";
+import { getAuthProfileForModule } from "@/lib/actions/helpers";
 
 const createActivitySchema = z
   .object({
@@ -91,7 +91,7 @@ export async function createSpaceActivity(data: {
 
   const validated = parsed.data;
 
-  const { error: authError, supabase, user, profile } = await getAuthProfile();
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("reservations");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   // Verify space exists and is active
@@ -176,7 +176,7 @@ export async function cancelSpaceActivity(activityId: string) {
     return { error: "Invalid activity ID" };
   }
 
-  const { error: authError, supabase, user, profile } = await getAuthProfile();
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("reservations");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: updated, error } = await supabase
@@ -203,7 +203,7 @@ export async function cancelRecurringActivities(recurrenceGroupId: string) {
     return { error: "Invalid recurrence group ID" };
   }
 
-  const { error: authError, supabase, user, profile } = await getAuthProfile();
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("reservations");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   // Verify ownership via the first activity in the group

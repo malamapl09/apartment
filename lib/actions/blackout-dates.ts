@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 
 export async function getBlackouts(spaceId: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   // Verify the space belongs to the admin's building
@@ -39,7 +39,7 @@ export async function addBlackout(
   startTime?: string | null,
   endTime?: string | null,
 ) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: space } = await supabase
@@ -80,7 +80,7 @@ export async function addBlackout(
 }
 
 export async function removeBlackout(id: string, spaceId: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   // Verify the space belongs to the admin's building

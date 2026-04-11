@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { getAuthProfileForModule } from "@/lib/actions/helpers";
 
 const companionSchema = z.object({
   name: z.string().min(1).max(200),
@@ -34,19 +35,8 @@ export async function registerVisitor(data: RegisterVisitorInput) {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile) return { error: "Profile not found" };
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("visitors");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: ownerRecord } = await supabase
     .from("apartment_owners")
@@ -108,12 +98,8 @@ export async function registerVisitor(data: RegisterVisitorInput) {
 }
 
 export async function getMyVisitors(filter?: "expected" | "past" | "all") {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("visitors");
+  if (authError || !user) return { error: authError ?? "Unauthorized", data: [] };
 
   let query = supabase
     .from("visitors")
@@ -133,12 +119,8 @@ export async function getMyVisitors(filter?: "expected" | "past" | "all") {
 }
 
 export async function cancelVisitor(id: string) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("visitors");
+  if (authError || !user) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
     .from("visitors")

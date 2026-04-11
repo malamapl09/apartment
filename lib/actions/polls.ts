@@ -2,21 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 
 export async function getActivePolls() {
-  const supabase = await createClient();
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("polls");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile) return { error: "Profile not found", data: [] };
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   const { data: polls, error } = await supabase
     .from("polls")
@@ -44,12 +35,8 @@ export async function getActivePolls() {
 }
 
 export async function castVote(pollId: string, optionIds: string[]) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("polls");
+  if (authError || !user) return { error: authError ?? "Unauthorized" };
 
   // Verify the poll exists and is active
   const { data: poll, error: pollError } = await supabase
@@ -118,12 +105,8 @@ export async function castVote(pollId: string, optionIds: string[]) {
 }
 
 export async function getPollResults(pollId: string) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("polls");
+  if (authError || !user) return { error: authError ?? "Unauthorized" };
 
   const { data: poll, error: pollError } = await supabase
     .from("polls")

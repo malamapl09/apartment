@@ -32,10 +32,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Pencil, X, Loader2, ArrowLeft } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Pencil, X, Loader2, ArrowLeft, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
-import type { Building, Profile } from "@/types";
+import { ALL_MODULES, type Building, type ModuleKey, type Profile } from "@/types";
 import { TIMEZONES } from "@/lib/constants";
 
 interface BuildingDetailProps {
@@ -55,10 +56,23 @@ export function BuildingDetail({ building, profiles }: BuildingDetailProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [timezone, setTimezone] = useState(building.timezone);
+  const [enabledModules, setEnabledModules] = useState<ModuleKey[]>(
+    building.enabled_modules ?? [],
+  );
+
+  const toggleModule = (m: ModuleKey) => {
+    setEnabledModules((prev) =>
+      prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m],
+    );
+  };
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    // Append the modules array (FormData supports multiple values per key)
+    for (const m of enabledModules) {
+      formData.append("enabled_modules", m);
+    }
 
     startTransition(async () => {
       const result = await updateBuilding(building.id, formData);
@@ -183,6 +197,24 @@ export function BuildingDetail({ building, profiles }: BuildingDetailProps) {
                   {format(new Date(building.updated_at), "MMM d, yyyy")}
                 </dd>
               </div>
+              <div className="sm:col-span-2">
+                <dt className="text-sm text-muted-foreground">
+                  {t("modulesTitle")}
+                </dt>
+                <dd className="mt-1 flex flex-wrap gap-1.5">
+                  {(building.enabled_modules ?? []).length === 0 ? (
+                    <span className="text-sm text-muted-foreground italic">
+                      {t("noModules")}
+                    </span>
+                  ) : (
+                    (building.enabled_modules ?? []).map((m) => (
+                      <Badge key={m} variant="secondary" className="text-xs">
+                        {t(`modules.${m}`)}
+                      </Badge>
+                    ))
+                  )}
+                </dd>
+              </div>
             </dl>
           ) : (
             /* Edit mode */
@@ -244,6 +276,36 @@ export function BuildingDetail({ building, profiles }: BuildingDetailProps) {
                 </div>
               </div>
 
+              {/* Enabled modules */}
+              <div className="space-y-3 rounded-lg border p-4">
+                <div>
+                  <Label className="text-base">{t("modulesTitle")}</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t("modulesDescription")}
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20 p-2 text-xs text-amber-900 dark:text-amber-200">
+                  <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span>{t("modulesWarning")}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {ALL_MODULES.map((m) => (
+                    <label
+                      key={m}
+                      className="flex items-center gap-2 cursor-pointer rounded-md p-2 hover:bg-accent text-sm"
+                    >
+                      <Checkbox
+                        checked={enabledModules.includes(m)}
+                        onCheckedChange={() => toggleModule(m)}
+                      />
+                      {t(`modules.${m}`)}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex justify-end gap-3 pt-2">
                 <Button
                   type="button"
@@ -251,6 +313,7 @@ export function BuildingDetail({ building, profiles }: BuildingDetailProps) {
                   onClick={() => {
                     setIsEditing(false);
                     setTimezone(building.timezone);
+                    setEnabledModules(building.enabled_modules ?? []);
                   }}
                   disabled={isPending}
                 >

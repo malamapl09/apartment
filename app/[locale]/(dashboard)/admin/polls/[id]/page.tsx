@@ -23,6 +23,7 @@ import {
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { PollStatus } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -37,6 +38,7 @@ const statusClassName: Record<PollStatus, string> = {
 export default async function AdminPollDetailPage({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("polls");
   const t = await getTranslations("admin.polls");
 
   const { data: poll, error } = await getPollResults(id);

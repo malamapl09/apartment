@@ -13,10 +13,22 @@ export async function GET(request: NextRequest) {
 
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
-  // Find all pending charges past their due date
+  // Only act on buildings with the fees module enabled.
+  const { data: enabledBuildings } = await supabase
+    .from("buildings")
+    .select("id")
+    .contains("enabled_modules", ["fees"]);
+
+  const buildingIds = (enabledBuildings ?? []).map((b) => b.id);
+  if (buildingIds.length === 0) {
+    return NextResponse.json({ success: true, markedOverdue: 0 });
+  }
+
+  // Find all pending charges past their due date in those buildings
   const { data: overdueCharges, error: fetchError } = await supabase
     .from("charges")
     .select("id, apartment_id, fee_type_id, amount, due_date")
+    .in("building_id", buildingIds)
     .eq("status", "pending")
     .lt("due_date", today);
 

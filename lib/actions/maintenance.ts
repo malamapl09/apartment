@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import { z } from "zod";
 import type { MaintenanceCategory, MaintenancePriority } from "@/types";
 
@@ -33,19 +34,10 @@ export async function createMaintenanceRequest(data: {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const supabase = await createClient();
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("maintenance");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile) return { error: "Profile not found" };
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   // Get the user's apartment via apartment_owners
   const { data: apartmentOwner } = await supabase
@@ -78,12 +70,8 @@ export async function createMaintenanceRequest(data: {
 }
 
 export async function getMyMaintenanceRequests(filter?: "open" | "resolved" | "all") {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("maintenance");
+  if (authError || !user) return { error: authError ?? "Unauthorized", data: [] };
 
   let query = supabase
     .from("maintenance_requests")
@@ -103,12 +91,8 @@ export async function getMyMaintenanceRequests(filter?: "open" | "resolved" | "a
 }
 
 export async function getMaintenanceRequest(id: string) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("maintenance");
+  if (authError || !user) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
     .from("maintenance_requests")
@@ -141,12 +125,8 @@ export async function addComment(requestId: string, body: string) {
     return { error: parsed.error.issues[0]?.message ?? "Validation failed" };
   }
 
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("maintenance");
+  if (authError || !user) return { error: authError ?? "Unauthorized" };
 
   // Verify the user owns the request or is admin
   const { data: request } = await supabase

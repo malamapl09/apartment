@@ -14,6 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getDocuments, deleteDocument } from "@/lib/actions/documents";
 import { DocumentTable } from "@/components/admin/document-table";
 import type { DocumentWithUploader } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function AdminDocumentsPage({
   params,
@@ -22,6 +23,7 @@ export default async function AdminDocumentsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("documents");
   const t = await getTranslations("admin.documents");
 
   const { data: documents, error } = await getDocuments();

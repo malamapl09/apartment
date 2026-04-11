@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 import { logAuditEvent } from "@/lib/audit/log";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -26,7 +26,7 @@ function timeToMinutes(t: string): number {
 }
 
 export async function getRecurringBlackoutsForSpace(spaceId: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
   if (!UUID_RE.test(spaceId)) return { error: "Invalid id", data: [] };
 
@@ -50,7 +50,7 @@ export async function getRecurringBlackoutsForSpace(spaceId: string) {
 }
 
 export async function createRecurringBlackout(formData: FormData) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const daysRaw = formData.getAll("days").map((d) => Number(d));
@@ -129,7 +129,7 @@ export async function createRecurringBlackout(formData: FormData) {
 }
 
 export async function deleteRecurringBlackout(id: string, spaceId: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
   if (!UUID_RE.test(id) || !UUID_RE.test(spaceId)) return { error: "Invalid id" };
 

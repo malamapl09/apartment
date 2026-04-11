@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { VisitorRegisterForm } from "@/components/portal/visitor-register-form";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function RegisterVisitorPage({
   params,
@@ -11,6 +12,7 @@ export default async function RegisterVisitorPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("visitors");
   const t = await getTranslations("portal.visitors");
 
   return (

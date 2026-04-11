@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { AnnouncementForm } from "@/components/admin/announcement-form";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 import {
   Card,
   CardContent,
@@ -15,6 +16,7 @@ export default async function NewAnnouncementPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("announcements");
   const t = await getTranslations("admin.announcements");
 
   return (

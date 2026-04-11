@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { DocumentUploadForm } from "@/components/admin/document-upload-form";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 import {
   Card,
   CardContent,
@@ -15,6 +16,7 @@ export default async function DocumentUploadPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("documents");
   const t = await getTranslations("admin.documents");
 
   return (

@@ -14,6 +14,19 @@ export type SpaceActivityStatus = "active" | "cancelled";
 
 export type AnnouncementTarget = "all" | "owners" | "residents";
 
+export const ALL_MODULES = [
+  "reservations",
+  "visitors",
+  "maintenance",
+  "packages",
+  "polls",
+  "documents",
+  "announcements",
+  "fees",
+] as const;
+
+export type ModuleKey = (typeof ALL_MODULES)[number];
+
 export interface Building {
   id: string;
   name: string;
@@ -22,6 +35,7 @@ export interface Building {
   bank_account_info: BankAccountInfo | null;
   payment_deadline_hours: number;
   timezone: string;
+  enabled_modules: ModuleKey[];
   created_at: string;
   updated_at: string;
 }

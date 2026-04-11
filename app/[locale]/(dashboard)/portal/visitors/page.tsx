@@ -15,6 +15,7 @@ import { AlertCircle, UserPlus, Users, Clock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { VisitorAccessCode } from "@/components/shared/visitor-access-code";
 import type { Visitor, VisitorStatus } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 function StatusBadge({ status }: { status: VisitorStatus }) {
   const classMap: Record<VisitorStatus, string> = {
@@ -134,6 +135,7 @@ export default async function PortalVisitorsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("visitors");
   const t = await getTranslations("portal.visitors");
 
   const [expectedResult, pastResult, allResult] = await Promise.all([

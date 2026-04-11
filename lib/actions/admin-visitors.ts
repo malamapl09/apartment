@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 import { createNotification } from "@/lib/notifications/create";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 
 export async function getAllVisitors(filters?: {
   status?: string;
@@ -12,21 +13,8 @@ export async function getAllVisitors(filters?: {
   page?: number;
   per_page?: number;
 }) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [], total: 0 };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [], total: 0 };
-  }
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("visitors");
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [], total: 0 };
 
   const page = Math.max(1, Math.floor(filters?.page ?? 1));
   const perPage = filters?.per_page ?? 25;
@@ -103,21 +91,7 @@ async function fireFirstArrivalNotifications(
 }
 
 async function ensureAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" as const, supabase, user: null, profile: null };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" as const, supabase, user: null, profile: null };
-  }
-  return { error: null, supabase, user, profile };
+  return getAdminProfileForModule("visitors");
 }
 
 export async function checkInVisitorMember(
@@ -299,21 +273,8 @@ export async function getVisitorWithCompanions(visitorId: string) {
 }
 
 export async function getTodaysVisitors() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [] };
-  }
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("visitors");
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   const now = new Date().toISOString();
 
@@ -333,21 +294,8 @@ export async function getTodaysVisitors() {
 }
 
 export async function lookupByAccessCode(code: string) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("visitors");
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data, error } = await supabase
     .from("visitors")

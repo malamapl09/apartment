@@ -10,10 +10,22 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  // Find expired pending_payment reservations
+  // Only consider buildings with the reservations module enabled.
+  const { data: enabledBuildings } = await supabase
+    .from("buildings")
+    .select("id")
+    .contains("enabled_modules", ["reservations"]);
+
+  const buildingIds = (enabledBuildings ?? []).map((b) => b.id);
+  if (buildingIds.length === 0) {
+    return NextResponse.json({ cancelled: 0 });
+  }
+
+  // Find expired pending_payment reservations in those buildings
   const { data: expired, error: fetchError } = await supabase
     .from("reservations")
     .select("id, user_id, reference_code")
+    .in("building_id", buildingIds)
     .eq("status", "pending_payment")
     .lt("payment_deadline", new Date().toISOString());
 

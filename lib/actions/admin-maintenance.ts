@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import type { MaintenanceStatus } from "@/types";
 import { sendNotificationEmail } from "@/lib/email/send-notification-email";
 import { createNotification } from "@/lib/notifications/create";
@@ -13,21 +14,9 @@ export async function getMaintenanceRequests(filters?: {
   page?: number;
   per_page?: number;
 }) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("maintenance");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [], total: 0 };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: [], total: 0 };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: [], total: 0 };
 
   const page = Math.max(1, Math.floor(filters?.page ?? 1));
   const perPage = filters?.per_page ?? 25;
@@ -57,21 +46,9 @@ export async function updateMaintenanceStatus(
   status: MaintenanceStatus,
   assignedTo?: string
 ) {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("maintenance");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const updates: Record<string, unknown> = { status };
 
@@ -133,21 +110,9 @@ export async function updateMaintenanceStatus(
 }
 
 export async function addInternalNote(requestId: string, body: string) {
-  const supabase = await createClient();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("maintenance");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized" };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized" };
-  }
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   // Verify the maintenance request belongs to the admin's building
   const { data: request } = await supabase
@@ -172,21 +137,9 @@ export async function addInternalNote(requestId: string, body: string) {
 }
 
 export async function getMaintenanceStats() {
-  const supabase = await createClient();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("maintenance");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: null };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", data: null };
-  }
+  if (authError || !profile) return { error: authError ?? "Unauthorized", data: null };
 
   const { data, error } = await supabase
     .from("maintenance_requests")

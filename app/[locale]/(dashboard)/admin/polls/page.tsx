@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plus, BarChart3, AlertCircle } from "lucide-react";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -20,6 +21,7 @@ interface PageProps {
 export default async function AdminPollsPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("polls");
   const t = await getTranslations("admin.polls");
 
   const { data: polls, error } = await getPolls();

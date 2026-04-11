@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import { z } from "zod";
 
 const uploadDocumentSchema = z.object({
@@ -15,28 +16,8 @@ const uploadDocumentSchema = z.object({
   mime_type: z.string().optional().nullable(),
 });
 
-async function getAdminProfile(supabase: Awaited<ReturnType<typeof createClient>>) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", user: null, profile: null };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id, role")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile || !["admin", "super_admin"].includes(profile.role)) {
-    return { error: "Unauthorized", user: null, profile: null };
-  }
-
-  return { error: null, user, profile };
-}
-
 export async function uploadDocument(formData: FormData) {
-  const supabase = await createClient();
-  const { error: authError, user, profile } = await getAdminProfile(supabase);
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("documents");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const fileSizeRaw = formData.get("file_size");
@@ -68,18 +49,9 @@ export async function uploadDocument(formData: FormData) {
 }
 
 export async function getDocuments(category?: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  const { error: authError, supabase, user, profile } = await getAuthProfileForModule("documents");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("building_id")
-    .eq("id", user.id)
-    .single();
-  if (!profile) return { error: "Profile not found", data: [] };
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   let query = supabase
     .from("documents")
@@ -99,11 +71,8 @@ export async function getDocuments(category?: string) {
 }
 
 export async function getDocument(id: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: null };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("documents");
+  if (authError || !user) return { error: authError ?? "Unauthorized", data: null };
 
   const { data, error } = await supabase
     .from("documents")
@@ -117,8 +86,7 @@ export async function getDocument(id: string) {
 }
 
 export async function deleteDocument(id: string) {
-  const supabase = await createClient();
-  const { error: authError, profile } = await getAdminProfile(supabase);
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("documents");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   const { error } = await supabase
@@ -134,8 +102,7 @@ export async function deleteDocument(id: string) {
 }
 
 export async function uploadNewVersion(documentId: string, formData: FormData) {
-  const supabase = await createClient();
-  const { error: authError, user, profile } = await getAdminProfile(supabase);
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("documents");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: existing, error: fetchError } = await supabase

@@ -1,14 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { getAuthProfileForModule } from "@/lib/actions/helpers";
 
 export async function getMyPackages() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Unauthorized", data: [] };
+  const { error: authError, supabase, user } = await getAuthProfileForModule("packages");
+  if (authError || !user) return { error: authError ?? "Unauthorized", data: [] };
 
   // Get user's apartment(s)
   const { data: ownerRecords } = await supabase

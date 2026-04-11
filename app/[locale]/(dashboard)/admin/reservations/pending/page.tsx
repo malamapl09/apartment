@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Clock, AlertCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 const PER_PAGE = 25;
 
@@ -19,6 +20,7 @@ export default async function PendingPaymentsPage({
   const { locale } = await params;
   const resolvedSearchParams = await searchParams;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("admin.reservations.pending");
   const page = Math.max(1, parseInt(resolvedSearchParams.page ?? "1", 10) || 1);
 

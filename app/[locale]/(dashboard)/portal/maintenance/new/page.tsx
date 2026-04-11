@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { MaintenanceRequestForm } from "@/components/portal/maintenance-request-form";
 import { ArrowLeft } from "lucide-react";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -18,6 +19,7 @@ interface PageProps {
 export default async function NewMaintenanceRequestPage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("maintenance");
   const t = await getTranslations("portal.maintenance");
 
   return (

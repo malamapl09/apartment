@@ -25,9 +25,10 @@ interface HeaderProps {
     avatar_url?: string | null;
     role: string;
   };
+  enabledModules?: string[];
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, enabledModules = [] }: HeaderProps) {
   const t = useTranslations();
 
   const getInitials = (name: string) =>
@@ -44,6 +45,7 @@ export function Header({ user }: HeaderProps) {
         <div className="lg:hidden">
           <MobileSidebar
             userRole={user.role}
+            enabledModules={enabledModules}
             trigger={
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />

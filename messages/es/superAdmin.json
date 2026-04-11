@@ -81,7 +81,21 @@
       "inactive": "Inactivo",
       "notFound": "Edificio no encontrado",
       "noUsers": "Sin usuarios en este edificio",
-      "back": "Volver a Edificios"
+      "back": "Volver a Edificios",
+      "modulesTitle": "Módulos habilitados",
+      "modulesDescription": "Oculta los módulos que este edificio no necesita. Los datos existentes se conservan cuando un módulo se deshabilita.",
+      "modulesWarning": "Deshabilitar un módulo lo oculta para residentes y administradores. Los datos existentes permanecen en la base de datos y reaparecen cuando se vuelve a habilitar.",
+      "noModules": "Sin módulos habilitados",
+      "modules": {
+        "reservations": "Reservaciones y espacios",
+        "visitors": "Visitantes",
+        "maintenance": "Mantenimiento",
+        "packages": "Paquetería",
+        "polls": "Encuestas",
+        "documents": "Documentos",
+        "announcements": "Anuncios",
+        "fees": "Cuotas"
+      }
     }
   }
 }

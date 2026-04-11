@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Wrench, Clock, CheckCircle2 } from "lucide-react";
 
 import { PaginationControls } from "@/components/shared/pagination-controls";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 const PER_PAGE = 25;
 
@@ -35,6 +36,7 @@ export default async function AdminMaintenancePage({
   const { locale } = await params;
   const filters = await searchParams;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("maintenance");
   const t = await getTranslations("admin.maintenance");
   const page = Math.max(1, parseInt(filters.page ?? "1", 10) || 1);
 

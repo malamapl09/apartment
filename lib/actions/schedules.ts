@@ -1,10 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 
 export async function getSchedule(spaceId: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized", data: [] };
 
   // Verify the space belongs to the admin's building
@@ -30,7 +30,7 @@ export async function updateSchedule(
   spaceId: string,
   schedules: Array<{ day_of_week: number; start_time: string; end_time: string }>
 ) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
+  const { error: authError, supabase, profile } = await getAdminProfileForModule("reservations");
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
 
   // Verify the space belongs to the admin's building

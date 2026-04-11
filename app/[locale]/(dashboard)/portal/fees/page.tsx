@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, History } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { ChargeWithDetails } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function PortalFeesPage({
   params,
@@ -16,6 +17,7 @@ export default async function PortalFeesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("fees");
   const t = await getTranslations("portal.fees");
 
   const [

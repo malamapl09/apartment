@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import SpaceCard from "@/components/admin/space-card";
 import type { PublicSpace } from "@/types";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function SpacesPage({
   params,
@@ -13,6 +14,7 @@ export default async function SpacesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("reservations");
   const t = await getTranslations("admin.spaces");
 
   const { data: spaces = [] } = await getSpaces();

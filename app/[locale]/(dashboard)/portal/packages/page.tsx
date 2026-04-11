@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getMyPackages } from "@/lib/actions/packages";
 import { MyPackagesList } from "@/components/portal/my-packages-list";
+import { assertCurrentUserHasModule } from "@/lib/modules";
 
 export default async function PortalPackagesPage({
   params,
@@ -12,6 +13,7 @@ export default async function PortalPackagesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await assertCurrentUserHasModule("packages");
   const t = await getTranslations("portal.packages");
   const { data: packages, error } = await getMyPackages();
 

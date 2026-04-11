@@ -1,14 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getAdminProfile } from "@/lib/actions/helpers";
+import { getAdminProfileForModule } from "@/lib/actions/helpers";
 
 export async function adminCancelSpaceActivity(activityId: string) {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(activityId)) {
     return { error: "Invalid activity ID" };
   }
 
-  const { error: authError, supabase, user, profile } = await getAdminProfile();
+  const { error: authError, supabase, user, profile } = await getAdminProfileForModule("reservations");
   if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
 
   const { data: updated, error } = await supabase

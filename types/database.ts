@@ -274,6 +274,7 @@ export type Database = {
           address: string | null
           bank_account_info: Json | null
           created_at: string | null
+          enabled_modules: string[]
           id: string
           name: string
           payment_deadline_hours: number | null
@@ -285,6 +286,7 @@ export type Database = {
           address?: string | null
           bank_account_info?: Json | null
           created_at?: string | null
+          enabled_modules?: string[]
           id?: string
           name: string
           payment_deadline_hours?: number | null
@@ -296,6 +298,7 @@ export type Database = {
           address?: string | null
           bank_account_info?: Json | null
           created_at?: string | null
+          enabled_modules?: string[]
           id?: string
           name?: string
           payment_deadline_hours?: number | null
@@ -1723,6 +1726,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_in_visitor_group: {
+        Args: { p_user_id: string; p_visitor_id: string }
+        Returns: boolean
+      }
+      check_out_visitor_group: {
+        Args: { p_user_id: string; p_visitor_id: string }
+        Returns: undefined
+      }
       check_space_availability: {
         Args: {
           p_end: string
@@ -1781,9 +1792,13 @@ export type Database = {
         Returns: boolean
       }
       has_any_buildings: { Args: never; Returns: boolean }
+      is_module_enabled: {
+        Args: { p_building_id: string; p_module: string }
+        Returns: boolean
+      }
       recompute_visitor_status: {
         Args: { p_visitor_id: string }
-        Returns: undefined
+        Returns: boolean
       }
     }
     Enums: {
