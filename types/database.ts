@@ -560,7 +560,7 @@ export type Database = {
           description: string
           id: string
           occurred_at: string
-          profile_id: string
+          profile_id: string | null
           severity: string
           space_id: string | null
         }
@@ -571,7 +571,7 @@ export type Database = {
           description: string
           id?: string
           occurred_at?: string
-          profile_id: string
+          profile_id?: string | null
           severity?: string
           space_id?: string | null
         }
@@ -582,7 +582,7 @@ export type Database = {
           description?: string
           id?: string
           occurred_at?: string
-          profile_id?: string
+          profile_id?: string | null
           severity?: string
           space_id?: string | null
         }
@@ -1457,7 +1457,7 @@ export type Database = {
           ends_at: string | null
           id: string
           infraction_id: string | null
-          profile_id: string
+          profile_id: string | null
           reason: string
           revoked_at: string | null
           revoked_by: string | null
@@ -1471,7 +1471,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           infraction_id?: string | null
-          profile_id: string
+          profile_id?: string | null
           reason: string
           revoked_at?: string | null
           revoked_by?: string | null
@@ -1485,7 +1485,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           infraction_id?: string | null
-          profile_id?: string
+          profile_id?: string | null
           reason?: string
           revoked_at?: string | null
           revoked_by?: string | null
@@ -1667,6 +1667,21 @@ export type Database = {
           p_start: string
         }
         Returns: boolean
+      }
+      create_infraction_with_optional_restriction: {
+        Args: {
+          p_also_restrict: boolean
+          p_building_id: string
+          p_created_by: string
+          p_description: string
+          p_occurred_at: string
+          p_profile_id: string
+          p_restriction_ends_at: string
+          p_restriction_reason: string
+          p_severity: string
+          p_space_id: string
+        }
+        Returns: string
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       generate_maintenance_reference_code: { Args: never; Returns: string }

@@ -1,3 +1,4 @@
+import { toZonedTime } from "date-fns-tz";
 import type {
   PublicSpace,
   AvailabilitySchedule,
@@ -33,6 +34,7 @@ interface BookingParams {
   space: PublicSpace;
   startTime: Date;
   endTime: Date;
+  timezone: string; // IANA timezone, e.g. "America/Santo_Domingo"
   schedules: AvailabilitySchedule[];
   blackouts: BlackoutDate[];
   recurringBlackouts: RecurringBlackout[];
@@ -44,20 +46,79 @@ interface BookingParams {
   hasConflict: boolean;
 }
 
-function minutesSinceMidnight(date: Date): number {
-  return date.getHours() * 60 + date.getMinutes();
-}
-
 function parseTimeToMinutes(hhmmss: string): number {
+  // Convention: "23:59:59" represents end-of-day and maps to 1440 so that a
+  // booking ending at exactly midnight (next day) passes schedule/blackout
+  // comparisons. Postgres `time` has no 24:00 value, so end-of-day is stored
+  // as 23:59:59.
+  if (hhmmss === "23:59:59") return 1440;
   const [h, m] = hhmmss.split(":").map(Number);
   return h * 60 + (m || 0);
 }
 
-function isoDateString(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
+// Returns minutes-since-midnight for a Date already expressed in the target TZ
+// (as produced by toZonedTime).
+function zonedMinutesSinceMidnight(zonedDate: Date): number {
+  return zonedDate.getHours() * 60 + zonedDate.getMinutes();
+}
+
+function zonedDateString(zonedDate: Date): string {
+  const y = zonedDate.getFullYear();
+  const m = String(zonedDate.getMonth() + 1).padStart(2, "0");
+  const d = String(zonedDate.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
+}
+
+function samePosixDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+type BookingSegment = {
+  dayOfWeek: number;
+  dateString: string;
+  startMinutes: number;
+  endMinutes: number;
+};
+
+// Split a booking into one or two same-day segments in the building's timezone.
+// A booking that crosses midnight becomes two segments:
+//   [start, 1440] on the start day, then [0, endMinutes] on the next day.
+function splitIntoSegments(
+  zonedStart: Date,
+  zonedEnd: Date,
+): BookingSegment[] {
+  const startMinutes = zonedMinutesSinceMidnight(zonedStart);
+  const endMinutes = zonedMinutesSinceMidnight(zonedEnd);
+
+  if (samePosixDay(zonedStart, zonedEnd)) {
+    return [
+      {
+        dayOfWeek: zonedStart.getDay(),
+        dateString: zonedDateString(zonedStart),
+        startMinutes,
+        endMinutes,
+      },
+    ];
+  }
+
+  return [
+    {
+      dayOfWeek: zonedStart.getDay(),
+      dateString: zonedDateString(zonedStart),
+      startMinutes,
+      endMinutes: 1440,
+    },
+    {
+      dayOfWeek: zonedEnd.getDay(),
+      dateString: zonedDateString(zonedEnd),
+      startMinutes: 0,
+      endMinutes,
+    },
+  ];
 }
 
 export function validateBooking(params: BookingParams): ValidationResult {
@@ -65,6 +126,7 @@ export function validateBooking(params: BookingParams): ValidationResult {
     space,
     startTime,
     endTime,
+    timezone,
     schedules,
     blackouts,
     recurringBlackouts,
@@ -159,57 +221,62 @@ export function validateBooking(params: BookingParams): ValidationResult {
     };
   }
 
-  const dayOfWeek = startTime.getDay();
-  const schedule = schedules.find((s) => s.day_of_week === dayOfWeek);
-  if (!schedule) {
-    return { valid: false, errorKey: "reservation.notAvailableOnDay" };
-  }
+  // Convert booking times to the building's timezone before extracting
+  // wall-clock day/time. Without this, getDay()/getHours() would return values
+  // in the server's runtime timezone, which can be off by a day for buildings
+  // in a different timezone from the server.
+  const zonedStart = toZonedTime(startTime, timezone);
+  const zonedEnd = toZonedTime(endTime, timezone);
+  const segments = splitIntoSegments(zonedStart, zonedEnd);
 
-  const startMinutes = minutesSinceMidnight(startTime);
-  const endMinutes = minutesSinceMidnight(endTime);
-  const scheduleStart = parseTimeToMinutes(schedule.start_time);
-  const scheduleEnd = parseTimeToMinutes(schedule.end_time);
-  if (startMinutes < scheduleStart || endMinutes > scheduleEnd) {
-    return {
-      valid: false,
-      errorKey: "reservation.outsideSchedule",
-      errorParams: { start: schedule.start_time, end: schedule.end_time },
-    };
-  }
-
-  const bookingDate = isoDateString(startTime);
-  for (const blackout of blackouts) {
-    if (blackout.date !== bookingDate) continue;
-    if (blackout.start_time === null || blackout.end_time === null) {
-      return { valid: false, errorKey: "reservation.blackoutFullDay" };
+  for (const seg of segments) {
+    const schedule = schedules.find((s) => s.day_of_week === seg.dayOfWeek);
+    if (!schedule) {
+      return { valid: false, errorKey: "reservation.notAvailableOnDay" };
     }
-    const bStart = parseTimeToMinutes(blackout.start_time);
-    const bEnd = parseTimeToMinutes(blackout.end_time);
-    if (startMinutes < bEnd && endMinutes > bStart) {
+    const scheduleStart = parseTimeToMinutes(schedule.start_time);
+    const scheduleEnd = parseTimeToMinutes(schedule.end_time);
+    if (seg.startMinutes < scheduleStart || seg.endMinutes > scheduleEnd) {
       return {
         valid: false,
-        errorKey: "reservation.blackoutPartialDay",
-        errorParams: {
-          start: blackout.start_time.slice(0, 5),
-          end: blackout.end_time.slice(0, 5),
-        },
+        errorKey: "reservation.outsideSchedule",
+        errorParams: { start: schedule.start_time, end: schedule.end_time },
       };
     }
-  }
 
-  for (const rb of recurringBlackouts) {
-    if (rb.day_of_week !== dayOfWeek) continue;
-    const rbStart = parseTimeToMinutes(rb.start_time);
-    const rbEnd = parseTimeToMinutes(rb.end_time);
-    if (startMinutes < rbEnd && endMinutes > rbStart) {
-      return {
-        valid: false,
-        errorKey: "reservation.recurringBlackout",
-        errorParams: {
-          start: rb.start_time.slice(0, 5),
-          end: rb.end_time.slice(0, 5),
-        },
-      };
+    for (const blackout of blackouts) {
+      if (blackout.date !== seg.dateString) continue;
+      if (blackout.start_time === null || blackout.end_time === null) {
+        return { valid: false, errorKey: "reservation.blackoutFullDay" };
+      }
+      const bStart = parseTimeToMinutes(blackout.start_time);
+      const bEnd = parseTimeToMinutes(blackout.end_time);
+      if (seg.startMinutes < bEnd && seg.endMinutes > bStart) {
+        return {
+          valid: false,
+          errorKey: "reservation.blackoutPartialDay",
+          errorParams: {
+            start: blackout.start_time.slice(0, 5),
+            end: blackout.end_time.slice(0, 5),
+          },
+        };
+      }
+    }
+
+    for (const rb of recurringBlackouts) {
+      if (rb.day_of_week !== seg.dayOfWeek) continue;
+      const rbStart = parseTimeToMinutes(rb.start_time);
+      const rbEnd = parseTimeToMinutes(rb.end_time);
+      if (seg.startMinutes < rbEnd && seg.endMinutes > rbStart) {
+        return {
+          valid: false,
+          errorKey: "reservation.recurringBlackout",
+          errorParams: {
+            start: rb.start_time.slice(0, 5),
+            end: rb.end_time.slice(0, 5),
+          },
+        };
+      }
     }
   }
 

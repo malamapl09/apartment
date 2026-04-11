@@ -69,7 +69,10 @@ function allDayOpenSchedules(): AvailabilitySchedule[] {
   }));
 }
 
+const UTC = "UTC";
+
 const BASE_PARAMS = {
+  timezone: UTC,
   schedules: allDayOpenSchedules(),
   blackouts: [] as BlackoutDate[],
   recurringBlackouts: [] as RecurringBlackout[],
@@ -240,8 +243,8 @@ describe("validateBooking — blackouts", () => {
     const r = validateBooking({
       ...BASE_PARAMS,
       space: makeSpace(),
-      startTime: new Date("2026-04-20T10:00:00.000"),
-      endTime: new Date("2026-04-20T12:00:00.000"),
+      startTime: new Date("2026-04-20T10:00:00.000Z"),
+      endTime: new Date("2026-04-20T12:00:00.000Z"),
       blackouts: [
         {
           id: "b1",
@@ -261,8 +264,8 @@ describe("validateBooking — blackouts", () => {
     const r = validateBooking({
       ...BASE_PARAMS,
       space: makeSpace(),
-      startTime: new Date("2026-04-20T10:00:00.000"),
-      endTime: new Date("2026-04-20T11:00:00.000"),
+      startTime: new Date("2026-04-20T10:00:00.000Z"),
+      endTime: new Date("2026-04-20T11:00:00.000Z"),
       blackouts: [
         {
           id: "b1",
@@ -281,8 +284,8 @@ describe("validateBooking — blackouts", () => {
 describe("validateBooking — recurring blackouts", () => {
   // 2026-04-20 is a Monday (day_of_week=1)
   const mondayBooking = {
-    startTime: new Date("2026-04-20T10:00:00.000"),
-    endTime: new Date("2026-04-20T12:00:00.000"),
+    startTime: new Date("2026-04-20T10:00:00.000Z"),
+    endTime: new Date("2026-04-20T12:00:00.000Z"),
   };
 
   it("rejects when a recurring blackout on the same weekday overlaps", () => {
@@ -344,5 +347,159 @@ describe("validateBooking — recurring blackouts", () => {
       ],
     });
     expect(r.valid).toBe(true);
+  });
+});
+
+describe("validateBooking — cross-midnight bookings", () => {
+  // 2026-04-20 is a Monday, 2026-04-21 is a Tuesday.
+  // A Mon 22:00 → Tue 01:00 UTC booking spans both days.
+  const overnightBooking = {
+    startTime: new Date("2026-04-20T22:00:00.000Z"),
+    endTime: new Date("2026-04-21T01:00:00.000Z"),
+  };
+
+  it("rejects an overnight booking that hits a Monday-side recurring blackout split row", () => {
+    // Admin created a 22:00–08:00 nightly window that got stored as two rows:
+    // Mon [22:00, 23:59:59] and Tue [00:00:00, 08:00]. Either row should reject.
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      space: makeSpace({ max_duration_hours: 8 }),
+      ...overnightBooking,
+      recurringBlackouts: [
+        {
+          id: "rb1",
+          space_id: "00000000-0000-4000-8000-000000000001",
+          day_of_week: 1, // Monday
+          start_time: "22:00:00",
+          end_time: "23:59:59",
+          reason: "Quiet hours",
+          created_at: "2026-01-01T00:00:00Z",
+        },
+      ],
+    });
+    expect(r.valid).toBe(false);
+    expect(r.errorKey).toBe("reservation.recurringBlackout");
+  });
+
+  it("rejects an overnight booking that hits a Tuesday-side recurring blackout split row", () => {
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      space: makeSpace({ max_duration_hours: 8 }),
+      ...overnightBooking,
+      recurringBlackouts: [
+        {
+          id: "rb2",
+          space_id: "00000000-0000-4000-8000-000000000001",
+          day_of_week: 2, // Tuesday
+          start_time: "00:00:00",
+          end_time: "08:00:00",
+          reason: "Quiet hours",
+          created_at: "2026-01-01T00:00:00Z",
+        },
+      ],
+    });
+    expect(r.valid).toBe(false);
+    expect(r.errorKey).toBe("reservation.recurringBlackout");
+  });
+
+  it("rejects an overnight booking when the Tuesday date has a full-day blackout", () => {
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      space: makeSpace({ max_duration_hours: 8 }),
+      ...overnightBooking,
+      blackouts: [
+        {
+          id: "b1",
+          space_id: "00000000-0000-4000-8000-000000000001",
+          date: "2026-04-21",
+          reason: null,
+          start_time: null,
+          end_time: null,
+        },
+      ],
+    });
+    expect(r.valid).toBe(false);
+    expect(r.errorKey).toBe("reservation.blackoutFullDay");
+  });
+
+  it("rejects an overnight booking when a Tuesday partial-day blackout overlaps", () => {
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      space: makeSpace({ max_duration_hours: 8 }),
+      ...overnightBooking,
+      blackouts: [
+        {
+          id: "b1",
+          space_id: "00000000-0000-4000-8000-000000000001",
+          date: "2026-04-21",
+          reason: null,
+          start_time: "00:30:00",
+          end_time: "02:00:00",
+        },
+      ],
+    });
+    expect(r.valid).toBe(false);
+    expect(r.errorKey).toBe("reservation.blackoutPartialDay");
+  });
+
+  it("allows an overnight booking when no blackout touches either segment", () => {
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      space: makeSpace({ max_duration_hours: 8 }),
+      ...overnightBooking,
+    });
+    expect(r.valid).toBe(true);
+  });
+});
+
+describe("validateBooking — timezone-aware day-of-week", () => {
+  it("uses the building timezone (not the server clock) for day/time", () => {
+    // Booking: 2026-04-21T02:00:00Z — Tuesday in UTC, but in America/Santo_Domingo
+    // (UTC-4) it's 2026-04-20T22:00, which is Monday.
+    // A recurring blackout on Monday 21:00–23:00 should still reject this.
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      timezone: "America/Santo_Domingo",
+      space: makeSpace(),
+      startTime: new Date("2026-04-21T02:00:00.000Z"),
+      endTime: new Date("2026-04-21T03:00:00.000Z"),
+      recurringBlackouts: [
+        {
+          id: "rb-tz",
+          space_id: "00000000-0000-4000-8000-000000000001",
+          day_of_week: 1, // Monday in the building's timezone
+          start_time: "21:00:00",
+          end_time: "23:00:00",
+          reason: null,
+          created_at: "2026-01-01T00:00:00Z",
+        },
+      ],
+    });
+    expect(r.valid).toBe(false);
+    expect(r.errorKey).toBe("reservation.recurringBlackout");
+  });
+
+  it("matches blackout dates in the building timezone, not UTC", () => {
+    // Same 02:00 UTC / 22:00 local Mon booking — full-day blackout on 2026-04-20
+    // (the local Monday) should reject, even though the UTC date is 2026-04-21.
+    const r = validateBooking({
+      ...BASE_PARAMS,
+      timezone: "America/Santo_Domingo",
+      space: makeSpace(),
+      startTime: new Date("2026-04-21T02:00:00.000Z"),
+      endTime: new Date("2026-04-21T03:00:00.000Z"),
+      blackouts: [
+        {
+          id: "b1",
+          space_id: "00000000-0000-4000-8000-000000000001",
+          date: "2026-04-20",
+          reason: null,
+          start_time: null,
+          end_time: null,
+        },
+      ],
+    });
+    expect(r.valid).toBe(false);
+    expect(r.errorKey).toBe("reservation.blackoutFullDay");
   });
 });

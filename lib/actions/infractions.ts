@@ -46,51 +46,43 @@ export async function createInfraction(formData: FormData) {
     .single();
   if (!targetProfile) return { error: "Profile not found in your building" };
 
-  const { data: infraction, error } = await supabase
-    .from("infractions")
-    .insert({
-      building_id: profile.building_id,
-      profile_id: parsed.data.profile_id,
-      space_id: parsed.data.space_id || null,
-      occurred_at: parsed.data.occurred_at,
-      severity: parsed.data.severity,
-      description: parsed.data.description,
-      created_by: user.id,
-    })
-    .select()
-    .single();
+  // Atomic: infraction + optional linked restriction committed together.
+  // Without the DB-side wrapper, a partial failure could leave an infraction
+  // without its intended restriction.
+  const { data: infractionId, error } = await supabase.rpc(
+    "create_infraction_with_optional_restriction",
+    {
+      p_building_id: profile.building_id,
+      p_profile_id: parsed.data.profile_id,
+      p_space_id: parsed.data.space_id || null,
+      p_occurred_at: parsed.data.occurred_at,
+      p_severity: parsed.data.severity,
+      p_description: parsed.data.description,
+      p_created_by: user.id,
+      p_also_restrict: parsed.data.also_restrict ?? false,
+      p_restriction_reason: parsed.data.restriction_reason ?? null,
+      p_restriction_ends_at: parsed.data.restriction_ends_at ?? null,
+    },
+  );
 
-  if (error || !infraction) return { error: error?.message ?? "Failed to create infraction" };
+  if (error || !infractionId) {
+    return { error: error?.message ?? "Failed to create infraction" };
+  }
 
   await logAuditEvent({
     action: "infraction.create",
     tableName: "infractions",
-    recordId: infraction.id,
+    recordId: infractionId as string,
     newData: { severity: parsed.data.severity, profile_id: parsed.data.profile_id },
   });
 
-  if (parsed.data.also_restrict) {
-    const { error: restrictionError } = await supabase
-      .from("user_restrictions")
-      .insert({
-        building_id: profile.building_id,
-        profile_id: parsed.data.profile_id,
-        space_id: parsed.data.space_id || null,
-        infraction_id: infraction.id,
-        reason: parsed.data.restriction_reason || parsed.data.description,
-        ends_at: parsed.data.restriction_ends_at || null,
-        created_by: user.id,
-      });
-    if (restrictionError) return { error: restrictionError.message };
-  }
-
   revalidatePath(`/admin/owners/${parsed.data.profile_id}`);
-  return { success: true, data: infraction };
+  return { success: true, data: { id: infractionId as string } };
 }
 
 export async function deleteInfraction(id: string) {
-  const { error: authError, supabase, profile } = await getAdminProfile();
-  if (authError || !profile) return { error: authError ?? "Unauthorized" };
+  const { error: authError, supabase, profile, user } = await getAdminProfile();
+  if (authError || !profile || !user) return { error: authError ?? "Unauthorized" };
   if (!UUID_RE.test(id)) return { error: "Invalid id" };
 
   const { data: infraction } = await supabase
@@ -101,6 +93,19 @@ export async function deleteInfraction(id: string) {
     .single();
   if (!infraction) return { error: "Not found" };
 
+  // Revoke any still-active restrictions linked to this infraction so an
+  // admin deleting an erroneous infraction isn't left with an orphan
+  // restriction that still blocks the user.
+  const { error: revokeError } = await supabase
+    .from("user_restrictions")
+    .update({
+      revoked_at: new Date().toISOString(),
+      revoked_by: user.id,
+    })
+    .eq("infraction_id", id)
+    .is("revoked_at", null);
+  if (revokeError) return { error: revokeError.message };
+
   const { error } = await supabase.from("infractions").delete().eq("id", id);
   if (error) return { error: error.message };
 
@@ -110,7 +115,9 @@ export async function deleteInfraction(id: string) {
     recordId: id,
   });
 
-  revalidatePath(`/admin/owners/${infraction.profile_id}`);
+  if (infraction.profile_id) {
+    revalidatePath(`/admin/owners/${infraction.profile_id}`);
+  }
   return { success: true };
 }
 

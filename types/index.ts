@@ -133,7 +133,7 @@ export type InfractionSeverity = "minor" | "major" | "severe";
 export interface Infraction {
   id: string;
   building_id: string;
-  profile_id: string;
+  profile_id: string | null;
   space_id: string | null;
   occurred_at: string;
   severity: InfractionSeverity;
@@ -145,7 +145,7 @@ export interface Infraction {
 export interface UserRestriction {
   id: string;
   building_id: string;
-  profile_id: string;
+  profile_id: string | null;
   space_id: string | null;
   infraction_id: string | null;
   reason: string;

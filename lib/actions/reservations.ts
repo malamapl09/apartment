@@ -99,7 +99,6 @@ export async function createReservation(data: {
     supabase.rpc("has_active_restriction", {
       p_profile_id: user.id,
       p_space_id: data.space_id,
-      p_at: data.start_time,
     }),
     supabase.rpc("get_user_space_booked_hours", {
       p_user_id: user.id,
@@ -114,6 +113,24 @@ export async function createReservation(data: {
     }),
   ]);
 
+  // Fail closed if any critical lookup errored — never let booking proceed on
+  // incomplete information. The restriction, conflict, and hour-cap RPCs are
+  // all part of the enforcement chain.
+  if (
+    schedulesRes.error ||
+    blackoutsRes.error ||
+    recurringBlackoutsRes.error ||
+    monthlyCountRes.error ||
+    restrictionRes.error ||
+    bookedHoursRes.error ||
+    isAvailableRes.error
+  ) {
+    return {
+      error:
+        "Could not verify booking eligibility. Please try again in a moment.",
+    };
+  }
+
   const bookedHoursRow = Array.isArray(bookedHoursRes.data)
     ? bookedHoursRes.data[0]
     : bookedHoursRes.data;
@@ -122,6 +139,7 @@ export async function createReservation(data: {
     space,
     startTime: new Date(data.start_time),
     endTime: new Date(data.end_time),
+    timezone: buildingTimezone,
     schedules: schedulesRes.data || [],
     blackouts: (blackoutsRes.data || []) as import("@/types").BlackoutDate[],
     recurringBlackouts:
