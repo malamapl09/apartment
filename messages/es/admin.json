@@ -759,7 +759,8 @@
           "reasonLabel": "Razón",
           "reasonRequired": "La razón es requerida",
           "cancel": "Cancelar",
-          "save": "Guardar"
+          "save": "Guardar",
+          "nameOnlyWarning": "Sugerencia: una entrada solo por nombre bloqueará a cualquier visitante con ese mismo nombre. Añade una cédula o teléfono para ser más específico."
         }
       }
     },

@@ -147,24 +147,24 @@ export async function cancelVisitor(id: string) {
   const { error: authError, supabase, user } = await getAuthProfileForModule("visitors");
   if (authError || !user) return { error: authError ?? "Unauthorized" };
 
-  // Load first so we have building_id + name for the admin notification.
-  const { data: visitor } = await supabase
-    .from("visitors")
-    .select("id, building_id, visitor_name, apartments(unit_number)")
-    .eq("id", id)
-    .eq("registered_by", user.id)
-    .eq("status", "expected")
-    .single();
-  if (!visitor) return { error: "Visitor not found" };
-
-  const { error } = await supabase
+  // Atomic: the update + the row we need for the notification comes back in
+  // one round-trip. If another call (or the auto-expire cron) flipped the
+  // status between the time the user clicked cancel and now, the UPDATE
+  // matches zero rows and we surface that as an error instead of silently
+  // returning success.
+  const { data: updated, error } = await supabase
     .from("visitors")
     .update({ status: "cancelled" })
     .eq("id", id)
     .eq("registered_by", user.id)
-    .eq("status", "expected");
+    .eq("status", "expected")
+    .select("id, building_id, visitor_name, apartments(unit_number)");
 
   if (error) return { error: error.message };
+  if (!updated || updated.length === 0) {
+    return { error: "Visitor not found or already cancelled" };
+  }
+  const visitor = updated[0];
 
   // Fire-and-forget: tell every building admin the visit was cancelled
   // so the lobby staff doesn't let the guest in when they show up.
@@ -186,7 +186,9 @@ export async function cancelVisitor(id: string) {
       title: `Visit cancelled: ${visitor.visitor_name}`,
       body: `Unit ${unit} cancelled their expected visitor.`,
       data: { action_url: `/admin/visitors/${id}` },
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("[visitors] cancel notification failed", err);
+    });
   }
 
   revalidatePath("/portal/visitors");

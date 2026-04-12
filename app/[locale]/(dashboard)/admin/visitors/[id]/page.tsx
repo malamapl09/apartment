@@ -179,14 +179,6 @@ export default async function AdminVisitorDetailPage({ params }: PageProps) {
               <span className="text-muted-foreground">{t("validUntil")}</span>
               <span className="font-medium">{formatDate(v.valid_until)}</span>
             </div>
-            {v.is_recurring && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("recurring")}</span>
-                <Badge variant="secondary">
-                  {v.recurrence_pattern ?? "Yes"}
-                </Badge>
-              </div>
-            )}
           </CardContent>
         </Card>
 

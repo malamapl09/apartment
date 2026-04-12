@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, UserPlus, Users, Clock } from "lucide-react";
+import { AlertCircle, UserPlus, Users } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { VisitorAccessCode } from "@/components/shared/visitor-access-code";
 import type { Visitor, VisitorStatus } from "@/types";
@@ -80,12 +80,6 @@ function VisitorCard({ visitor, t }: { visitor: Visitor; t: (key: string) => str
             {formatDate(visitor.valid_until)}
           </div>
         </div>
-        {visitor.is_recurring && (
-          <Badge variant="secondary" className="gap-1">
-            <Clock className="h-3 w-3" />
-            {visitor.recurrence_pattern}
-          </Badge>
-        )}
         {visitor.status === "expected" && (
           <form
             action={async () => {

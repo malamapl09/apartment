@@ -759,7 +759,8 @@
           "reasonLabel": "Reason",
           "reasonRequired": "A reason is required",
           "cancel": "Cancel",
-          "save": "Save"
+          "save": "Save",
+          "nameOnlyWarning": "Tip: a name-only entry will match every visitor with that name. Add an ID number or phone to narrow it down."
         }
       }
     },

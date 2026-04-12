@@ -80,6 +80,9 @@ export default function VisitorBlacklistFormDialog() {
         <DialogHeader>
           <DialogTitle>{t("addTitle")}</DialogTitle>
         </DialogHeader>
+        <p className="text-xs text-muted-foreground rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900/40 p-2">
+          {t("form.nameOnlyWarning")}
+        </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="bl_name">
