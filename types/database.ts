@@ -1540,6 +1540,54 @@ export type Database = {
           },
         ]
       }
+      visitor_blacklist: {
+        Row: {
+          building_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          id_number: string | null
+          name: string
+          phone: string | null
+          reason: string
+        }
+        Insert: {
+          building_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          id_number?: string | null
+          name: string
+          phone?: string | null
+          reason: string
+        }
+        Update: {
+          building_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          id_number?: string | null
+          name?: string
+          phone?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitor_blacklist_building_id_fkey"
+            columns: ["building_id"]
+            isOneToOne: false
+            referencedRelation: "buildings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitor_blacklist_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visitor_companions: {
         Row: {
           checked_in_at: string | null
@@ -1620,7 +1668,7 @@ export type Database = {
           purpose: string | null
           recurrence_end_date: string | null
           recurrence_pattern: string | null
-          registered_by: string
+          registered_by: string | null
           status: string
           updated_at: string | null
           valid_from: string
@@ -1646,7 +1694,7 @@ export type Database = {
           purpose?: string | null
           recurrence_end_date?: string | null
           recurrence_pattern?: string | null
-          registered_by: string
+          registered_by?: string | null
           status?: string
           updated_at?: string | null
           valid_from: string
@@ -1672,7 +1720,7 @@ export type Database = {
           purpose?: string | null
           recurrence_end_date?: string | null
           recurrence_pattern?: string | null
-          registered_by?: string
+          registered_by?: string | null
           status?: string
           updated_at?: string | null
           valid_from?: string
@@ -1769,6 +1817,7 @@ export type Database = {
         Returns: string
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      expire_passed_visitors: { Args: never; Returns: number }
       generate_maintenance_reference_code: { Args: never; Returns: string }
       generate_reference_code: { Args: never; Returns: string }
       generate_visitor_access_code: { Args: never; Returns: string }
@@ -1794,6 +1843,15 @@ export type Database = {
       has_any_buildings: { Args: never; Returns: boolean }
       is_module_enabled: {
         Args: { p_building_id: string; p_module: string }
+        Returns: boolean
+      }
+      is_visitor_blacklisted: {
+        Args: {
+          p_building_id: string
+          p_id_number: string
+          p_name: string
+          p_phone: string
+        }
         Returns: boolean
       }
       recompute_visitor_status: {

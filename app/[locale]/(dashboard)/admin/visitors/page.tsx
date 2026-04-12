@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Users, AlertCircle, Search } from "lucide-react";
+import { Users, AlertCircle, Search, ShieldAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { assertCurrentUserHasModule } from "@/lib/modules";
 import type { VisitorWithDetails } from "@/types";
 
@@ -71,6 +73,12 @@ export default async function AdminVisitorsPage({ searchParams }: PageProps) {
             <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
             <p className="text-muted-foreground">{t("description")}</p>
           </div>
+          <Button asChild variant="outline">
+            <Link href="/admin/visitors/blacklist">
+              <ShieldAlert className="h-4 w-4 mr-2" />
+              {t("blacklist.title")}
+            </Link>
+          </Button>
         </div>
 
         {/* Expected Today */}

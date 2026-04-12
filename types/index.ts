@@ -326,7 +326,7 @@ export interface Visitor {
   id: string;
   building_id: string;
   apartment_id: string;
-  registered_by: string;
+  registered_by: string | null;
   visitor_name: string;
   visitor_id_number: string | null;
   visitor_phone: string | null;
@@ -350,8 +350,19 @@ export interface Visitor {
 }
 
 export interface VisitorWithDetails extends Visitor {
-  profiles: Pick<Profile, "id" | "full_name">;
+  profiles: Pick<Profile, "id" | "full_name"> | null;
   apartments: Pick<Apartment, "id" | "unit_number">;
+}
+
+export interface VisitorBlacklistEntry {
+  id: string;
+  building_id: string;
+  name: string;
+  id_number: string | null;
+  phone: string | null;
+  reason: string;
+  created_by: string | null;
+  created_at: string;
 }
 
 export interface VisitorCompanion {

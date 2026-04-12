@@ -1,9 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { getAuthProfileForModule } from "@/lib/actions/helpers";
+import { createBulkNotifications } from "@/lib/notifications/create";
 
 const companionSchema = z.object({
   name: z.string().min(1).max(200),
@@ -20,14 +20,14 @@ const registerVisitorSchema = z.object({
   purpose: z.string().optional(),
   valid_from: z.string().datetime("Invalid valid_from date format"),
   valid_until: z.string().datetime("Invalid valid_until date format"),
-  is_recurring: z.boolean().optional(),
-  recurrence_pattern: z.string().optional(),
-  recurrence_end_date: z.string().datetime().optional(),
   notes: z.string().max(500).optional(),
   companions: z.array(companionSchema).max(20).optional(),
 });
 
 export type RegisterVisitorInput = z.input<typeof registerVisitorSchema>;
+
+const BLACKLIST_ERROR =
+  "This visitor cannot be registered. Contact building management.";
 
 export async function registerVisitor(data: RegisterVisitorInput) {
   const parsed = registerVisitorSchema.safeParse(data);
@@ -45,6 +45,36 @@ export async function registerVisitor(data: RegisterVisitorInput) {
     .single();
   if (!ownerRecord) return { error: "No apartment found for this user" };
 
+  // Check blacklist for primary + every companion before writing anything.
+  const { data: primaryBlocked, error: primaryBlockError } = await supabase.rpc(
+    "is_visitor_blacklisted",
+    {
+      p_building_id: profile.building_id,
+      p_name: parsed.data.visitor_name,
+      p_id_number: parsed.data.visitor_id_number ?? null,
+      p_phone: parsed.data.visitor_phone ?? null,
+    },
+  );
+  if (primaryBlockError) return { error: primaryBlockError.message };
+  if (primaryBlocked === true) return { error: BLACKLIST_ERROR };
+
+  const companionsInput = (parsed.data.companions ?? []).filter((c) =>
+    c.name.trim(),
+  );
+  for (const companion of companionsInput) {
+    const { data: compBlocked, error: compBlockError } = await supabase.rpc(
+      "is_visitor_blacklisted",
+      {
+        p_building_id: profile.building_id,
+        p_name: companion.name,
+        p_id_number: companion.id_number ?? null,
+        p_phone: companion.phone ?? null,
+      },
+    );
+    if (compBlockError) return { error: compBlockError.message };
+    if (compBlocked === true) return { error: BLACKLIST_ERROR };
+  }
+
   const primaryPayload = {
     name: parsed.data.visitor_name,
     id_number: parsed.data.visitor_id_number ?? null,
@@ -55,18 +85,13 @@ export async function registerVisitor(data: RegisterVisitorInput) {
     notes: parsed.data.notes ?? null,
     valid_from: parsed.data.valid_from,
     valid_until: parsed.data.valid_until,
-    is_recurring: parsed.data.is_recurring ?? false,
-    recurrence_pattern: parsed.data.recurrence_pattern ?? null,
-    recurrence_end_date: parsed.data.recurrence_end_date ?? null,
   };
 
-  const companionsPayload = (parsed.data.companions ?? [])
-    .filter((c) => c.name.trim())
-    .map((c) => ({
-      name: c.name.trim(),
-      id_number: c.id_number ?? null,
-      phone: c.phone ?? null,
-    }));
+  const companionsPayload = companionsInput.map((c) => ({
+    name: c.name.trim(),
+    id_number: c.id_number ?? null,
+    phone: c.phone ?? null,
+  }));
 
   const { data: visitorId, error: rpcError } = await supabase.rpc(
     "create_visitor_with_companions",
@@ -122,6 +147,16 @@ export async function cancelVisitor(id: string) {
   const { error: authError, supabase, user } = await getAuthProfileForModule("visitors");
   if (authError || !user) return { error: authError ?? "Unauthorized" };
 
+  // Load first so we have building_id + name for the admin notification.
+  const { data: visitor } = await supabase
+    .from("visitors")
+    .select("id, building_id, visitor_name, apartments(unit_number)")
+    .eq("id", id)
+    .eq("registered_by", user.id)
+    .eq("status", "expected")
+    .single();
+  if (!visitor) return { error: "Visitor not found" };
+
   const { error } = await supabase
     .from("visitors")
     .update({ status: "cancelled" })
@@ -130,6 +165,29 @@ export async function cancelVisitor(id: string) {
     .eq("status", "expected");
 
   if (error) return { error: error.message };
+
+  // Fire-and-forget: tell every building admin the visit was cancelled
+  // so the lobby staff doesn't let the guest in when they show up.
+  const { data: admins } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("building_id", visitor.building_id)
+    .in("role", ["admin", "super_admin"]);
+
+  const adminIds = (admins ?? []).map((a) => a.id);
+  if (adminIds.length > 0) {
+    const apartment = Array.isArray(visitor.apartments)
+      ? visitor.apartments[0]
+      : visitor.apartments;
+    const unit = (apartment as { unit_number?: string } | null)?.unit_number ?? "—";
+
+    createBulkNotifications(adminIds, {
+      type: "visitor_cancelled",
+      title: `Visit cancelled: ${visitor.visitor_name}`,
+      body: `Unit ${unit} cancelled their expected visitor.`,
+      data: { action_url: `/admin/visitors/${id}` },
+    }).catch(() => {});
+  }
 
   revalidatePath("/portal/visitors");
   return { success: true };

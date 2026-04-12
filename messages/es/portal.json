@@ -407,9 +407,6 @@
       "purposePlaceholder": "Razón de la visita (opcional)",
       "validFrom": "Válido Desde",
       "validUntil": "Válido Hasta",
-      "isRecurring": "Visitante Recurrente",
-      "recurrencePattern": "Recurrencia",
-      "recurrenceEndDate": "Fecha Fin de Recurrencia",
       "accessCode": "Código de Acceso",
       "shareCode": "Comparte este código con tu visitante",
       "copyCode": "Copiar Código",
@@ -432,11 +429,6 @@
         "expired": "Expirado",
         "cancelled": "Cancelado"
       },
-      "recurrence": {
-        "daily": "Diario",
-        "weekly": "Semanal",
-        "monthly": "Mensual"
-      },
       "notesLabel": "Notas",
       "notesPlaceholder": "Notas adicionales...",
       "dateRangeError": "La fecha de fin debe ser posterior a la fecha de inicio",
@@ -451,6 +443,9 @@
         "max": "Máximo {max} invitados por visita",
         "maxReached": "Máximo {max} invitados alcanzado",
         "sharedBy": "Compartido por {count} invitados"
+      },
+      "errors": {
+        "blacklisted": "Este visitante no puede ser registrado. Contacta a la administración del edificio."
       }
     },
     "packages": {

@@ -407,9 +407,6 @@
       "purposePlaceholder": "Reason for the visit (optional)",
       "validFrom": "Valid From",
       "validUntil": "Valid Until",
-      "isRecurring": "Recurring Visitor",
-      "recurrencePattern": "Recurrence",
-      "recurrenceEndDate": "Recurrence End Date",
       "accessCode": "Access Code",
       "shareCode": "Share this code with your visitor",
       "copyCode": "Copy Code",
@@ -432,11 +429,6 @@
         "expired": "Expired",
         "cancelled": "Cancelled"
       },
-      "recurrence": {
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly"
-      },
       "notesLabel": "Notes",
       "notesPlaceholder": "Any additional notes...",
       "dateRangeError": "Valid until must be after valid from",
@@ -451,6 +443,9 @@
         "max": "Maximum {max} guests per visit",
         "maxReached": "Maximum {max} guests reached",
         "sharedBy": "Shared by {count} guests"
+      },
+      "errors": {
+        "blacklisted": "This visitor cannot be registered. Contact building management."
       }
     },
     "packages": {

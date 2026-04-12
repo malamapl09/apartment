@@ -730,6 +730,37 @@
         "checkInSuccess": "Invitado registrado",
         "checkOut": "Salida",
         "checkOutSuccess": "Invitado salió"
+      },
+      "blacklist": {
+        "title": "Lista negra de visitantes",
+        "description": "Bloquea personas específicas para que no puedan ser registradas como visitantes. El registro se rechaza si coincide el nombre, cédula o teléfono con alguna entrada.",
+        "back": "Volver a Visitantes",
+        "empty": "No hay visitantes en la lista negra.",
+        "add": "Agregar entrada",
+        "addTitle": "Nueva entrada",
+        "addSuccess": "Entrada añadida a la lista negra",
+        "addError": "No se pudo añadir la entrada",
+        "delete": "Eliminar",
+        "deleteConfirm": "¿Estás seguro? Eliminar esta entrada permitirá que esta persona sea registrada nuevamente.",
+        "deleteSuccess": "Entrada eliminada",
+        "columns": {
+          "name": "Nombre",
+          "idNumber": "Cédula",
+          "phone": "Teléfono",
+          "reason": "Razón",
+          "addedBy": "Agregado por",
+          "actions": "Acciones"
+        },
+        "form": {
+          "nameLabel": "Nombre",
+          "nameRequired": "El nombre es requerido",
+          "idNumberLabel": "Cédula",
+          "phoneLabel": "Teléfono",
+          "reasonLabel": "Razón",
+          "reasonRequired": "La razón es requerida",
+          "cancel": "Cancelar",
+          "save": "Guardar"
+        }
       }
     },
     "packages": {

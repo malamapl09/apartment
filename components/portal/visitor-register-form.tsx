@@ -9,14 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -51,9 +43,6 @@ export function VisitorRegisterForm() {
     purpose: "",
     valid_from: "",
     valid_until: "",
-    is_recurring: false,
-    recurrence_pattern: "",
-    recurrence_end_date: "",
     notes: "",
   });
   const [companions, setCompanions] = useState<Companion[]>([]);
@@ -114,13 +103,6 @@ export function VisitorRegisterForm() {
         purpose: formData.purpose || undefined,
         valid_from: new Date(formData.valid_from).toISOString(),
         valid_until: new Date(formData.valid_until).toISOString(),
-        is_recurring: formData.is_recurring,
-        recurrence_pattern: formData.is_recurring
-          ? formData.recurrence_pattern || undefined
-          : undefined,
-        recurrence_end_date: formData.is_recurring
-          ? formData.recurrence_end_date || undefined
-          : undefined,
         notes: formData.notes || undefined,
         companions: cleanedCompanions.length > 0 ? cleanedCompanions : undefined,
       });
@@ -173,9 +155,6 @@ export function VisitorRegisterForm() {
                   purpose: "",
                   valid_from: "",
                   valid_until: "",
-                  is_recurring: false,
-                  recurrence_pattern: "",
-                  recurrence_end_date: "",
                   notes: "",
                 });
                 setCompanions([]);
@@ -416,67 +395,6 @@ export function VisitorRegisterForm() {
             </div>
           </div>
 
-          {/* Recurring */}
-          <div className="flex items-center gap-3 rounded-lg border p-4">
-            <Switch
-              id="is_recurring"
-              checked={formData.is_recurring}
-              onCheckedChange={(checked) =>
-                setFormData((prev) => ({ ...prev, is_recurring: checked }))
-              }
-              aria-label={t("isRecurring")}
-            />
-            <Label htmlFor="is_recurring" className="cursor-pointer">
-              {t("isRecurring")}
-            </Label>
-          </div>
-
-          {formData.is_recurring && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="recurrence_pattern">
-                  {t("recurrencePattern")}
-                </Label>
-                <Select
-                  value={formData.recurrence_pattern}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      recurrence_pattern: value,
-                    }))
-                  }
-                >
-                  <SelectTrigger id="recurrence_pattern">
-                    <SelectValue placeholder={t("recurrencePattern")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">
-                      {t("recurrence.daily")}
-                    </SelectItem>
-                    <SelectItem value="weekly">
-                      {t("recurrence.weekly")}
-                    </SelectItem>
-                    <SelectItem value="monthly">
-                      {t("recurrence.monthly")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="recurrence_end_date">
-                  {t("recurrenceEndDate")}
-                </Label>
-                <Input
-                  id="recurrence_end_date"
-                  name="recurrence_end_date"
-                  type="date"
-                  value={formData.recurrence_end_date}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Notes */}
           <div className="space-y-2">

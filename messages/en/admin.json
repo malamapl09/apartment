@@ -730,6 +730,37 @@
         "checkInSuccess": "Guest checked in",
         "checkOut": "Check out",
         "checkOutSuccess": "Guest checked out"
+      },
+      "blacklist": {
+        "title": "Visitor Blacklist",
+        "description": "Block specific people from being registered as visitors in this building. Registration is refused if the name, ID number, or phone matches any entry.",
+        "back": "Back to Visitors",
+        "empty": "No visitors are blacklisted.",
+        "add": "Add entry",
+        "addTitle": "New Blacklist Entry",
+        "addSuccess": "Entry added to the blacklist",
+        "addError": "Could not add entry",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure? Removing this entry will allow this person to be registered again.",
+        "deleteSuccess": "Entry removed",
+        "columns": {
+          "name": "Name",
+          "idNumber": "ID",
+          "phone": "Phone",
+          "reason": "Reason",
+          "addedBy": "Added by",
+          "actions": "Actions"
+        },
+        "form": {
+          "nameLabel": "Name",
+          "nameRequired": "Name is required",
+          "idNumberLabel": "ID number",
+          "phoneLabel": "Phone",
+          "reasonLabel": "Reason",
+          "reasonRequired": "A reason is required",
+          "cancel": "Cancel",
+          "save": "Save"
+        }
       }
     },
     "packages": {
