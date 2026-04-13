@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Calendar, Home, Bell, ArrowRight } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
@@ -32,15 +31,18 @@ export default async function PortalDashboardPage({
 
   const supabase = await createClient();
 
-  // Fetch user profile with apartment info
+  // Fetch user profile with apartment info. apartments table uses
+  // `unit_number`, not `apartment_number`; building info comes from a
+  // separate fetch below since the join here returned an empty shape
+  // historically.
   const { data: profile } = await supabase
     .from("profiles")
     .select(`
       *,
-      apartment_owners!inner (
+      apartment_owners (
         apartment_id,
         apartments (
-          apartment_number,
+          unit_number,
           building:buildings (
             id,
             name
@@ -57,14 +59,17 @@ export default async function PortalDashboardPage({
     ? ((await getMyReservations("upcoming")).data ?? []).slice(0, 5)
     : null;
 
-  // Fetch recent announcements (top 3)
+  // Fetch recent announcements (top 3). The announcements table has no
+  // `published` column — published_at being non-null is the convention.
+  // expires_at filter keeps already-expired notices out.
+  const buildingId = authProfile.building_id;
   const { data: announcements } = await supabase
     .from("announcements")
     .select("*")
-    .eq("building_id", profile?.apartment_owners?.[0]?.apartments?.building?.id)
-    .eq("published", true)
+    .eq("building_id", buildingId)
+    .not("published_at", "is", null)
     .or(`expires_at.is.null,expires_at.gte.${new Date().toISOString()}`)
-    .order("created_at", { ascending: false })
+    .order("published_at", { ascending: false })
     .limit(3);
 
   const apartmentInfo = profile?.apartment_owners?.[0]?.apartments;
@@ -84,7 +89,7 @@ export default async function PortalDashboardPage({
         {apartmentInfo && (
           <p className="text-muted-foreground mt-2">
             <Home className="inline h-4 w-4 mr-1" />
-            {buildingInfo?.name} - {t("apartment")} {apartmentInfo.apartment_number}
+            {buildingInfo?.name} - {t("apartment")} {apartmentInfo.unit_number}
           </p>
         )}
       </div>
@@ -202,15 +207,13 @@ export default async function PortalDashboardPage({
                     <div className="flex-1">
                       <h4 className="font-semibold">{announcement.title}</h4>
                       <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {announcement.content}
+                        {announcement.body}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {formatDate(announcement.created_at, locale)}
+                        {announcement.published_at &&
+                          formatDate(announcement.published_at, locale)}
                       </p>
                     </div>
-                    {announcement.priority === "high" && (
-                      <Badge variant="destructive">{t("priority_high")}</Badge>
-                    )}
                   </div>
                 </div>
               ))}

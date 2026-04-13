@@ -12,7 +12,7 @@ import { getEmailPreferences } from "@/lib/actions/email-preferences";
 interface ApartmentOwnerEntry {
   apartment_id: string;
   apartments: {
-    apartment_number: string | null;
+    unit_number: string | null;
     building: {
       id: string;
       name: string;
@@ -46,7 +46,8 @@ export default async function ProfilePage({
     redirect(`/${locale}/login`);
   }
 
-  // Fetch user profile with apartment info
+  // Fetch user profile with apartment info. apartments uses `unit_number`,
+  // not `apartment_number`.
   const { data: profile } = await supabase
     .from("profiles")
     .select(`
@@ -54,7 +55,7 @@ export default async function ProfilePage({
       apartment_owners (
         apartment_id,
         apartments (
-          apartment_number,
+          unit_number,
           building:buildings (
             id,
             name
@@ -70,7 +71,7 @@ export default async function ProfilePage({
 
   const apartments: ApartmentSummary[] =
     (profile?.apartment_owners as ApartmentOwnerEntry[] | null | undefined)?.map((ao) => ({
-      number: ao.apartments?.apartment_number,
+      number: ao.apartments?.unit_number,
       building: ao.apartments?.building?.name,
     })) ?? [];
 

@@ -23,7 +23,6 @@ interface BankInfo {
   account_name: string;
   account_number: string;
   bank_name: string;
-  routing_number?: string;
 }
 
 interface BookingFlowProps {
@@ -31,7 +30,6 @@ interface BookingFlowProps {
     building?: {
       id: string;
       name: string;
-      currency: string;
     };
   };
   schedules: AvailabilitySchedule[];
@@ -184,14 +182,9 @@ export default function BookingFlow({
                     <div>
                       <span className="font-medium">{t("payment_instructions.account_number")}:</span> {bankInfo.account_number}
                     </div>
-                    {bankInfo.routing_number && (
-                      <div>
-                        <span className="font-medium">{t("payment_instructions.routing")}:</span> {bankInfo.routing_number}
-                      </div>
-                    )}
                     <div className="mt-3 p-3 bg-primary/10 rounded">
                       <span className="font-medium">{t("amount_to_transfer")}:</span>{" "}
-                      <span className="text-lg font-bold">{formatCurrency(total, space.building?.currency || "USD")}</span>
+                      <span className="text-lg font-bold">{formatCurrency(total, locale)}</span>
                     </div>
                   </div>
                 </AlertDescription>
@@ -343,13 +336,13 @@ export default function BookingFlow({
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">{t("hourly_rate")}</span>
-                    <span className="text-sm font-medium">{formatCurrency(cost, space.building?.currency || "USD")}</span>
+                    <span className="text-sm font-medium">{formatCurrency(cost, locale)}</span>
                   </div>
 
                   {space.deposit_amount > 0 && (
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">{t("deposit")}</span>
-                      <span className="text-sm font-medium">{formatCurrency(space.deposit_amount, space.building?.currency || "USD")}</span>
+                      <span className="text-sm font-medium">{formatCurrency(space.deposit_amount, locale)}</span>
                     </div>
                   )}
 
@@ -357,7 +350,7 @@ export default function BookingFlow({
 
                   <div className="flex justify-between text-lg font-bold">
                     <span>{t("total")}</span>
-                    <span>{formatCurrency(total, space.building?.currency || "USD")}</span>
+                    <span>{formatCurrency(total, locale)}</span>
                   </div>
                 </div>
 

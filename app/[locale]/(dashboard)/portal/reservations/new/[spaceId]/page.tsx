@@ -94,7 +94,7 @@ export default async function NewReservationPage({
   const spaceWithBuilding = {
     ...space,
     building: space.buildings
-      ? { id: space.buildings.id, name: space.buildings.name, currency: "USD" }
+      ? { id: space.buildings.id, name: space.buildings.name }
       : undefined,
   };
 
