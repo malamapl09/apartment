@@ -1,32 +1,21 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, FileText, Upload, XCircle, ArrowRight } from "lucide-react";
+import { Calendar, Clock, FileText, Upload, ArrowRight } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
-import type { ReservationStatus } from "@/types";
+import { createClient } from "@/lib/supabase/server";
+import { getMyReservations } from "@/lib/actions/reservations";
 import { assertCurrentUserHasModule } from "@/lib/modules";
+import type { Reservation } from "@/types";
 
-interface ReservationWithSpace {
-  id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  status: ReservationStatus;
-  reference_code: string;
-  space: {
-    name: string;
-    photo_url: string | null;
-    building: {
-      name: string;
-    } | null;
-  } | null;
-}
+type ReservationRow = Reservation & {
+  public_spaces: { id: string; name: string; photos: string[] | null } | null;
+};
 
 export default async function MyReservationsPage({
   params,
@@ -39,107 +28,43 @@ export default async function MyReservationsPage({
   const t = await getTranslations("portal.reservations");
 
   const supabase = await createClient();
-
-  // Get current user
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) redirect(`/${locale}/login`);
 
-  if (!user) {
-    redirect(`/${locale}/login`);
-  }
+  const [upcomingResult, pastResult, allResult] = await Promise.all([
+    getMyReservations("upcoming"),
+    getMyReservations("past"),
+    getMyReservations("all"),
+  ]);
 
-  const today = new Date().toISOString().split("T")[0];
+  const upcomingReservations = (upcomingResult.data ?? []) as ReservationRow[];
+  const pastReservations = (pastResult.data ?? []) as ReservationRow[];
+  const allReservations = (allResult.data ?? []) as ReservationRow[];
 
-  // Fetch upcoming reservations
-  const { data: upcomingReservationsRaw } = await supabase
-    .from("reservations")
-    .select(`
-      *,
-      space:spaces (
-        name,
-        photo_url,
-        building:buildings (
-          name
-        )
-      )
-    `)
-    .eq("user_id", user.id)
-    .in("status", ["confirmed", "payment_submitted", "pending_payment"])
-    .gte("date", today)
-    .order("date", { ascending: true })
-    .order("start_time", { ascending: true });
-
-  // Fetch past reservations
-  const { data: pastReservationsRaw } = await supabase
-    .from("reservations")
-    .select(`
-      *,
-      space:spaces (
-        name,
-        photo_url,
-        building:buildings (
-          name
-        )
-      )
-    `)
-    .eq("user_id", user.id)
-    .or(`status.eq.completed,status.eq.cancelled,status.eq.rejected,date.lt.${today}`)
-    .order("date", { ascending: false })
-    .order("start_time", { ascending: false })
-    .limit(20);
-
-  // Fetch all reservations for "All" tab
-  const { data: allReservationsRaw } = await supabase
-    .from("reservations")
-    .select(`
-      *,
-      space:spaces (
-        name,
-        photo_url,
-        building:buildings (
-          name
-        )
-      )
-    `)
-    .eq("user_id", user.id)
-    .order("date", { ascending: false })
-    .order("start_time", { ascending: false })
-    .limit(50);
-
-  const upcomingReservations = (upcomingReservationsRaw ?? []) as ReservationWithSpace[];
-  const pastReservations = (pastReservationsRaw ?? []) as ReservationWithSpace[];
-  const allReservations = (allReservationsRaw ?? []) as ReservationWithSpace[];
-
-  const renderReservationCard = (reservation: ReservationWithSpace) => {
+  const renderReservationCard = (reservation: ReservationRow) => {
     const canUploadProof = reservation.status === "pending_payment";
-    const canCancel =
-      reservation.status === "pending_payment" ||
-      reservation.status === "payment_submitted";
+    const photo = reservation.public_spaces?.photos?.[0] ?? null;
 
     return (
       <Card key={reservation.id}>
         <CardContent className="p-6">
           <div className="flex items-start gap-4">
-            {/* Photo */}
-            {reservation.space?.photo_url && (
+            {photo && (
               <img
-                src={reservation.space.photo_url}
-                alt={reservation.space.name}
+                src={photo}
+                alt={reservation.public_spaces?.name ?? ""}
                 className="w-24 h-24 rounded object-cover"
               />
             )}
 
-            {/* Details */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-4 mb-3">
                 <div>
                   <h3 className="font-semibold text-lg truncate">
-                    {reservation.space?.name}
+                    {reservation.public_spaces?.name ?? "—"}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {reservation.space?.building?.name}
-                  </p>
                 </div>
                 <ReservationStatusBadge status={reservation.status} />
               </div>
@@ -147,13 +72,13 @@ export default async function MyReservationsPage({
               <div className="grid gap-2 text-sm mb-4">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>{formatDate(reservation.date, locale)}</span>
+                  <span>{formatDate(reservation.start_time, locale)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <span>
-                    {formatTime(reservation.start_time)} -{" "}
-                    {formatTime(reservation.end_time)}
+                    {formatTime(reservation.start_time, locale)} -{" "}
+                    {formatTime(reservation.end_time, locale)}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -164,7 +89,6 @@ export default async function MyReservationsPage({
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-wrap gap-2">
                 <Button asChild size="sm" variant="outline">
                   <Link href={`/${locale}/portal/reservations/${reservation.id}`}>
@@ -174,18 +98,11 @@ export default async function MyReservationsPage({
 
                 {canUploadProof && (
                   <Button asChild size="sm" variant="default">
-                    <Link href={`/${locale}/portal/reservations/${reservation.id}#payment`}>
+                    <Link
+                      href={`/${locale}/portal/reservations/${reservation.id}#payment`}
+                    >
                       <Upload className="mr-2 h-4 w-4" />
                       {t("upload_proof")}
-                    </Link>
-                  </Button>
-                )}
-
-                {canCancel && (
-                  <Button asChild size="sm" variant="destructive">
-                    <Link href={`/${locale}/portal/reservations/${reservation.id}#cancel`}>
-                      <XCircle className="mr-2 h-4 w-4" />
-                      {t("cancel")}
                     </Link>
                   </Button>
                 )}

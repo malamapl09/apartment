@@ -185,7 +185,12 @@
         "dailyCapReached": "Has alcanzado el límite de {hours} horas diarias para este espacio",
         "weeklyCapReached": "Has alcanzado el límite de {hours} horas semanales para este espacio",
         "monthlyCapReached": "Has alcanzado el límite de {hours} horas mensuales para este espacio"
-      }
+      },
+      "cancelConfirmTitle": "¿Cancelar esta reserva?",
+      "cancelConfirmDescription": "Esto liberará el horario y la reserva no podrá ser restaurada.",
+      "cancelConfirmAction": "Sí, cancelar",
+      "cancelKeep": "Mantener reserva",
+      "cancelError": "No se pudo cancelar la reserva"
     },
     "reservation_detail": {
       "reference_code": "Código de Referencia",
@@ -204,7 +209,9 @@
         "bank": "Banco",
         "account_name": "Nombre de la Cuenta",
         "account_number": "Número de Cuenta",
-        "routing": "Número de Ruta"
+        "routing": "Número de Ruta",
+        "account_type": "Tipo de cuenta",
+        "missing": "El edificio aún no ha publicado los datos de pago. Contacta a la administración."
       },
       "amount_to_transfer": "Monto a Transferir",
       "payment_proof": "Comprobante de Pago",
@@ -214,7 +221,9 @@
       "changed_by": "Cambiado por",
       "download_ics": "Descargar Calendario",
       "cancel_reservation": "Cancelar Reservación",
-      "back_to_list": "Volver a Reservaciones"
+      "back_to_list": "Volver a Reservaciones",
+      "notes": "Notas",
+      "cancellation_reason": "Razón de cancelación"
     },
     "payment_upload": {
       "title": "Subir Comprobante de Pago",

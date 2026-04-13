@@ -10,6 +10,7 @@ import { formatDate, formatTime } from "@/lib/utils/date";
 import ReservationStatusBadge from "@/components/shared/reservation-status-badge";
 import { getPortalSummary } from "@/lib/actions/analytics";
 import { getAuthProfile } from "@/lib/actions/helpers";
+import { getMyReservations } from "@/lib/actions/reservations";
 import { isModuleEnabled } from "@/lib/modules";
 import PortalSummaryCards from "@/components/portal/summary-cards";
 
@@ -50,25 +51,10 @@ export default async function PortalDashboardPage({
     .eq("id", user.id)
     .single();
 
-  // Fetch upcoming reservations (top 5) — only if the module is enabled
+  // Fetch upcoming reservations (top 5) — only if the module is enabled.
+  // getMyReservations returns rows with `public_spaces (id, name, photos)`.
   const upcomingReservations = hasReservations
-    ? (
-        await supabase
-          .from("reservations")
-          .select(`
-            *,
-            space:spaces (
-              name,
-              photo_url
-            )
-          `)
-          .eq("user_id", user.id)
-          .in("status", ["confirmed", "payment_submitted", "pending_payment"])
-          .gte("date", new Date().toISOString().split("T")[0])
-          .order("date", { ascending: true })
-          .order("start_time", { ascending: true })
-          .limit(5)
-      ).data
+    ? ((await getMyReservations("upcoming")).data ?? []).slice(0, 5)
     : null;
 
   // Fetch recent announcements (top 3)
@@ -162,20 +148,20 @@ export default async function PortalDashboardPage({
                   className="block"
                 >
                   <div className="flex items-start gap-4 p-4 rounded-lg border hover:bg-accent transition-colors">
-                    {reservation.space?.photo_url && (
+                    {reservation.public_spaces?.photos?.[0] && (
                       <img
-                        src={reservation.space.photo_url}
-                        alt={reservation.space.name}
+                        src={reservation.public_spaces.photos[0]}
+                        alt={reservation.public_spaces.name}
                         className="w-16 h-16 rounded object-cover"
                       />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="font-semibold truncate">{reservation.space?.name}</h4>
+                        <h4 className="font-semibold truncate">{reservation.public_spaces?.name ?? "—"}</h4>
                         <ReservationStatusBadge status={reservation.status} />
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {formatDate(reservation.date, locale)} • {formatTime(reservation.start_time)} - {formatTime(reservation.end_time)}
+                        {formatDate(reservation.start_time, locale)} • {formatTime(reservation.start_time, locale)} - {formatTime(reservation.end_time, locale)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {t("reference")}: {reservation.reference_code}

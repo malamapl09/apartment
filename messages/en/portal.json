@@ -185,7 +185,12 @@
         "dailyCapReached": "Daily limit of {hours} hours reached for this space",
         "weeklyCapReached": "Weekly limit of {hours} hours reached for this space",
         "monthlyCapReached": "Monthly limit of {hours} hours reached for this space"
-      }
+      },
+      "cancelConfirmTitle": "Cancel this reservation?",
+      "cancelConfirmDescription": "This will release the time slot and your reservation cannot be restored.",
+      "cancelConfirmAction": "Yes, cancel it",
+      "cancelKeep": "Keep reservation",
+      "cancelError": "Could not cancel reservation"
     },
     "reservation_detail": {
       "reference_code": "Reference Code",
@@ -204,7 +209,9 @@
         "bank": "Bank",
         "account_name": "Account Name",
         "account_number": "Account Number",
-        "routing": "Routing Number"
+        "routing": "Routing Number",
+        "account_type": "Account type",
+        "missing": "The building hasn't published payment details yet. Contact the administrator."
       },
       "amount_to_transfer": "Amount to Transfer",
       "payment_proof": "Payment Proof",
@@ -214,7 +221,9 @@
       "changed_by": "Changed by",
       "download_ics": "Download Calendar",
       "cancel_reservation": "Cancel Reservation",
-      "back_to_list": "Back to Reservations"
+      "back_to_list": "Back to Reservations",
+      "notes": "Notes",
+      "cancellation_reason": "Cancellation reason"
     },
     "payment_upload": {
       "title": "Upload Payment Proof",
