@@ -42,7 +42,7 @@ interface PaymentVerificationProps {
     reference_code: string;
     start_time: string;
     end_time: string;
-    total_amount: number;
+    payment_amount: number | null;
     payment_proof_url: string | null;
     created_at: string;
     public_spaces: {
@@ -160,7 +160,7 @@ export function PaymentVerification({ reservation }: PaymentVerificationProps) {
                     <DollarSign className="h-4 w-4 mt-0.5 text-muted-foreground" />
                     <div>
                       <p className="text-sm font-medium">
-                        ${reservation.total_amount.toFixed(2)}
+                        ${(reservation.payment_amount ?? 0).toFixed(2)}
                       </p>
                       <p className="text-xs text-muted-foreground">{t("details.amount")}</p>
                     </div>

@@ -30,7 +30,7 @@ interface Reservation {
   reference_code: string;
   start_time: string;
   end_time: string;
-  total_amount: number;
+  payment_amount: number | null;
   status: string;
   public_spaces: {
     id: string;
@@ -118,7 +118,7 @@ export function ReservationTable({ reservations }: ReservationTableProps) {
                 </TableCell>
                 <TableCell className="hidden sm:table-cell">
                   <span className="font-semibold">
-                    ${reservation.total_amount.toFixed(2)}
+                    ${(reservation.payment_amount ?? 0).toFixed(2)}
                   </span>
                 </TableCell>
                 <TableCell>
