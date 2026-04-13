@@ -23,7 +23,6 @@
       "targetResidents": "Residents",
       "validUntil": "Valid until:"
     },
-    "priority_high": "Important",
     "summary": {
       "pendingCharges": "Pending Charges",
       "activeRequests": "Active Requests",
