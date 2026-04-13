@@ -868,6 +868,16 @@
         "endDateRequired": "La fecha de cierre es requerida",
         "endDateFuture": "La fecha de cierre debe ser en el futuro",
         "atLeastTwoOptions": "Se requieren al menos 2 opciones"
+      },
+      "table": {
+        "title": "Título",
+        "type": "Tipo",
+        "target": "Audiencia",
+        "status": "Estado",
+        "votes": "Votos",
+        "endsAt": "Termina",
+        "actions": "Acciones",
+        "empty": "Aún no hay encuestas."
       }
     },
     "documents": {

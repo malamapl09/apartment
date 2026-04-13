@@ -868,6 +868,16 @@
         "endDateRequired": "End date is required",
         "endDateFuture": "End date must be in the future",
         "atLeastTwoOptions": "At least 2 options are required"
+      },
+      "table": {
+        "title": "Title",
+        "type": "Type",
+        "target": "Audience",
+        "status": "Status",
+        "votes": "Votes",
+        "endsAt": "Ends",
+        "actions": "Actions",
+        "empty": "No polls yet."
       }
     },
     "documents": {
