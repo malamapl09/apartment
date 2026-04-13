@@ -213,11 +213,14 @@ export async function getMyReservations(filter?: "upcoming" | "past" | "all") {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Unauthorized", data: [] };
 
+  // Upcoming sorts soonest-first; past/all show most-recent-first.
+  const ascending = filter === "upcoming";
+
   let query = supabase
     .from("reservations")
     .select(`*, public_spaces (id, name, photos)`)
     .eq("user_id", user.id)
-    .order("start_time", { ascending: false });
+    .order("start_time", { ascending });
 
   if (filter === "upcoming") {
     query = query.gte("start_time", new Date().toISOString())
@@ -281,7 +284,11 @@ export async function cancelReservation(reservationId: string, reason?: string) 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Unauthorized" };
 
-  const { error } = await supabase
+  // Use .select() so we can detect a no-op update (e.g. the admin verified
+  // the payment in the background between page-load and click). Without this
+  // the silent zero-row update would return success and leave the user
+  // looking at an unchanged page.
+  const { data: updated, error } = await supabase
     .from("reservations")
     .update({
       status: "cancelled",
@@ -290,9 +297,15 @@ export async function cancelReservation(reservationId: string, reason?: string) 
     })
     .eq("id", reservationId)
     .eq("user_id", user.id)
-    .in("status", ["pending_payment", "payment_submitted"]);
+    .in("status", ["pending_payment", "payment_submitted"])
+    .select("id");
 
   if (error) return { error: error.message };
+  if (!updated || updated.length === 0) {
+    return {
+      error: "Reservation could not be cancelled. It may have already been confirmed or cancelled.",
+    };
+  }
 
   revalidatePath("/portal/reservations");
   return { success: true };

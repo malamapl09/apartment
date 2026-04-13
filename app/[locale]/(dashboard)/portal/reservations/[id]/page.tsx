@@ -9,7 +9,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Calendar,
   Clock,
-  DollarSign,
   FileText,
   Download,
   Building,
@@ -224,7 +223,7 @@ export default async function ReservationDetailPage({
 
       {/* Payment Instructions — only when waiting on a transfer */}
       {reservation.status === "pending_payment" && !isFree && (
-        <Alert id="payment">
+        <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <p className="font-semibold mb-2">
@@ -368,10 +367,6 @@ export default async function ReservationDetailPage({
               <Link href={`/${locale}/portal/reservations`}>
                 {t("back_to_list")}
               </Link>
-            </Button>
-
-            <Button asChild variant="ghost" className="ml-auto">
-              <DollarSign className="h-4 w-4" />
             </Button>
           </div>
         </CardContent>
