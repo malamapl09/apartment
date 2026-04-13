@@ -98,7 +98,16 @@
       "upcoming_activities": "Upcoming Activities",
       "upcoming_activities_description": "Scheduled activities at this space (informational only — they don't block reservations)",
       "no_activities": "No upcoming activities",
-      "activity_badge": "Activity"
+      "activity_badge": "Activity",
+      "paymentInfo": {
+        "title": "Payment Information",
+        "description": "Reservations are paid via bank transfer to the building's account.",
+        "bankName": "Bank",
+        "accountHolder": "Account holder",
+        "accountNumber": "Account number",
+        "accountType": "Account type",
+        "missing": "Contact the building administrator for payment details."
+      }
     },
     "reservations": {
       "title": "My Reservations",
@@ -311,7 +320,15 @@
         "occupied": "Occupied",
         "activity": "Activity"
       },
-      "log_activity": "Log an Activity"
+      "log_activity": "Log an Activity",
+      "paymentInfoReview": {
+        "title": "How you'll pay",
+        "description": "After confirming, transfer the total due to this account and upload your payment proof. The administrator will verify and approve.",
+        "bank": "Bank",
+        "accountName": "Account holder",
+        "accountNumber": "Account number",
+        "missing": "Contact the building administrator for payment details."
+      }
     },
     "reservationStatus": {
       "pending_payment": "Pending Payment",

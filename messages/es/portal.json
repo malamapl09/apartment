@@ -98,7 +98,16 @@
       "upcoming_activities": "Actividades Próximas",
       "upcoming_activities_description": "Actividades programadas en este espacio (solo informativas — no bloquean reservaciones)",
       "no_activities": "No hay actividades próximas",
-      "activity_badge": "Actividad"
+      "activity_badge": "Actividad",
+      "paymentInfo": {
+        "title": "Información de pago",
+        "description": "Las reservas se pagan mediante transferencia bancaria a la cuenta del edificio.",
+        "bankName": "Banco",
+        "accountHolder": "Titular de la cuenta",
+        "accountNumber": "Número de cuenta",
+        "accountType": "Tipo de cuenta",
+        "missing": "Contacta a la administración del edificio para los datos de pago."
+      }
     },
     "reservations": {
       "title": "Mis Reservaciones",
@@ -311,7 +320,15 @@
         "occupied": "Ocupado",
         "activity": "Actividad"
       },
-      "log_activity": "Registrar Actividad"
+      "log_activity": "Registrar Actividad",
+      "paymentInfoReview": {
+        "title": "Cómo pagarás",
+        "description": "Después de confirmar, transfiere el total a esta cuenta y sube tu comprobante de pago. La administración verificará y aprobará.",
+        "bank": "Banco",
+        "accountName": "Titular",
+        "accountNumber": "Número de cuenta",
+        "missing": "Contacta a la administración del edificio para los datos de pago."
+      }
     },
     "reservationStatus": {
       "pending_payment": "Pago Pendiente",

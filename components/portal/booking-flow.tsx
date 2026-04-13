@@ -360,6 +360,53 @@ export default function BookingFlow({
                     <span>{formatCurrency(total, space.building?.currency || "USD")}</span>
                   </div>
                 </div>
+
+                {/* Payment info surfaced here so the resident sees exactly
+                    where to transfer before they commit to the booking. */}
+                <div className="mt-4 rounded-lg border bg-muted/30 p-4 space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {t("paymentInfoReview.title")}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("paymentInfoReview.description")}
+                    </p>
+                  </div>
+                  {bankInfo ? (
+                    <div className="grid gap-2 sm:grid-cols-2 text-sm">
+                      {bankInfo.bank_name && (
+                        <div>
+                          <span className="text-xs text-muted-foreground">
+                            {t("paymentInfoReview.bank")}
+                          </span>
+                          <div className="font-medium">{bankInfo.bank_name}</div>
+                        </div>
+                      )}
+                      {bankInfo.account_name && (
+                        <div>
+                          <span className="text-xs text-muted-foreground">
+                            {t("paymentInfoReview.accountName")}
+                          </span>
+                          <div className="font-medium">{bankInfo.account_name}</div>
+                        </div>
+                      )}
+                      {bankInfo.account_number && (
+                        <div>
+                          <span className="text-xs text-muted-foreground">
+                            {t("paymentInfoReview.accountNumber")}
+                          </span>
+                          <div className="font-mono font-medium">
+                            {bankInfo.account_number}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">
+                      {t("paymentInfoReview.missing")}
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 

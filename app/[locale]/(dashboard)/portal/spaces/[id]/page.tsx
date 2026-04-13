@@ -7,10 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Users, DollarSign, Clock, Shield, Calendar, Info, ArrowRight, Image as ImageIcon, Activity } from "lucide-react";
+import { Users, DollarSign, Clock, Shield, Calendar, Info, ArrowRight, Image as ImageIcon, Activity, CreditCard } from "lucide-react";
 import { formatCurrency } from "@/lib/utils/date";
 import ActivityCancelButton from "@/components/portal/activity-cancel-button";
 import { assertCurrentUserHasModule } from "@/lib/modules";
+import type { BankAccountInfo } from "@/types";
 
 export default async function SpaceDetailPage({
   params,
@@ -33,14 +34,16 @@ export default async function SpaceDetailPage({
     redirect(`/${locale}/login`);
   }
 
-  // Fetch space
+  // Fetch space + the building's bank info so we can show residents where
+  // they'll transfer funds BEFORE they commit to a reservation.
   const { data: space, error } = await supabase
     .from("public_spaces")
     .select(`
       *,
       buildings (
         id,
-        name
+        name,
+        bank_account_info
       )
     `)
     .eq("id", id)
@@ -52,6 +55,7 @@ export default async function SpaceDetailPage({
 
   const isFree = space.hourly_rate === 0 && space.deposit_amount === 0;
   const firstPhoto = space.photos?.[0];
+  const bankInfo = (space.buildings?.bank_account_info ?? null) as BankAccountInfo | null;
 
   // Fetch availability schedules
   const { data: schedules } = await supabase
@@ -322,6 +326,65 @@ export default async function SpaceDetailPage({
           )}
         </CardContent>
       </Card>
+
+      {/* Payment Information — so residents see where funds will be
+          transferred before they even click "Reserve". Only relevant for
+          paid spaces. */}
+      {!isFree && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              {t("paymentInfo.title")}
+            </CardTitle>
+            <CardDescription>{t("paymentInfo.description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {bankInfo ? (
+              <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                {bankInfo.bank_name && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      {t("paymentInfo.bankName")}
+                    </span>
+                    <span className="font-medium">{bankInfo.bank_name}</span>
+                  </div>
+                )}
+                {bankInfo.holder_name && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      {t("paymentInfo.accountHolder")}
+                    </span>
+                    <span className="font-medium">{bankInfo.holder_name}</span>
+                  </div>
+                )}
+                {bankInfo.account_number && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      {t("paymentInfo.accountNumber")}
+                    </span>
+                    <span className="font-mono font-medium">
+                      {bankInfo.account_number}
+                    </span>
+                  </div>
+                )}
+                {bankInfo.account_type && (
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-muted-foreground text-xs">
+                      {t("paymentInfo.accountType")}
+                    </span>
+                    <span className="font-medium">{bankInfo.account_type}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {t("paymentInfo.missing")}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* CTA */}
       {space.is_active && space.allow_reservations !== false && (
