@@ -528,6 +528,17 @@
         "contracts": "Contratos",
         "notices": "Avisos",
         "forms": "Formularios"
+      },
+      "acknowledgmentRequiredBadge": "Requiere confirmación",
+      "acknowledgedBadge": "Confirmado",
+      "acknowledgeButton": "He leído este documento",
+      "acknowledgeSuccess": "Gracias — tu confirmación ha sido registrada.",
+      "acknowledgeError": "No se pudo registrar tu confirmación. Inténtalo de nuevo.",
+      "banner": {
+        "title": "Documentos pendientes de confirmación",
+        "description": "Por favor, abre y confirma que has leído los siguientes:",
+        "viewAll": "Ver documentos",
+        "morePending": "+{count} más"
       }
     },
     "fees": {

@@ -385,6 +385,45 @@ export type Database = {
           },
         ]
       }
+      document_acknowledgments: {
+        Row: {
+          acknowledged_at: string
+          created_at: string
+          document_id: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          acknowledged_at?: string
+          created_at?: string
+          document_id: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          acknowledged_at?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_acknowledgments_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_acknowledgments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           building_id: string
@@ -398,6 +437,7 @@ export type Database = {
           is_active: boolean | null
           mime_type: string | null
           previous_version_id: string | null
+          requires_acknowledgment: boolean
           target: string | null
           title: string
           updated_at: string | null
@@ -416,6 +456,7 @@ export type Database = {
           is_active?: boolean | null
           mime_type?: string | null
           previous_version_id?: string | null
+          requires_acknowledgment?: boolean
           target?: string | null
           title: string
           updated_at?: string | null
@@ -434,6 +475,7 @@ export type Database = {
           is_active?: boolean | null
           mime_type?: string | null
           previous_version_id?: string | null
+          requires_acknowledgment?: boolean
           target?: string | null
           title?: string
           updated_at?: string | null
@@ -1817,6 +1859,15 @@ export type Database = {
         Returns: string
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      document_audience: {
+        Args: { p_document_id: string }
+        Returns: {
+          email: string
+          full_name: string
+          has_acked: boolean
+          profile_id: string
+        }[]
+      }
       expire_passed_visitors: { Args: never; Returns: number }
       generate_maintenance_reference_code: { Args: never; Returns: string }
       generate_reference_code: { Args: never; Returns: string }
@@ -1853,6 +1904,14 @@ export type Database = {
           p_phone: string
         }
         Returns: boolean
+      }
+      my_pending_acknowledgments: {
+        Args: never
+        Returns: {
+          category: string
+          document_id: string
+          title: string
+        }[]
       }
       recompute_visitor_status: {
         Args: { p_visitor_id: string }

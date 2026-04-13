@@ -6,6 +6,7 @@ import { VisitorCheckinEmail } from "@/lib/email/templates/visitor-checkin";
 import { NewAnnouncementEmail } from "@/lib/email/templates/new-announcement";
 import { OverdueReminderEmail } from "@/lib/email/templates/overdue-reminder";
 import { PackageReceivedEmail } from "@/lib/email/templates/package-received";
+import { DocumentAcknowledgmentRequiredEmail } from "@/lib/email/templates/document-acknowledgment-required";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://residencehub.app";
 
@@ -15,7 +16,8 @@ type NotificationType =
   | "visitor_checkins"
   | "new_announcements"
   | "overdue_reminders"
-  | "package_received";
+  | "package_received"
+  | "document_ack_required";
 
 interface NewChargeProps {
   fullName: string;
@@ -70,13 +72,21 @@ interface PackageReceivedProps {
   appUrl: string;
 }
 
+interface DocumentAckRequiredProps {
+  fullName: string;
+  documentTitle: string;
+  buildingName: string;
+  appUrl: string;
+}
+
 type NotificationPayload =
   | { type: "new_charges"; props: NewChargeProps }
   | { type: "maintenance_updates"; props: MaintenanceUpdateProps }
   | { type: "visitor_checkins"; props: VisitorCheckinProps }
   | { type: "new_announcements"; props: NewAnnouncementProps }
   | { type: "overdue_reminders"; props: OverdueReminderProps }
-  | { type: "package_received"; props: PackageReceivedProps };
+  | { type: "package_received"; props: PackageReceivedProps }
+  | { type: "document_ack_required"; props: DocumentAckRequiredProps };
 
 interface SendNotificationEmailOptions {
   userId: string;
@@ -94,6 +104,8 @@ const subjectMap: Record<NotificationType, (props: Record<string, string>) => st
     `Overdue Reminder: $${props.amount} for ${props.feeType}`,
   package_received: (props) =>
     `Package Received for Apartment ${props.unitNumber}`,
+  document_ack_required: (props) =>
+    `Action required: Please acknowledge "${props.documentTitle}"`,
 };
 
 function buildTemplate(payload: NotificationPayload): React.ReactElement {
@@ -110,6 +122,8 @@ function buildTemplate(payload: NotificationPayload): React.ReactElement {
       return OverdueReminderEmail(payload.props);
     case "package_received":
       return PackageReceivedEmail(payload.props);
+    case "document_ack_required":
+      return DocumentAcknowledgmentRequiredEmail(payload.props);
     default: {
       const _exhaustive: never = payload;
       throw new Error(`Unknown notification type: ${(payload as { type: string }).type}`);

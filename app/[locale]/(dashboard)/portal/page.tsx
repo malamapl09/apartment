@@ -10,8 +10,11 @@ import ReservationStatusBadge from "@/components/shared/reservation-status-badge
 import { getPortalSummary } from "@/lib/actions/analytics";
 import { getAuthProfile } from "@/lib/actions/helpers";
 import { getMyReservations } from "@/lib/actions/reservations";
+import { getMyPendingAcknowledgments } from "@/lib/actions/document-acknowledgments";
 import { isModuleEnabled } from "@/lib/modules";
 import PortalSummaryCards from "@/components/portal/summary-cards";
+import DocumentAcknowledgmentBanner from "@/components/portal/document-acknowledgment-banner";
+import type { PendingAcknowledgment } from "@/types";
 
 export default async function PortalDashboardPage({
   params,
@@ -28,6 +31,7 @@ export default async function PortalDashboardPage({
   }
   const enabledModules = authProfile.enabled_modules;
   const hasReservations = isModuleEnabled(enabledModules, "reservations");
+  const hasDocuments = isModuleEnabled(enabledModules, "documents");
 
   const supabase = await createClient();
 
@@ -58,6 +62,10 @@ export default async function PortalDashboardPage({
   const upcomingReservations = hasReservations
     ? ((await getMyReservations("upcoming")).data ?? []).slice(0, 5)
     : null;
+
+  const pendingAcks: PendingAcknowledgment[] = hasDocuments
+    ? ((await getMyPendingAcknowledgments()).data ?? []) as PendingAcknowledgment[]
+    : [];
 
   // Fetch recent announcements (top 3). The announcements table has no
   // `published` column — published_at being non-null is the convention.
@@ -93,6 +101,11 @@ export default async function PortalDashboardPage({
           </p>
         )}
       </div>
+
+      {/* Pending document acknowledgments — shown above summary so it's front and center */}
+      {pendingAcks.length > 0 && (
+        <DocumentAcknowledgmentBanner pending={pendingAcks} locale={locale} />
+      )}
 
       {/* Summary Cards */}
       {summary && (

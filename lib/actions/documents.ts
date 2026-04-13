@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
+import { fireAckNotificationsForDocument } from "@/lib/actions/document-acknowledgments";
 import { z } from "zod";
 
 const uploadDocumentSchema = z.object({
@@ -14,6 +15,7 @@ const uploadDocumentSchema = z.object({
   file_name: z.string().min(1),
   file_size: z.number().optional().nullable(),
   mime_type: z.string().optional().nullable(),
+  requires_acknowledgment: z.coerce.boolean().default(false),
 });
 
 export async function uploadDocument(formData: FormData) {
@@ -30,19 +32,38 @@ export async function uploadDocument(formData: FormData) {
     file_name: formData.get("file_name"),
     file_size: fileSizeRaw ? Number(fileSizeRaw) : null,
     mime_type: formData.get("mime_type") || null,
+    requires_acknowledgment: formData.get("requires_acknowledgment") === "true",
   });
 
   if (!result.success) return { error: "Validation failed" };
 
-  const { error } = await supabase.from("documents").insert({
-    ...result.data,
-    building_id: profile.building_id,
-    uploaded_by: user.id,
-    version: 1,
-    is_active: true,
-  });
+  const { data: inserted, error } = await supabase
+    .from("documents")
+    .insert({
+      ...result.data,
+      building_id: profile.building_id,
+      uploaded_by: user.id,
+      version: 1,
+      is_active: true,
+    })
+    .select("id, title")
+    .single();
 
-  if (error) return { error: error.message };
+  if (error || !inserted) return { error: error?.message ?? "Insert failed" };
+
+  // Fire notifications (fire-and-forget) when the document requires
+  // acknowledgment. audience RPC filters to active owners/residents matching
+  // the document's target.
+  if (result.data.requires_acknowledgment) {
+    fireAckNotificationsForDocument(
+      supabase,
+      inserted.id,
+      inserted.title,
+      profile.building_id,
+    ).catch((err) => {
+      console.error("[documents] ack notifications failed", err);
+    });
+  }
 
   revalidatePath("/admin/documents");
   return { success: true };
@@ -116,6 +137,15 @@ export async function uploadNewVersion(documentId: string, formData: FormData) {
   if (fetchError || !existing) return { error: "Document not found" };
 
   const fileSizeRaw = formData.get("file_size");
+  // If the admin left the requires_acknowledgment field unset, inherit from
+  // the previous version so new versions of "requires ack" documents keep
+  // requiring it.
+  const requiresAckRaw = formData.get("requires_acknowledgment");
+  const requiresAck =
+    requiresAckRaw === null
+      ? (existing.requires_acknowledgment ?? false)
+      : requiresAckRaw === "true";
+
   const result = uploadDocumentSchema.safeParse({
     title: formData.get("title") || existing.title,
     description: formData.get("description") || existing.description,
@@ -125,20 +155,38 @@ export async function uploadNewVersion(documentId: string, formData: FormData) {
     file_name: formData.get("file_name"),
     file_size: fileSizeRaw ? Number(fileSizeRaw) : null,
     mime_type: formData.get("mime_type") || null,
+    requires_acknowledgment: requiresAck,
   });
 
   if (!result.success) return { error: "Validation failed" };
 
-  const { error } = await supabase.from("documents").insert({
-    ...result.data,
-    building_id: profile.building_id,
-    uploaded_by: user.id,
-    version: (existing.version ?? 1) + 1,
-    previous_version_id: documentId,
-    is_active: true,
-  });
+  const { data: inserted, error } = await supabase
+    .from("documents")
+    .insert({
+      ...result.data,
+      building_id: profile.building_id,
+      uploaded_by: user.id,
+      version: (existing.version ?? 1) + 1,
+      previous_version_id: documentId,
+      is_active: true,
+    })
+    .select("id, title")
+    .single();
 
-  if (error) return { error: error.message };
+  if (error || !inserted) return { error: error?.message ?? "Insert failed" };
+
+  // A new version resets acknowledgments — previous-version acks don't carry
+  // over since it's a new document row.
+  if (result.data.requires_acknowledgment) {
+    fireAckNotificationsForDocument(
+      supabase,
+      inserted.id,
+      inserted.title,
+      profile.building_id,
+    ).catch((err) => {
+      console.error("[documents] ack notifications failed", err);
+    });
+  }
 
   revalidatePath("/admin/documents");
   return { success: true };

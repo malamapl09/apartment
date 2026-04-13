@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getDocuments } from "@/lib/actions/documents";
+import { createClient } from "@/lib/supabase/server";
 import { DocumentBrowser } from "@/components/portal/document-browser";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -16,7 +17,20 @@ export default async function PortalDocumentsPage({
   await assertCurrentUserHasModule("documents");
   const t = await getTranslations("portal.documents");
 
-  const { data: documents, error } = await getDocuments();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [{ data: documents, error }, acksResult] = await Promise.all([
+    getDocuments(),
+    user
+      ? supabase
+          .from("document_acknowledgments")
+          .select("document_id")
+          .eq("profile_id", user.id)
+      : Promise.resolve({ data: [] as { document_id: string }[] }),
+  ]);
 
   if (error) {
     return (
@@ -31,6 +45,9 @@ export default async function PortalDocumentsPage({
   }
 
   const allDocuments = (documents as DocumentWithUploader[]) ?? [];
+  const myAcknowledgedIds = (acksResult.data ?? []).map(
+    (a: { document_id: string }) => a.document_id,
+  );
 
   return (
     <div className="space-y-6">
@@ -39,7 +56,10 @@ export default async function PortalDocumentsPage({
         <p className="text-muted-foreground mt-2">{t("description")}</p>
       </div>
 
-      <DocumentBrowser documents={allDocuments} />
+      <DocumentBrowser
+        documents={allDocuments}
+        myAcknowledgedIds={myAcknowledgedIds}
+      />
     </div>
   );
 }

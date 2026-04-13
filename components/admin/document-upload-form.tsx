@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -35,6 +36,7 @@ const formSchema = z.object({
   description: z.string().max(1000).optional(),
   category: z.enum(["rules", "minutes", "contracts", "notices", "forms"]),
   target: z.enum(["all", "owners", "residents"]),
+  requires_acknowledgment: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +60,7 @@ export function DocumentUploadForm({ locale }: DocumentUploadFormProps) {
       description: "",
       category: "notices",
       target: "all",
+      requires_acknowledgment: false,
     },
   });
 
@@ -99,6 +102,10 @@ export function DocumentUploadForm({ locale }: DocumentUploadFormProps) {
       formData.append("file_name", selectedFile.name);
       formData.append("file_size", String(selectedFile.size));
       formData.append("mime_type", selectedFile.type);
+      formData.append(
+        "requires_acknowledgment",
+        values.requires_acknowledgment ? "true" : "false",
+      );
 
       const result = await uploadDocument(formData);
 
@@ -227,6 +234,27 @@ export function DocumentUploadForm({ locale }: DocumentUploadFormProps) {
             </FormDescription>
           )}
         </FormItem>
+
+        <FormField
+          control={form.control}
+          name="requires_acknowledgment"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start justify-between gap-4 rounded-lg border p-4">
+              <div className="space-y-1 leading-tight">
+                <FormLabel>{t("requiresAcknowledgmentLabel")}</FormLabel>
+                <FormDescription>
+                  {t("requiresAcknowledgmentDescription")}
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         <div className="flex gap-4">
           <Button type="submit" disabled={isSubmitting} className="flex-1">

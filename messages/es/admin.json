@@ -920,7 +920,10 @@
         "actions": "Acciones",
         "empty": "No se encontraron documentos",
         "viewDetails": "Ver Detalles",
-        "download": "Descargar"
+        "download": "Descargar",
+        "acknowledgment": "Confirmación",
+        "ackRequired": "Requerida",
+        "view": "Ver"
       },
       "filters": {
         "category": "Categoría",
@@ -936,6 +939,27 @@
         "selectFile": "Por favor selecciona un archivo para subir",
         "uploadFailed": "Ocurrió un error inesperado. Por favor inténtalo de nuevo.",
         "deleteFailed": "Ocurrió un error inesperado"
+      },
+      "requiresAcknowledgmentLabel": "Requiere confirmación",
+      "requiresAcknowledgmentDescription": "Los residentes del público objetivo recibirán una notificación y se les pedirá confirmar que leyeron este documento.",
+      "detail": {
+        "back": "Volver a documentos",
+        "metadata": "Detalles del documento",
+        "acknowledgmentRequired": "Requiere confirmación",
+        "yes": "Sí",
+        "no": "No"
+      },
+      "acknowledgments": {
+        "title": "Estado de confirmación",
+        "summary": "{acked} de {total} residentes confirmaron ({percent}%)",
+        "acknowledgedHeading": "Confirmaron ({count})",
+        "pendingHeading": "Pendientes ({count})",
+        "noneAcknowledged": "Nadie ha confirmado aún.",
+        "nonePending": "Todos han confirmado.",
+        "empty": "Aún no hay residentes en el público de este documento.",
+        "sendReminder": "Enviar recordatorio",
+        "reminderSuccess": "Recordatorio enviado a {count} residentes.",
+        "reminderError": "No se pudo enviar el recordatorio. Inténtalo de nuevo."
       }
     },
     "analytics": {

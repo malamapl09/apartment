@@ -528,6 +528,17 @@
         "contracts": "Contracts",
         "notices": "Notices",
         "forms": "Forms"
+      },
+      "acknowledgmentRequiredBadge": "Acknowledgment required",
+      "acknowledgedBadge": "Acknowledged",
+      "acknowledgeButton": "I have read this",
+      "acknowledgeSuccess": "Thanks — your acknowledgment has been recorded.",
+      "acknowledgeError": "Could not record your acknowledgment. Please try again.",
+      "banner": {
+        "title": "Documents waiting for your acknowledgment",
+        "description": "Please open and confirm you've read the following:",
+        "viewAll": "View documents",
+        "morePending": "+{count} more"
       }
     },
     "fees": {

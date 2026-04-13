@@ -26,7 +26,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MoreHorizontal, Download, Trash2, Loader2 } from "lucide-react";
+import { MoreHorizontal, Download, Trash2, Loader2, Eye, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 import type { DocumentWithUploader, DocumentCategory, DocumentTarget } from "@/types";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -53,6 +55,7 @@ const targetVariantMap: Record<DocumentTarget, "default" | "secondary" | "outlin
 export function DocumentTable({ documents, onDelete }: DocumentTableProps) {
   const t = useTranslations("admin.documents");
   const tActions = useTranslations("actions");
+  const locale = useLocale();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -101,6 +104,7 @@ export function DocumentTable({ documents, onDelete }: DocumentTableProps) {
             <TableHead className="hidden sm:table-cell">{t("table.category")}</TableHead>
             <TableHead className="hidden sm:table-cell">{t("table.target")}</TableHead>
             <TableHead className="hidden sm:table-cell">{t("table.version")}</TableHead>
+            <TableHead className="hidden sm:table-cell">{t("table.acknowledgment")}</TableHead>
             <TableHead className="hidden sm:table-cell">{t("table.uploadedBy")}</TableHead>
             <TableHead className="hidden sm:table-cell">{t("table.date")}</TableHead>
             <TableHead className="text-right">{t("table.actions")}</TableHead>
@@ -131,6 +135,16 @@ export function DocumentTable({ documents, onDelete }: DocumentTableProps) {
               </TableCell>
               <TableCell className="hidden sm:table-cell">v{doc.version}</TableCell>
               <TableCell className="hidden sm:table-cell">
+                {doc.requires_acknowledgment ? (
+                  <Badge variant="outline" className="gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {t("table.ackRequired")}
+                  </Badge>
+                ) : (
+                  <span className="text-muted-foreground text-xs">—</span>
+                )}
+              </TableCell>
+              <TableCell className="hidden sm:table-cell">
                 {doc.profiles?.full_name ?? "—"}
               </TableCell>
               <TableCell className="hidden sm:table-cell">
@@ -145,6 +159,12 @@ export function DocumentTable({ documents, onDelete }: DocumentTableProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link href={`/${locale}/admin/documents/${doc.id}`}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        {t("table.view")}
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <a href={doc.file_url} target="_blank" rel="noopener noreferrer" download={doc.file_name}>
                         <Download className="mr-2 h-4 w-4" />

@@ -269,6 +269,7 @@ export interface Document {
   previous_version_id: string | null;
   target: DocumentTarget;
   uploaded_by: string | null;
+  requires_acknowledgment: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -276,6 +277,27 @@ export interface Document {
 
 export interface DocumentWithUploader extends Document {
   profiles: Pick<Profile, "id" | "full_name"> | null;
+}
+
+export interface DocumentAcknowledgment {
+  id: string;
+  document_id: string;
+  profile_id: string;
+  acknowledged_at: string;
+  created_at: string;
+}
+
+export interface DocumentAudienceMember {
+  profile_id: string;
+  full_name: string | null;
+  email: string;
+  has_acked: boolean;
+}
+
+export interface PendingAcknowledgment {
+  document_id: string;
+  title: string;
+  category: string;
 }
 
 // Maintenance Requests

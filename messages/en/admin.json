@@ -920,7 +920,10 @@
         "actions": "Actions",
         "empty": "No documents found",
         "viewDetails": "View Details",
-        "download": "Download"
+        "download": "Download",
+        "acknowledgment": "Acknowledged",
+        "ackRequired": "Required",
+        "view": "View"
       },
       "filters": {
         "category": "Category",
@@ -936,6 +939,27 @@
         "selectFile": "Please select a file to upload",
         "uploadFailed": "An unexpected error occurred. Please try again.",
         "deleteFailed": "An unexpected error occurred"
+      },
+      "requiresAcknowledgmentLabel": "Requires acknowledgment",
+      "requiresAcknowledgmentDescription": "Residents in the target audience will be notified and asked to confirm they've read this document.",
+      "detail": {
+        "back": "Back to documents",
+        "metadata": "Document details",
+        "acknowledgmentRequired": "Acknowledgment required",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "acknowledgments": {
+        "title": "Acknowledgment status",
+        "summary": "{acked} of {total} residents acknowledged ({percent}%)",
+        "acknowledgedHeading": "Acknowledged ({count})",
+        "pendingHeading": "Pending ({count})",
+        "noneAcknowledged": "Nobody has acknowledged yet.",
+        "nonePending": "Everyone has acknowledged.",
+        "empty": "There are no residents in this document's audience yet.",
+        "sendReminder": "Send reminder",
+        "reminderSuccess": "Reminder sent to {count} residents.",
+        "reminderError": "Could not send the reminder. Please try again."
       }
     },
     "analytics": {
