@@ -108,7 +108,7 @@ export default async function SpaceDetailPage({
         <TabsContent value="schedule" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t("availability")}</CardTitle>
+              <CardTitle>{t("schedule")}</CardTitle>
             </CardHeader>
             <CardContent>
               <AvailabilityEditor

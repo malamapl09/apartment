@@ -401,7 +401,8 @@
         "empty": {
           "title": "No hay pagos pendientes",
           "description": "No hay comprobantes de pago pendientes de verificación"
-        }
+        },
+        "error": "No se pudieron cargar los pagos pendientes"
       },
       "space": "Espacio",
       "owner": "Propietario",
@@ -878,7 +879,8 @@
         "endsAt": "Termina",
         "actions": "Acciones",
         "empty": "Aún no hay encuestas."
-      }
+      },
+      "viewResults": "Ver resultados"
     },
     "documents": {
       "title": "Documentos",

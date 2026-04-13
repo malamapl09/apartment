@@ -401,7 +401,8 @@
         "empty": {
           "title": "No pending payments",
           "description": "All payments have been processed"
-        }
+        },
+        "error": "Failed to load pending payments"
       },
       "space": "Space",
       "owner": "Owner",
@@ -878,7 +879,8 @@
         "endsAt": "Ends",
         "actions": "Actions",
         "empty": "No polls yet."
-      }
+      },
+      "viewResults": "View results"
     },
     "documents": {
       "title": "Documents",

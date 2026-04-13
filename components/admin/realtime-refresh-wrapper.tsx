@@ -24,7 +24,9 @@ export function RealtimeRefreshWrapper({
 }: RealtimeRefreshWrapperProps) {
   const router = useRouter();
   const { profile } = useUser();
-  const t = useTranslations("common.realtime");
+  // common.json's top-level keys are not namespaced under "common" — the
+  // actual path for this string is realtime.dataUpdated.
+  const t = useTranslations("realtime");
   const buildingId = profile?.building_id;
 
   const handleUpdate = useCallback(() => {
