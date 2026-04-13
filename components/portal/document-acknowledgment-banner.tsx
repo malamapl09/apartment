@@ -23,7 +23,6 @@ export default function DocumentAcknowledgmentBanner({
   if (pending.length === 0) return null;
 
   const { titlesShown, moreCount } = summarizePendingAcks(pending, 3);
-  const preview = pending.slice(0, titlesShown.length);
 
   return (
     <Alert
@@ -35,9 +34,9 @@ export default function DocumentAcknowledgmentBanner({
       <AlertDescription className="space-y-3">
         <p>{t("description")}</p>
         <ul className="space-y-1 text-sm list-disc pl-5">
-          {preview.map((doc) => (
-            <li key={doc.document_id}>
-              <span className="font-medium">{doc.title}</span>
+          {titlesShown.map((title, i) => (
+            <li key={pending[i].document_id}>
+              <span className="font-medium">{title}</span>
             </li>
           ))}
           {moreCount > 0 && (

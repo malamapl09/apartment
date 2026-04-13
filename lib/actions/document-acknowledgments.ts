@@ -18,11 +18,25 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
  * unique constraint — re-clicking returns success without duplicating the row.
  */
 export async function acknowledgeDocument(documentId: string) {
-  const { error: authError, supabase, user } = await getAuthProfileForModule(
-    "documents",
-  );
-  if (authError || !user) return { error: authError ?? "Unauthorized" };
+  const { error: authError, supabase, user, profile } =
+    await getAuthProfileForModule("documents");
+  if (authError || !user || !profile) return { error: authError ?? "Unauthorized" };
   if (!UUID_RE.test(documentId)) return { error: "Invalid document id" };
+
+  // Pre-check the document is in the caller's building, active, and actually
+  // requires acknowledgment. The tightened INSERT RLS policy enforces this at
+  // the DB level, but an app-layer check gives us a clean error message
+  // instead of a cryptic RLS violation.
+  const { data: doc, error: docError } = await supabase
+    .from("documents")
+    .select("id")
+    .eq("id", documentId)
+    .eq("building_id", profile.building_id)
+    .eq("is_active", true)
+    .eq("requires_acknowledgment", true)
+    .maybeSingle();
+  if (docError) return { error: docError.message };
+  if (!doc) return { error: "Document not found or does not require acknowledgment" };
 
   // upsert on (document_id, profile_id) — ignore conflicts so double-clicks are no-ops.
   const { error } = await supabase
@@ -82,12 +96,22 @@ export async function sendAcknowledgmentReminder(documentId: string) {
   if (authError || !profile) return { error: authError ?? "Unauthorized" };
   if (!UUID_RE.test(documentId)) return { error: "Invalid document id" };
 
+  // buildings(name) is a many-to-one FK join; PostgREST returns it as a single
+  // object (or null), not an array.
+  type DocRow = {
+    id: string;
+    title: string;
+    building_id: string;
+    requires_acknowledgment: boolean;
+    buildings: { name: string } | null;
+  };
+
   const { data: doc } = await supabase
     .from("documents")
     .select("id, title, building_id, requires_acknowledgment, buildings(name)")
     .eq("id", documentId)
     .eq("building_id", profile.building_id)
-    .single();
+    .single<DocRow>();
   if (!doc) return { error: "Document not found" };
   if (!doc.requires_acknowledgment) {
     return { error: "Document does not require acknowledgment" };
@@ -106,9 +130,7 @@ export async function sendAcknowledgmentReminder(documentId: string) {
     return { success: true, notified: 0 };
   }
 
-  const buildingsRel = (doc as { buildings?: unknown }).buildings;
-  const buildingRow = Array.isArray(buildingsRel) ? buildingsRel[0] : buildingsRel;
-  const buildingName = (buildingRow as { name?: string } | null)?.name ?? "";
+  const buildingName = doc.buildings?.name ?? "";
 
   await notifyAcknowledgmentRequired({
     recipientIds: pending.map((m) => m.profile_id),
@@ -175,19 +197,37 @@ export async function fireAckNotificationsForDocument(
   documentTitle: string,
   buildingId: string,
 ) {
-  const { data: building } = await supabase
+  const { data: building, error: buildingError } = await supabase
     .from("buildings")
     .select("name")
     .eq("id", buildingId)
     .single();
+  if (buildingError) {
+    console.error(
+      "[documents] could not resolve building name for ack notifications",
+      buildingId,
+      buildingError,
+    );
+  }
 
-  const { data: audience } = await supabase.rpc("document_audience", {
-    p_document_id: documentId,
-  });
+  const { data: audience, error: audienceError } = await supabase.rpc(
+    "document_audience",
+    { p_document_id: documentId },
+  );
+  if (audienceError) {
+    console.error(
+      "[documents] audience RPC failed, skipping notifications",
+      documentId,
+      audienceError,
+    );
+    return;
+  }
 
   const recipients = ((audience ?? []) as DocumentAudienceMember[])
     .filter((m) => !m.has_acked)
     .map((m) => m.profile_id);
+
+  if (recipients.length === 0) return;
 
   await notifyAcknowledgmentRequired({
     recipientIds: recipients,

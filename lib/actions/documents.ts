@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
 import { getAdminProfileForModule, getAuthProfileForModule } from "@/lib/actions/helpers";
 import { fireAckNotificationsForDocument } from "@/lib/actions/document-acknowledgments";
 import { z } from "zod";
@@ -174,6 +173,23 @@ export async function uploadNewVersion(documentId: string, formData: FormData) {
     .single();
 
   if (error || !inserted) return { error: error?.message ?? "Insert failed" };
+
+  // Deactivate the previous version so `getDocuments()` (which filters
+  // is_active = true) returns only the new row. If this fails the new
+  // version is still usable — log and continue; a retry would re-fire
+  // notifications, which is worse than two momentarily-active rows.
+  const { error: deactivateError } = await supabase
+    .from("documents")
+    .update({ is_active: false })
+    .eq("id", documentId)
+    .eq("building_id", profile.building_id);
+  if (deactivateError) {
+    console.error(
+      "[documents] failed to deactivate previous version",
+      documentId,
+      deactivateError,
+    );
+  }
 
   // A new version resets acknowledgments — previous-version acks don't carry
   // over since it's a new document row.

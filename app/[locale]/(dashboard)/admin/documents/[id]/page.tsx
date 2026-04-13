@@ -19,9 +19,12 @@ interface PageProps {
   params: Promise<{ locale: string; id: string }>;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default async function AdminDocumentDetailPage({ params }: PageProps) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  if (!UUID_RE.test(id)) notFound();
   await assertCurrentUserHasModule("documents");
   const t = await getTranslations("admin.documents");
 
