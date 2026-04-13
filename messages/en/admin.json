@@ -257,6 +257,11 @@
       "name": "Space Name",
       "capacity": "Capacity",
       "hourlyRate": "Hourly Rate",
+      "rateSuffix": {
+        "hourly": "/hr",
+        "flat_rate": " flat",
+        "per_day": "/day"
+      },
       "deposit": "Deposit Amount",
       "activitiesOnly": "Activities Only",
       "minAdvance": "Min Advance (hours)",
@@ -306,7 +311,22 @@
         "descriptionPlaceholder": "Describe the space, amenities, and features...",
         "capacityLabel": "Capacity (people) *",
         "pricing": "Pricing",
-        "hourlyRateLabel": "Hourly Rate ($) *",
+        "pricingTypeLabel": "Pricing Model *",
+        "pricingType": {
+          "hourly": "Per Hour",
+          "flat_rate": "Flat Rate",
+          "per_day": "Per Day"
+        },
+        "pricingTypeDescription": {
+          "hourly": "Charge based on the booking duration in hours.",
+          "flat_rate": "Charge a single flat fee regardless of duration.",
+          "per_day": "Charge per day of use (rounded up, minimum 1 day)."
+        },
+        "rateLabel": {
+          "hourly": "Hourly Rate ($) *",
+          "flat_rate": "Flat Rate ($) *",
+          "per_day": "Daily Rate ($) *"
+        },
         "depositLabel": "Deposit Amount ($)",
         "bookingRules": "Booking Rules",
         "minAdvanceLabel": "Minimum Advance Hours *",
@@ -314,6 +334,7 @@
         "maxAdvanceLabel": "Maximum Advance Days *",
         "maxAdvanceDescription": "How far in advance can bookings be made",
         "maxDurationLabel": "Maximum Duration (hours) *",
+        "maxDurationHintNonHourly": "Still applies to flat-rate and per-day pricing — raise it for all-day events.",
         "maxMonthlyLabel": "Max Monthly Bookings per Owner *",
         "gapMinutesLabel": "Gap Between Bookings (min) *",
         "gapMinutesDescription": "Cleanup/setup time between bookings",

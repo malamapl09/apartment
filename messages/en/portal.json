@@ -52,6 +52,11 @@
       "free": "Free",
       "free_of_charge": "Free of charge",
       "per_hour": "/hour",
+      "rateSuffix": {
+        "hourly": "/hour",
+        "flat_rate": " flat",
+        "per_day": "/day"
+      },
       "max_duration": "Max duration",
       "reserve": "Reserve This Space",
       "viewDetails": "View Details",
@@ -69,6 +74,11 @@
       "capacity": "Capacity",
       "people": "people",
       "hourly_rate": "Hourly Rate",
+      "rate_label": {
+        "hourly": "Hourly Rate",
+        "flat_rate": "Flat Rate",
+        "per_day": "Daily Rate"
+      },
       "free_of_charge": "Free of charge",
       "deposit": "Deposit",
       "max_duration": "Max Duration",
@@ -301,6 +311,11 @@
       },
       "cost_breakdown": "Cost Breakdown",
       "hourly_rate": "Hourly Rate",
+      "rate_label": {
+        "hourly": "Hourly Rate",
+        "flat_rate": "Flat Rate",
+        "per_day": "Daily Rate"
+      },
       "deposit": "Deposit",
       "total": "Total",
       "terms": {

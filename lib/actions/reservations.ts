@@ -8,7 +8,9 @@ import {
   validateBooking,
   type BookingErrorKey,
 } from "@/lib/reservations/validate-booking";
+import { calculateReservationPrice } from "@/lib/reservations/calculate-price";
 import { getAuthProfileForModule } from "@/lib/actions/helpers";
+import type { SpacePricingType } from "@/types";
 
 const createReservationSchema = z.object({
   space_id: z.string().uuid("Invalid space ID"),
@@ -164,9 +166,14 @@ export async function createReservation(data: {
     return { error: t(key, validation.errorParams) };
   }
 
-  // Calculate payment amount
-  const durationHours = (new Date(data.end_time).getTime() - new Date(data.start_time).getTime()) / (1000 * 60 * 60);
-  const paymentAmount = durationHours * space.hourly_rate + space.deposit_amount;
+  // Calculate payment amount based on the space's pricing type
+  const { total: paymentAmount } = calculateReservationPrice({
+    pricingType: (space.pricing_type ?? "hourly") as SpacePricingType,
+    rate: space.hourly_rate,
+    depositAmount: space.deposit_amount,
+    startTime: new Date(data.start_time),
+    endTime: new Date(data.end_time),
+  });
 
   // Generate reference code
   const { data: refCode } = await supabase.rpc("generate_reference_code");

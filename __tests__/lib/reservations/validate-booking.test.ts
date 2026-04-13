@@ -40,6 +40,7 @@ function makeSpace(overrides: Partial<PublicSpace> = {}): PublicSpace {
     description: null,
     capacity: 10,
     photos: [],
+    pricing_type: "hourly",
     hourly_rate: 0,
     deposit_amount: 0,
     allow_reservations: true,

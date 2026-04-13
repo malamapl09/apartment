@@ -1207,6 +1207,7 @@ export type Database = {
           min_advance_hours: number | null
           name: string
           photos: string[] | null
+          pricing_type: string
           updated_at: string | null
         }
         Insert: {
@@ -1230,6 +1231,7 @@ export type Database = {
           min_advance_hours?: number | null
           name: string
           photos?: string[] | null
+          pricing_type?: string
           updated_at?: string | null
         }
         Update: {
@@ -1253,6 +1255,7 @@ export type Database = {
           min_advance_hours?: number | null
           name?: string
           photos?: string[] | null
+          pricing_type?: string
           updated_at?: string | null
         }
         Relationships: [
@@ -2049,3 +2052,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

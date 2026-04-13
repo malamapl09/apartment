@@ -52,6 +52,11 @@
       "free": "Gratis",
       "free_of_charge": "Sin costo",
       "per_hour": "/hora",
+      "rateSuffix": {
+        "hourly": "/hora",
+        "flat_rate": " fijo",
+        "per_day": "/día"
+      },
       "max_duration": "Duración máxima",
       "reserve": "Reservar Este Espacio",
       "viewDetails": "Ver Detalles",
@@ -69,6 +74,11 @@
       "capacity": "Capacidad",
       "people": "personas",
       "hourly_rate": "Tarifa por Hora",
+      "rate_label": {
+        "hourly": "Tarifa por Hora",
+        "flat_rate": "Tarifa Fija",
+        "per_day": "Tarifa Diaria"
+      },
       "free_of_charge": "Sin costo",
       "deposit": "Depósito",
       "max_duration": "Duración Máxima",
@@ -301,6 +311,11 @@
       },
       "cost_breakdown": "Desglose de Costos",
       "hourly_rate": "Tarifa por Hora",
+      "rate_label": {
+        "hourly": "Tarifa por Hora",
+        "flat_rate": "Tarifa Fija",
+        "per_day": "Tarifa Diaria"
+      },
       "deposit": "Depósito",
       "total": "Total",
       "terms": {

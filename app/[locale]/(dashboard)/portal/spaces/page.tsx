@@ -89,13 +89,13 @@ export default async function SpacesPage({
                       </span>
                     </div>
 
-                    {/* Hourly Rate */}
+                    {/* Rate */}
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-muted-foreground" />
                       <span>
                         {isFree
                           ? t("free_of_charge")
-                          : `${formatCurrency(space.hourly_rate, "USD")} ${t("per_hour")}`}
+                          : `${formatCurrency(space.hourly_rate, "USD")} ${t(`rateSuffix.${space.pricing_type ?? "hourly"}`)}`}
                       </span>
                     </div>
 

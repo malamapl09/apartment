@@ -66,7 +66,10 @@ export default function SpaceCard({ space, locale }: SpaceCardProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <span>${space.hourly_rate}/hr</span>
+              <span>
+                ${space.hourly_rate}
+                {t(`rateSuffix.${space.pricing_type ?? "hourly"}`)}
+              </span>
             </div>
           </div>
         </CardContent>

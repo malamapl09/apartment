@@ -2,12 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PublicSpace } from "@/types";
+import { PublicSpace, SpacePricingType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -30,6 +37,9 @@ export default function SpaceForm({
   const [allowReservations, setAllowReservations] = useState(
     initialData?.allow_reservations ?? true
   );
+  const [pricingType, setPricingType] = useState<SpacePricingType>(
+    initialData?.pricing_type ?? "hourly"
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,6 +47,7 @@ export default function SpaceForm({
 
     const formData = new FormData(e.currentTarget);
     formData.set("allow_reservations", allowReservations.toString());
+    formData.set("pricing_type", pricingType);
 
     try {
       const result = await onSubmit(formData);
@@ -105,9 +116,37 @@ export default function SpaceForm({
           <CardTitle>{t("pricing")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="pricing_type">{t("pricingTypeLabel")}</Label>
+            <Select
+              value={pricingType}
+              onValueChange={(v) => setPricingType(v as SpacePricingType)}
+            >
+              <SelectTrigger id="pricing_type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hourly">
+                  {t("pricingType.hourly")}
+                </SelectItem>
+                <SelectItem value="flat_rate">
+                  {t("pricingType.flat_rate")}
+                </SelectItem>
+                <SelectItem value="per_day">
+                  {t("pricingType.per_day")}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
+              {t(`pricingTypeDescription.${pricingType}`)}
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="hourly_rate">{t("hourlyRateLabel")}</Label>
+              <Label htmlFor="hourly_rate">
+                {t(`rateLabel.${pricingType}`)}
+              </Label>
               <Input
                 id="hourly_rate"
                 name="hourly_rate"
@@ -185,6 +224,11 @@ export default function SpaceForm({
                 defaultValue={initialData?.max_duration_hours ?? 4}
                 required
               />
+              {pricingType !== "hourly" && (
+                <p className="text-sm text-muted-foreground">
+                  {t("maxDurationHintNonHourly")}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

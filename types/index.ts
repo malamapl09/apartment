@@ -12,6 +12,8 @@ export type ReservationStatus =
 
 export type SpaceActivityStatus = "active" | "cancelled";
 
+export type SpacePricingType = "hourly" | "flat_rate" | "per_day";
+
 export type AnnouncementTarget = "all" | "owners" | "residents";
 
 export const ALL_MODULES = [
@@ -98,6 +100,7 @@ export interface PublicSpace {
   description: string | null;
   capacity: number | null;
   photos: string[];
+  pricing_type: SpacePricingType;
   hourly_rate: number;
   deposit_amount: number;
   allow_reservations: boolean;

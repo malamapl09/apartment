@@ -160,7 +160,9 @@ export default async function SpaceDetailPage({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{t("hourly_rate")}</span>
+                <span className="text-sm font-medium">
+                  {t(`rate_label.${space.pricing_type ?? "hourly"}`)}
+                </span>
               </div>
               <span className="text-sm font-semibold">
                 {isFree

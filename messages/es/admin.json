@@ -257,6 +257,11 @@
       "name": "Nombre del Espacio",
       "capacity": "Capacidad",
       "hourlyRate": "Tarifa por Hora",
+      "rateSuffix": {
+        "hourly": "/hr",
+        "flat_rate": " fijo",
+        "per_day": "/día"
+      },
       "deposit": "Monto del Depósito",
       "activitiesOnly": "Solo Actividades",
       "minAdvance": "Anticipación Mínima (horas)",
@@ -306,7 +311,22 @@
         "descriptionPlaceholder": "Describe el espacio, comodidades y características...",
         "capacityLabel": "Capacidad (personas) *",
         "pricing": "Precios",
-        "hourlyRateLabel": "Tarifa por Hora ($) *",
+        "pricingTypeLabel": "Modelo de Tarifa *",
+        "pricingType": {
+          "hourly": "Por Hora",
+          "flat_rate": "Tarifa Fija",
+          "per_day": "Por Día"
+        },
+        "pricingTypeDescription": {
+          "hourly": "Cobrar según la duración de la reserva en horas.",
+          "flat_rate": "Cobrar una tarifa única sin importar la duración.",
+          "per_day": "Cobrar por día de uso (redondeado hacia arriba, mínimo 1 día)."
+        },
+        "rateLabel": {
+          "hourly": "Tarifa por Hora ($) *",
+          "flat_rate": "Tarifa Fija ($) *",
+          "per_day": "Tarifa Diaria ($) *"
+        },
         "depositLabel": "Monto del Depósito ($)",
         "bookingRules": "Reglas de Reservación",
         "minAdvanceLabel": "Horas Mínimas de Anticipación *",
@@ -314,6 +334,7 @@
         "maxAdvanceLabel": "Días Máximos de Anticipación *",
         "maxAdvanceDescription": "Con cuánta anticipación se pueden hacer las reservaciones",
         "maxDurationLabel": "Duración Máxima (horas) *",
+        "maxDurationHintNonHourly": "Aplica también para tarifas fijas y por día — súbelo para eventos de día completo.",
         "maxMonthlyLabel": "Máximo de Reservaciones Mensuales por Propietario *",
         "gapMinutesLabel": "Tiempo entre Reservaciones (min) *",
         "gapMinutesDescription": "Tiempo de limpieza/preparación entre reservaciones",

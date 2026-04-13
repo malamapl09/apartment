@@ -17,6 +17,7 @@ import ReservationCalendar from "./reservation-calendar";
 import TimeSlotPicker from "./time-slot-picker";
 import ActivityForm from "./activity-form";
 import { createReservation } from "@/lib/actions/reservations";
+import { calculateReservationPrice } from "@/lib/reservations/calculate-price";
 import { formatDate, formatCurrency } from "@/lib/utils/date";
 
 interface BankInfo {
@@ -63,21 +64,30 @@ export default function BookingFlow({
     ? schedules.find((s) => s.day_of_week === selectedDate.getDay())
     : undefined;
 
-  // Calculate duration and cost
-  const calculateCost = () => {
-    if (!startTime || !endTime || space.hourly_rate === 0) return 0;
+  // Calculate duration and cost — mirror the server-side math so the resident
+  // sees exactly what they'll be charged.
+  const pricingType = space.pricing_type ?? "hourly";
+  const priceBreakdown =
+    !startTime || !endTime || space.hourly_rate === 0 || !selectedDate
+      ? null
+      : (() => {
+          const [startHour, startMin] = startTime.split(":").map(Number);
+          const [endHour, endMin] = endTime.split(":").map(Number);
+          const start = new Date(selectedDate);
+          start.setHours(startHour, startMin, 0, 0);
+          const end = new Date(selectedDate);
+          end.setHours(endHour, endMin, 0, 0);
+          return calculateReservationPrice({
+            pricingType,
+            rate: space.hourly_rate,
+            depositAmount: space.deposit_amount,
+            startTime: start,
+            endTime: end,
+          });
+        })();
 
-    const [startHour, startMin] = startTime.split(":").map(Number);
-    const [endHour, endMin] = endTime.split(":").map(Number);
-
-    const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
-    const durationHours = durationMinutes / 60;
-
-    return durationHours * space.hourly_rate;
-  };
-
-  const cost = calculateCost();
-  const total = cost + (space.deposit_amount || 0);
+  const cost = priceBreakdown?.rateTotal ?? 0;
+  const total = priceBreakdown?.total ?? space.deposit_amount ?? 0;
 
   // Handle date selection
   const handleDateSelect = (date: Date | undefined) => {
@@ -335,7 +345,9 @@ export default function BookingFlow({
 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">{t("hourly_rate")}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t(`rate_label.${pricingType}`)}
+                    </span>
                     <span className="text-sm font-medium">{formatCurrency(cost, locale)}</span>
                   </div>
 
